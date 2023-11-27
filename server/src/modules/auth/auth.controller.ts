@@ -76,6 +76,7 @@ export class AuthController {
   @UseGuards(FacebookAuthGuard)
   async facebookLogin(@Request() req, @Res() res: Response): Promise<any> {
     const { user } = req;
+    // console.log(user);
     return res.redirect(`http://localhost:3000/auth/oauth-redirect?id=${user.id}&email=${user.email}&firstName=${user.firstName}&lastName=${user.lastName}&picture=${user.picture}&accessToken=${user.accessToken}`);
   }
 
