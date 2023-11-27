@@ -6,10 +6,10 @@ import { BrowserRouter } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-    <BrowserRouter>
-        <AuthProvider>
-            <App />
-            <ToastContainer />
-        </AuthProvider>
-    </BrowserRouter>
+  <BrowserRouter>
+    <AuthProvider>
+      <App />
+      <ToastContainer />
+    </AuthProvider>
+  </BrowserRouter>
 );

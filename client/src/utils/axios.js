@@ -1,7 +1,10 @@
 import axios from "axios";
 const getToken = () => JSON.parse(localStorage.getItem("token"));
+
+export const baseURL =
+  "https://0176-2402-800-63a8-ea84-8902-a67c-dd92-65d1.ngrok-free.app";
 export const axiosInstance = axios.create({
-  baseURL: "https://e8bd-115-74-164-116.ngrok-free.app",
+  baseURL: baseURL,
   timeout: 10000,
   headers: {
     Authorization: `Bearer ${getToken()}`,

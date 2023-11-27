@@ -13,7 +13,7 @@ import Shop from "./pages/Shop/Shop";
 import Stats from "./pages/Stats/Stats";
 import "./styles/app.sass";
 import AuthLayout from "./layouts/Auth/AuthLayout";
-import GoogleRedirect from "./pages/OAuthRedirect/GoogleRedirect";
+import OAuthRedirect from "./pages/OAuthRedirect/OAuthRedirect";
 function App() {
   return (
     <div className="App">
@@ -24,7 +24,7 @@ function App() {
           <Route path="sign-in" element={<SignIn />} />
           <Route path="reset-password" element={<ResetPassword />} />
           <Route path="forgot-password" element={<ForgotPassword />} />
-          <Route path="oauth-redirect" element={<GoogleRedirect />} />
+          <Route path="oauth-redirect" element={<OAuthRedirect />} />
         </Route>
         <Route path="/dashboard" element={<ProtectedLayout />}>
           <Route index element={<Home />} />

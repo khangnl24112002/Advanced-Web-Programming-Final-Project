@@ -1,4 +1,4 @@
-import { axiosInstance } from "../utils/axios";
+import { axiosInstance, baseURL } from "../utils/axios";
 
 export const authServices = {
   login: async (userAccount) => {
@@ -23,15 +23,9 @@ export const authServices = {
     console.log(provider);
     try {
       if (provider === "Google") {
-        window.open(
-          "https://e8bd-115-74-164-116.ngrok-free.app/auth/google",
-          "_self"
-        );
+        window.open(`${baseURL}/auth/google`, "_self");
       } else if (provider === "Facebook") {
-        window.open(
-          "https://e8bd-115-74-164-116.ngrok-free.app/auth/facebook",
-          "_self"
-        );
+        window.open(`${baseURL}/auth/facebook`, "_self");
       }
     } catch (error) {}
   },

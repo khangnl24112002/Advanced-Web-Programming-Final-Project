@@ -8,7 +8,6 @@ import { useAuth } from "../../hooks/useAuth";
 import { EMAIL_REGEX } from "../../constants";
 import { authServices } from "../../services/AuthServices";
 import { errorToast } from "../../utils/toast";
-import Image from "../../components/Image";
 
 const SignIn = () => {
   const initalState = {

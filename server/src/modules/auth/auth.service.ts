@@ -26,7 +26,7 @@ export class AuthService {
         email,
       },
     });
-    if (user.emailVerified) {
+    if (user?.emailVerified) {
       throw new HttpException({
         status: false,
         message: "Tài khoản đã tồn tại"
