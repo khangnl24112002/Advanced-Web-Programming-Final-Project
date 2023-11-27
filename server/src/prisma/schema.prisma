@@ -20,6 +20,8 @@ model users {
   gender            String?
   roleId            Int?      @map(name: "role_id")
   address           String?
+  emailVerifiedAt   DateTime? @map(name: "email_verified_at")
+  emailVerified     Boolean?  @default(false) @map(name: "email_verified")
   status            Boolean?
   isDisabled        Boolean   @default(false) @map(name: "is_disabled")
   isDeleted         Boolean   @default(false) @map(name: "is_deleted")

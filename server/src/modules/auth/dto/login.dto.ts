@@ -32,8 +32,8 @@ export class LoginReponse {
     nullable: true,
   })
   data: {
-    user: IUser;
-    token: string;
+    user: IUser,
+    token: string,
   };
   @ApiProperty({ example: 'Đăng nhập thành công', nullable: true })
   message: { [key: string]: any };
@@ -55,8 +55,8 @@ export class AccountCreateReponse {
     nullable: true,
   })
   data: {
-    user: IUser;
-    token: string;
+    user: IUser,
+    token: string,
   };
   @ApiProperty({ example: 'Đăng ký thành công', nullable: true })
   message: { [key: string]: any };
