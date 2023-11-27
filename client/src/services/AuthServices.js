@@ -1,4 +1,4 @@
-import { axiosInstance } from "../utils/axios";
+import { axiosInstance, baseURL } from "../utils/axios";
 
 export const authServices = {
   login: async (userAccount) => {
@@ -18,5 +18,15 @@ export const authServices = {
       console.log(error.response.data);
       return error.response.data;
     }
+  },
+  handleOAuthLogin: async (provider) => {
+    console.log(provider);
+    try {
+      if (provider === "Google") {
+        window.open(`${baseURL}/auth/google`, "_self");
+      } else if (provider === "Facebook") {
+        window.open(`${baseURL}/auth/facebook`, "_self");
+      }
+    } catch (error) {}
   },
 };

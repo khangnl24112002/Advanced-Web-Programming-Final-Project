@@ -13,32 +13,31 @@ import Shop from "./pages/Shop/Shop";
 import Stats from "./pages/Stats/Stats";
 import "./styles/app.sass";
 import AuthLayout from "./layouts/Auth/AuthLayout";
+import OAuthRedirect from "./pages/OAuthRedirect/OAuthRedirect";
 function App() {
-    return (
-        <div className="App">
-            <Routes>
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/auth" element={<AuthLayout />}>
-                    <Route path="sign-up" element={<SignUp />} />
-                    <Route path="sign-in" element={<SignIn />} />
-                    <Route path="reset-password" element={<ResetPassword />} />
-                    <Route
-                        path="forgot-password"
-                        element={<ForgotPassword />}
-                    />
-                </Route>
-                <Route path="/dashboard" element={<ProtectedLayout />}>
-                    <Route index element={<Home />} />
-                    <Route path="settings" element={<Settings />} />
-                    <Route path="shop" element={<Shop />} />
-                    <Route path="profile" element={<Profile />} />
-                    <Route path="stats" element={<Stats />} />
-                    {/* Handle other routes */}
-                </Route>
-                <Route path="*" element={<NotFound />} />
-            </Routes>
-        </div>
-    );
+  return (
+    <div className="App">
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/auth" element={<AuthLayout />}>
+          <Route path="sign-up" element={<SignUp />} />
+          <Route path="sign-in" element={<SignIn />} />
+          <Route path="reset-password" element={<ResetPassword />} />
+          <Route path="forgot-password" element={<ForgotPassword />} />
+          <Route path="oauth-redirect" element={<OAuthRedirect />} />
+        </Route>
+        <Route path="/dashboard" element={<ProtectedLayout />}>
+          <Route index element={<Home />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="shop" element={<Shop />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="stats" element={<Stats />} />
+          {/* Handle other routes */}
+        </Route>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </div>
+  );
 }
 
 export default App;
