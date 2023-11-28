@@ -21,7 +21,7 @@ import { SendgridService } from '../mail/mail.service';
 import { MAIL_TEMPLATE_ID, comparePassword } from 'src/utils';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ResetPasswordDto, createNewPasswordDto } from './dto/reset-password.dto';
 import { Response } from 'express';
 
 
@@ -188,11 +188,40 @@ export class AuthController {
     const isValidPassword = await comparePassword(oldPassword, encryptedPassword);
     if (!isValidPassword) {
       throw new HttpException({
-        status: false, 
+        status: false,
         daa: null,
         message: 'Mật khẩu bạn đã nhập không chính xác.',
       }, HttpStatus.BAD_REQUEST)
 
+    }
+    const updatePassword = await this.authService.updatePassword(user.id, newPassword);
+    if (!updatePassword) {
+      throw new HttpException(
+        {
+          message: 'Cập nhật mật khẩu thất bại',
+          data: null,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return {
+      status: true,
+      message: 'Cập nhật mật khẩu thành công',
+    }
+  }
+
+  @Post('create-new-password')
+  async createNewPassword(@Body() body: createNewPasswordDto, @Query('email') email: string) {
+    const { newPassword } = body;
+    const user = await this.authService.findUserVerifyEmail(email);
+    if (!user) {
+      throw new HttpException(
+        {
+          message: 'Email không tồn tại',
+          data: null,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
     const updatePassword = await this.authService.updatePassword(user.id, newPassword);
     if (!updatePassword) {
