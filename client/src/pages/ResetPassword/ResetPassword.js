@@ -7,6 +7,7 @@ import TextInput from "../../components/TextInput";
 import { useAuth } from "../../hooks/useAuth";
 import { authServices } from "../../services/AuthServices";
 import { errorToast } from "../../utils/toast";
+import { jwtDecode } from "jwt-decode";
 
 const ResetPassword = () => {
     const initalState = {
@@ -16,7 +17,8 @@ const ResetPassword = () => {
     const [userAccount, setUserAccount] = useState(initalState);
     // const { login } = useAuth();
     const token = getTokenFromURL();
-    console.log(token);
+    const decoded = jwtDecode(token);
+    console.log(decoded);
     const handleSubmit = async (event) => {
         event.preventDefault();
         // const isValidData = validateData(userAccount);
