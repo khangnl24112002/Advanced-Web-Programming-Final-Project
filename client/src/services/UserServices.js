@@ -34,4 +34,15 @@ export const userServices = {
             return error.response.data;
         }
     },
+    sendVerificationToEmail: async (email) => {
+        try {
+            const response = await axiosInstance.get(
+                `/auth/forgot-password?email=${email}`
+            );
+            return response;
+        } catch (error) {
+            console.log(error);
+            return error.response;
+        }
+    },
 };

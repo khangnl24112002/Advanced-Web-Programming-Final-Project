@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import TextInput from "../../components/TextInput";
 import { EMAIL_REGEX } from "../../constants";
 import { errorToast, successToast } from "../../utils/toast";
+import { userServices } from "../../services/UserServices";
 
 const ForgotPassword = () => {
     const initalState = {
@@ -16,16 +17,17 @@ const ForgotPassword = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         console.log(userAccount);
-        return successToast("Đã gửi mã xác nhận tới email của bạn");
-        // const isValidData = validateData(userAccount);
-        // if (isValidData === 1) {
-        //     const response = await authServices.login(userAccount);
-        //     if (response.status === true) {
-        //         login(response.data.user, response.data.token);
-        //     } else {
-        //         return errorToast(response.message);
-        //     }
-        // }
+        const isValidData = validateData(userAccount);
+        if (isValidData === 1) {
+            const response = await userServices.sendVerificationToEmail(
+                userAccount.email
+            );
+            if (response.status === true) {
+                return successToast(response.message);
+            } else {
+                return errorToast(response.message);
+            }
+        }
     };
 
     const handleChange = (event) => {
