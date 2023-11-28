@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import cn from "classnames";
 import styles from "./ResetPassword.module.sass";
 import { use100vh } from "react-div-100vh";
-import { Link } from "react-router-dom";
+import { getTokenFromURL } from "../../utils/getTokenFromURL";
 import TextInput from "../../components/TextInput";
 import { useAuth } from "../../hooks/useAuth";
 import { authServices } from "../../services/AuthServices";
@@ -15,18 +15,19 @@ const ResetPassword = () => {
     };
     const [userAccount, setUserAccount] = useState(initalState);
     const { login } = useAuth();
-
+    const token = getTokenFromURL();
+    console.log(token);
     const handleSubmit = async (event) => {
         event.preventDefault();
-        // const isValidData = validateData(userAccount);
-        // if (isValidData === 1) {
-        //     const response = await authServices.login(userAccount);
-        //     if (response.status === true) {
-        //         login(response.data.user, response.data.token);
-        //     } else {
-        //         return errorToast(response.message);
-        //     }
-        // }
+        const isValidData = validateData(userAccount);
+        if (isValidData === 1) {
+            const response = await authServices.login(userAccount);
+            if (response.status === true) {
+                login(response.data.user, response.data.token);
+            } else {
+                return errorToast(response.message);
+            }
+        }
     };
 
     const handleChange = (event) => {
