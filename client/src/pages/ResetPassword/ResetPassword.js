@@ -14,20 +14,20 @@ const ResetPassword = () => {
         confirmedPassword: "",
     };
     const [userAccount, setUserAccount] = useState(initalState);
-    const { login } = useAuth();
+    // const { login } = useAuth();
     const token = getTokenFromURL();
     console.log(token);
     const handleSubmit = async (event) => {
         event.preventDefault();
-        const isValidData = validateData(userAccount);
-        if (isValidData === 1) {
-            const response = await authServices.login(userAccount);
-            if (response.status === true) {
-                login(response.data.user, response.data.token);
-            } else {
-                return errorToast(response.message);
-            }
-        }
+        // const isValidData = validateData(userAccount);
+        // if (isValidData === 1) {
+        //     const response = await authServices.login(userAccount);
+        //     if (response.status === true) {
+        //         login(response.data.user, response.data.token);
+        //     } else {
+        //         return errorToast(response.message);
+        //     }
+        // }
     };
 
     const handleChange = (event) => {

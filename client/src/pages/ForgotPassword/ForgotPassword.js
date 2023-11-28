@@ -16,12 +16,12 @@ const ForgotPassword = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        console.log(userAccount);
         const isValidData = validateData(userAccount);
         if (isValidData === 1) {
             const response = await userServices.sendVerificationToEmail(
                 userAccount.email
             );
+            console.log(response);
             if (response.status === true) {
                 return successToast(response.message);
             } else {

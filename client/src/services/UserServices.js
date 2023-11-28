@@ -39,10 +39,10 @@ export const userServices = {
             const response = await axiosInstance.get(
                 `/auth/forgot-password?email=${email}`
             );
-            return response;
+            return response.data;
         } catch (error) {
             console.log(error);
-            return error.response;
+            return error.response.data;
         }
     },
 };
