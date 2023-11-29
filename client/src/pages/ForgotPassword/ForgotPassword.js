@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import TextInput from "../../components/TextInput";
 import { EMAIL_REGEX } from "../../constants";
 import { errorToast, successToast } from "../../utils/toast";
-import { userServices } from "../../services/UserServices";
+import { authServices } from "../../services/AuthServices";
 
 const ForgotPassword = () => {
     const initalState = {
@@ -18,7 +18,7 @@ const ForgotPassword = () => {
         event.preventDefault();
         const isValidData = validateData(userAccount);
         if (isValidData === 1) {
-            const response = await userServices.sendVerificationToEmail(
+            const response = await authServices.sendVerificationToEmail(
                 userAccount.email
             );
             console.log(response);
