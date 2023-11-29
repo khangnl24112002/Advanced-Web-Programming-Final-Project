@@ -6,6 +6,7 @@ export const CORS: CorsOptions = {
     'https://advanced-web-programming-midterm.vercel.app',
     'https://advanced-web-programming-midterm-6f92.vercel.app',
     'https://advanced-web-programming-midterm-6iiv.vercel.app',
+    'https://advanced-web-programming-final-project.vercel.app',
   ],
   credentials: true,
   exposedHeaders: 'uuid',

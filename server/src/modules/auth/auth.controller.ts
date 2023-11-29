@@ -43,7 +43,7 @@ export class AuthController {
 
     const { token } = await this.authService.signUpByEmail(body);
     const dynamic_template_data = {
-      link: `http://localhost:3333/auth/verify?token=${token}`,
+      link: `${process.env.BACKEND_URL}/auth/verify?token=${token}`,
     };
     const msg = this.mailService.messageSignUpGenerate(
       [body.email as string],
@@ -69,14 +69,14 @@ export class AuthController {
   @UseGuards(GoogleOAuthGuard)
   async googleAuthRedirect(@Request() req, @Res() res: Response) {
     const { user } = req;
-    return res.redirect(`http://localhost:3000/auth/oauth-redirect?id=${user.id}&email=${user.email}&firstName=${user.firstName}&lastName=${user.lastName}&picture=${user.picture}&accessToken=${user.accessToken}`);
+    return res.redirect(`${process.env.FRONTEND_URL}/auth/oauth-redirect?id=${user.id}&email=${user.email}&firstName=${user.firstName}&lastName=${user.lastName}&picture=${user.picture}&accessToken=${user.accessToken}`);
   }
 
   @Get("facebook-redirect")
   @UseGuards(FacebookAuthGuard)
   async facebookLogin(@Request() req, @Res() res: Response): Promise<any> {
     const { user } = req;
-    return res.redirect(`http://localhost:3000/auth/oauth-redirect?id=${user.id}&email=${user.email}&firstName=${user.firstName}&lastName=${user.lastName}&picture=${user.picture}&accessToken=${user.accessToken}`);
+    return res.redirect(`${process.env.FRONTEND_URL}/auth/oauth-redirect?id=${user.id}&email=${user.email}&firstName=${user.firstName}&lastName=${user.lastName}&picture=${user.picture}&accessToken=${user.accessToken}`);
   }
 
   @Get("facebook")
@@ -125,7 +125,7 @@ export class AuthController {
       );
     }
     const verifyUser = await this.authService.verifyUser(decoded.id);
-    return { name: verifyUser.firstName, link: "http://localhost:3000/auth/google" };
+    return { name: verifyUser.firstName, link: `${process.env.FRONTEND_URL}/auth/sign-in` };
   }
 
   @Get('forgot-password')
@@ -157,7 +157,7 @@ export class AuthController {
       id: user.id,
     });
     const dynamic_template_data = {
-      link: `http://localhost:3000/auth/reset-password?token=${token}`,
+      link: `${process.env.FRONTEND_URL}/auth/reset-password?token=${token}`,
     };
     const msg = this.mailService.messageSignUpGenerate(
       [email],
