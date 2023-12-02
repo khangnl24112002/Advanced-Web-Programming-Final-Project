@@ -32,12 +32,13 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     if (!existUser) {
       const password = Math.random().toString(36).slice(-8);
       // create new user
-      existUser = await this.authService.signUpByEmail({
+      const response = await this.authService.signUpByEmail({
         ...user,
         provider,
         password,
         emailVerified: true,
       });
+      existUser = response.user;
     }
     const access_token = await this.authService.generateAccessToken({ id: existUser.id, email: existUser.email });
     done(null, {
