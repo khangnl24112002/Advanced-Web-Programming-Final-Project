@@ -16,10 +16,8 @@ const ResetPassword = () => {
         confirmedPassword: "",
     };
     const [userAccount, setUserAccount] = useState(initalState);
-    // const { login } = useAuth();
     const token = getTokenFromURL();
     const decoded = jwtDecode(token);
-
     const handleSubmit = async (event) => {
         event.preventDefault();
         const isValidData = validateData(userAccount);
@@ -34,7 +32,7 @@ const ResetPassword = () => {
                 }, 3000);
                 return successToast(
                     response.message +
-                        "\nYou will be redirected to login page after 3 seconds"
+                        "\nBạn sẽ được trả về trang đăng nhập sau 3 giây"
                 );
             } else {
                 return errorToast(response.message);
