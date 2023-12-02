@@ -75,6 +75,7 @@ export class AuthService {
     const ex_user = await this.prismaService.users.findFirst({
       where: {
         email,
+        emailVerified: true,
       },
     });
     if (!ex_user) {
