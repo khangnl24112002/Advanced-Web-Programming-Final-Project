@@ -38,6 +38,7 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
         ...user,
         provider,
         password,
+        emailVerified: true,
       });
     }
     const token = await this.authService.generateAccessToken({

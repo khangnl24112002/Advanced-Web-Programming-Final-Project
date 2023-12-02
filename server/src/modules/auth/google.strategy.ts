@@ -36,6 +36,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         ...user,
         provider,
         password,
+        emailVerified: true,
       });
     }
     const access_token = await this.authService.generateAccessToken({ id: existUser.id, email: existUser.email });
