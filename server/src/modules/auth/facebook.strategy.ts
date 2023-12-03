@@ -12,7 +12,7 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
       clientSecret: process.env.APP_FB_SECRET,
       callbackURL: `${process.env.BACKEND_URL}/auth/facebook-redirect`,
       scope: 'email',
-      profileFields: ['emails', 'name'],
+      profileFields: ['emails', 'name', 'photos'],
     });
   }
 
@@ -22,12 +22,12 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
     profile: Profile,
     done: (err: any, user: any, info?: any) => void,
   ): Promise<any> {
-    console.log("Profile", profile)
-    const { name, emails } = profile;
+    const { name, emails, id} = profile;
     const user = {
       email: emails[0].value,
       firstName: name.givenName,
       lastName: name.familyName,
+      picture: `https://graph.facebook.com/${id}/picture?type=large`
     };
     const provider = 'facebook';
     let existUser: any = await this.authService.findUserByEmail(user.email);
