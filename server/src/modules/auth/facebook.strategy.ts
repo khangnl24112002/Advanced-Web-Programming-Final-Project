@@ -10,7 +10,7 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
     super({
       clientID: process.env.APP_FB_ID,
       clientSecret: process.env.APP_FB_SECRET,
-      callbackURL: 'http://localhost:3333/auth/facebook-redirect',
+      callbackURL: `${process.env.BACKEND_URL}/auth/facebook-redirect`,
       scope: 'email',
       profileFields: ['emails', 'name', 'photos'],
     });
@@ -34,11 +34,13 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
     if (!existUser) {
       const password = Math.random().toString(36).slice(-8);
       // create new user
-      existUser = await this.authService.signUpByEmail({
+      const response = await this.authService.signUpByEmail({
         ...user,
         provider,
         password,
+        emailVerified: true,
       });
+      existUser = response.user;
     }
     const token = await this.authService.generateAccessToken({
       id: existUser.id,

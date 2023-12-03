@@ -2,31 +2,42 @@ import React, { useState } from "react";
 import cn from "classnames";
 import styles from "./ResetPassword.module.sass";
 import { use100vh } from "react-div-100vh";
-import { Link } from "react-router-dom";
+import { getTokenFromURL } from "../../utils/getTokenFromURL";
 import TextInput from "../../components/TextInput";
-import { useAuth } from "../../hooks/useAuth";
 import { authServices } from "../../services/AuthServices";
-import { errorToast } from "../../utils/toast";
+import { errorToast, successToast } from "../../utils/toast";
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 const ResetPassword = () => {
+    const navigation = useNavigate();
     const initalState = {
-        password: "",
+        newPassword: "",
         confirmedPassword: "",
     };
     const [userAccount, setUserAccount] = useState(initalState);
-    const { login } = useAuth();
-
+    const token = getTokenFromURL();
+    const decoded = jwtDecode(token);
     const handleSubmit = async (event) => {
         event.preventDefault();
-        // const isValidData = validateData(userAccount);
-        // if (isValidData === 1) {
-        //     const response = await authServices.login(userAccount);
-        //     if (response.status === true) {
-        //         login(response.data.user, response.data.token);
-        //     } else {
-        //         return errorToast(response.message);
-        //     }
-        // }
+        const isValidData = validateData(userAccount);
+        if (isValidData === 1) {
+            const response = await authServices.createNewPassword(
+                userAccount,
+                decoded.email
+            );
+            if (response.status === true) {
+                setTimeout(() => {
+                    navigation("/auth/sign-in");
+                }, 3000);
+                return successToast(
+                    response.message +
+                        "\nBạn sẽ được trả về trang đăng nhập sau 3 giây"
+                );
+            } else {
+                return errorToast(response.message);
+            }
+        }
     };
 
     const handleChange = (event) => {
@@ -39,7 +50,7 @@ const ResetPassword = () => {
 
     const validateData = (userAccount) => {
         let result = 1;
-        if (userAccount.password === "") {
+        if (userAccount.newPassword === "") {
             return errorToast("Mật khẩu không được để trống");
         }
 
@@ -62,7 +73,7 @@ const ResetPassword = () => {
                     <div className={styles.body}>
                         <TextInput
                             className={styles.field}
-                            name="password"
+                            name="newPassword"
                             type="password"
                             placeholder="Mật khẩu"
                             required

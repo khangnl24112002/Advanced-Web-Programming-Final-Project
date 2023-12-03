@@ -18,7 +18,7 @@ export class AuthService {
     });
   }
   async signUpByEmail(createUserDTO: any) {
-    const { firstName, lastName, email, password, role } = createUserDTO;
+    const { firstName, lastName, email, password, role, emailVerified } = createUserDTO;
     const roleId: number = ROLES[role?.toUpperCase() || 'USER'] as unknown as number
     const encryptedPassword = await hashPassword(password);
     let user = await this.prismaService.users.findFirst({
@@ -51,7 +51,8 @@ export class AuthService {
           lastName,
           email,
           encryptedPassword,
-          roleId
+          roleId,
+          emailVerified: emailVerified || false,
         },
       });
     }
@@ -75,6 +76,7 @@ export class AuthService {
     const ex_user = await this.prismaService.users.findFirst({
       where: {
         email,
+        emailVerified: true,
       },
     });
     if (!ex_user) {

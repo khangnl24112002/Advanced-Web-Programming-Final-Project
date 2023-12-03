@@ -18,3 +18,12 @@ export class ResetPasswordDto {
   @IsEmail()
   email: string;
 }
+
+export class createNewPasswordDto {
+  @ApiProperty({ example: '1234' })
+  @IsString()
+  @IsNotEmpty()
+  newPassword: string;
+
+
+}
