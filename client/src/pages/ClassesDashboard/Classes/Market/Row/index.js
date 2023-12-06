@@ -50,6 +50,20 @@ const Row = ({ item, value, onChange, up }) => {
                         </div>
                     </div>
                 </div>
+
+                <div className={styles.col}>{item.price}</div>
+                <div className={styles.col}>
+                    <div className={styles.label}>Sales</div>
+                    <div className={styles.sales}>
+                        <div className={styles.number}>
+                            {numberWithCommas(item.sales)}
+                        </div>
+                        {/* <Balance
+                            className={styles.balance}
+                            value={item.balance}
+                        /> */}
+                    </div>
+                </div>
                 <div className={styles.col}>
                     <div className={styles.label}>Status</div>
                     {item.status ? (
@@ -58,7 +72,7 @@ const Row = ({ item, value, onChange, up }) => {
                         </div>
                     ) : (
                         <div className={cn("status-red", styles.status)}>
-                            Deactive
+                            Unactive
                         </div>
                     )}
                     <Control
@@ -68,20 +82,7 @@ const Row = ({ item, value, onChange, up }) => {
                         up={up}
                     />
                 </div>
-                <div className={styles.col}>${item.price}</div>
-                <div className={styles.col}>
-                    <div className={styles.label}>Sales</div>
-                    <div className={styles.sales}>
-                        <div className={styles.number}>
-                            ${numberWithCommas(item.sales)}
-                        </div>
-                        <Balance
-                            className={styles.balance}
-                            value={item.balance}
-                        />
-                    </div>
-                </div>
-                <div className={styles.col}>
+                {/* <div className={styles.col}>
                     <div className={styles.label}>Views</div>
                     <div className={styles.box}>
                         <div className={styles.number}>
@@ -112,7 +113,7 @@ const Row = ({ item, value, onChange, up }) => {
                             ></div>
                         </div>
                     </div>
-                </div>
+                </div> */}
             </div>
             <ModalProduct
                 visible={visibleModalProduct}

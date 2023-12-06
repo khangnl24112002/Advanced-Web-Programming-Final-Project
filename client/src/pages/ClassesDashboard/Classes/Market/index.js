@@ -30,11 +30,9 @@ const Market = ({ items }) => {
                         /> */}
                     </div>
                     <div className={styles.col}>Class</div>
+                    <div className={styles.col}>ID Class</div>
+                    <div className={styles.col}>Number of Students</div>
                     <div className={styles.col}>Status</div>
-                    <div className={styles.col}>Price</div>
-                    <div className={styles.col}>Sales</div>
-                    <div className={styles.col}>Views</div>
-                    <div className={styles.col}>Likes</div>
                 </div>
                 {items.map((x, index) => (
                     <Row
@@ -46,14 +44,14 @@ const Market = ({ items }) => {
                     />
                 ))}
             </div>
-            <div className={styles.foot}>
+            {/* <div className={styles.foot}>
                 <button className={styles.arrow}>
                     <Icon name="arrow-left" size="20" />
                 </button>
                 <button className={styles.arrow}>
                     <Icon name="arrow-right" size="20" />
                 </button>
-            </div>
+            </div> */}
         </div>
     );
 };

@@ -39,9 +39,9 @@ const ModalProduct = ({ visible, onClose }) => {
                 <div className={styles.control}>
                     <Link
                         className={cn("button-white", styles.button)}
-                        to="/products/add"
+                        to="/dashboard/classes/u1"
                     >
-                        Edit Class
+                        Classroom Information
                     </Link>
                     <button className={styles.close} onClick={onClose}>
                         <Icon name="close" size="20" />
