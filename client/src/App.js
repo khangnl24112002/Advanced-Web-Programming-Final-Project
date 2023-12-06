@@ -9,7 +9,7 @@ import Settings from "./pages/Settings/Settings";
 import NotFound from "./pages/NotFound/NotFound";
 import LandingPage from "./pages/Landing Page/LandingPage";
 import Home from "./pages/Home/Home";
-import Shop from "./pages/Shop/Shop";
+import ClassesDashboard from "./pages/ClassesDashboard/ClassesDashboard";
 import Stats from "./pages/Stats/Stats";
 import "./styles/app.sass";
 import AuthLayout from "./layouts/Auth/AuthLayout";
@@ -33,7 +33,7 @@ function App() {
                 <Route path="/dashboard" element={<ProtectedLayout />}>
                     <Route index element={<Home />} />
                     <Route path="settings" element={<Settings />} />
-                    <Route path="shop" element={<Shop />} />
+                    <Route path="classes" element={<ClassesDashboard />} />
                     <Route path="profile" element={<Profile />} />
                     <Route path="stats" element={<Stats />} />
                     {/* Handle other routes */}
