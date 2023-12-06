@@ -25,9 +25,9 @@ const navigation = [
         ],
     },
     {
-        title: "Shop",
-        icon: "store",
-        url: "/dashboard/shop",
+        title: "Classes",
+        icon: "board",
+        url: "/dashboard/classes",
     },
 ];
 
