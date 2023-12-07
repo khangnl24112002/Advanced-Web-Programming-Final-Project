@@ -21,7 +21,7 @@ export class AuthService {
     const { firstName, lastName, email, password, role, emailVerified } = createUserDTO;
     const roleId: number = ROLES[role?.toUpperCase() || 'USER'] as unknown as number
     const encryptedPassword = await hashPassword(password);
-    let user = await this.prismaService.users.findFirst({
+    let user: any = await this.prismaService.users.findFirst({
       where: {
         email,
       },
@@ -78,6 +78,9 @@ export class AuthService {
         email,
         emailVerified: true,
       },
+      include: {
+        role: true
+      }
     });
     if (!ex_user) {
       throw new HttpException({
@@ -110,6 +113,7 @@ export class AuthService {
           email: ex_user?.email,
           firstName: ex_user.firstName,
           lastName: ex_user.lastName,
+          role: ex_user.role.name,
         },
       },
       message: 'Đăng nhập thành công',
@@ -131,6 +135,9 @@ export class AuthService {
       where: {
         email,
       },
+      include: {
+        role: true
+      }
     });
     return user;
   }

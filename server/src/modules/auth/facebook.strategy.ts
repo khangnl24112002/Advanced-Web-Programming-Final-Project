@@ -40,7 +40,7 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
         password,
         emailVerified: true,
       });
-      existUser = response.user;
+      existUser = {...response.user, role: "user"};
     }
     const token = await this.authService.generateAccessToken({
       id: existUser.id,
@@ -50,6 +50,7 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
         ...user,
         id: existUser.id,
         accessToken: token,
+        ...(existUser?.role?.name ||  existUser?.role ? { role: existUser?.role.name ||  existUser?.role} : {})
     });
   }
 }

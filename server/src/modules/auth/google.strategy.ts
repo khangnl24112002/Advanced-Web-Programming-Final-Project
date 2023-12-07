@@ -38,13 +38,14 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         password,
         emailVerified: true,
       });
-      existUser = response.user;
+      existUser = {...response.user, role: "user"};
     }
     const access_token = await this.authService.generateAccessToken({ id: existUser.id, email: existUser.email });
     done(null, {
       ...user,
       id: existUser.id,
-      accessToken: access_token
+      accessToken: access_token,
+      ...(existUser?.role?.name ||  existUser?.role ? { role: existUser?.role.name ||  existUser?.role} : {})
     });
   }
 }

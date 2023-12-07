@@ -11,24 +11,26 @@ datasource db {
 }
 
 model users {
-  id                String    @id @default(uuid())
-  email             String?   @unique
-  encryptedPassword String    @map(name: "encrypted_password")
-  firstName         String?   @map(name: "first_name")
-  lastName          String?   @map(name: "last_name")
+  id                String          @id @default(uuid())
+  email             String?         @unique
+  encryptedPassword String          @map(name: "encrypted_password")
+  firstName         String?         @map(name: "first_name")
+  lastName          String?         @map(name: "last_name")
   provider          String?
   gender            String?
-  roleId            Int?      @map(name: "role_id")
+  roleId            Int?            @map(name: "role_id")
   address           String?
-  emailVerifiedAt   DateTime? @map(name: "email_verified_at")
-  emailVerified     Boolean?  @default(false) @map(name: "email_verified")
+  emailVerifiedAt   DateTime?       @map(name: "email_verified_at")
+  emailVerified     Boolean?        @default(false) @map(name: "email_verified")
   status            Boolean?
-  isDisabled        Boolean   @default(false) @map(name: "is_disabled")
-  isDeleted         Boolean   @default(false) @map(name: "is_deleted")
-  deletedAt         DateTime? @map(name: "deleted_at")
-  role              roles?    @relation(fields: [roleId], references: [id])
-  createdAt         DateTime  @default(now()) @map(name: "created_at")
-  updatedAt         DateTime  @default(now()) @updatedAt @map(name: "updated_at")
+  isDisabled        Boolean         @default(false) @map(name: "is_disabled")
+  isDeleted         Boolean         @default(false) @map(name: "is_deleted")
+  deletedAt         DateTime?       @map(name: "deleted_at")
+  role              roles?          @relation(fields: [roleId], references: [id])
+  createdAt         DateTime        @default(now()) @map(name: "created_at")
+  updatedAt         DateTime        @default(now()) @updatedAt @map(name: "updated_at")
+  classStudents     classStudents[]
+  classes           classes[]
 }
 
 model roles {
@@ -37,4 +39,32 @@ model roles {
   createdAt DateTime @default(now()) @map(name: "created_at")
   updatedAt DateTime @default(now()) @updatedAt @map(name: "updated_at")
   users     users[]
+}
+
+model classes {
+  id              Int             @id @default(autoincrement())
+  name            String?
+  teacherId       String?         @map(name: "teacher_id")
+  maximumStudents Int?            @map(name: "maximum_students")
+  description     String?         @db.Text
+  isDisabled      Boolean         @default(false) @map(name: "is_disabled")
+  disabledAt      DateTime?       @map(name: "disabled_at")
+  createdAt       DateTime        @default(now()) @map(name: "created_at")
+  updatedAt       DateTime        @default(now()) @updatedAt @map(name: "updated_at")
+  classStudents   classStudents[]
+  teacher         users?          @relation(fields: [teacherId], references: [id])
+}
+
+model classStudents {
+  id         Int       @id @default(autoincrement())
+  classId    Int?      @map(name: "class_id")
+  studentId  String?   @map(name: "student_id")
+  isDisabled Boolean   @default(false) @map(name: "is_disabled")
+  disabledAt DateTime? @map(name: "disabled_at")
+  createdAt  DateTime  @default(now()) @map(name: "created_at")
+  updatedAt  DateTime  @default(now()) @updatedAt @map(name: "updated_at")
+  classes    classes?  @relation(fields: [classId], references: [id])
+  students   users?    @relation(fields: [studentId], references: [id])
+
+  @@map("class_students")
 }

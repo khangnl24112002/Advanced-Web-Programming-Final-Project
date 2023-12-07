@@ -26,7 +26,7 @@ export class UserController {
   @ApiCreatedResponse({
     type: GetUsersResponse,
   })
-  @Put('')
+  @Put()
   update(@Body() updateUserDto: UpdateUserDto, @Query('email') email: string) {
     return this.userService.update(email,updateUserDto);
   }
