@@ -79,3 +79,10 @@ export class GetStudentInClassResponse {
   })
   data: any;
 }
+
+export class InviteStudentResponse {
+  @ApiProperty({ example: true })
+  status: boolean;
+  @ApiProperty({ example: 'Mời học sinh vào lớp thành công' })
+  message: string;
+}

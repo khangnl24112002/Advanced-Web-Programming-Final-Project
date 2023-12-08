@@ -104,7 +104,13 @@ export class ClassesController {
   }
 
   @Get(':id/invite/:studentId')
+  @ApiOkResponse({type: CreateClassResponse})
   async inviteStudentToClass(@Param('id') id: string, @Param('studentId') studentId: string) {
-    return this.classesService.inviteStudentToClass(+id, studentId);
+    await this.classesService.inviteStudentToClass(+id, studentId);
+    return {
+      status: true,
+      message: "Mời học sinh vào lớp thành công",
+      data: null
+    }
   }
 }
