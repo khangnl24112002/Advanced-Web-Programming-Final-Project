@@ -22,6 +22,7 @@ function App() {
   return (
     <div className="App">
       <Routes>
+        {/** All user can access to these routes */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/auth" element={<AuthLayout />}>
           <Route path="" element={<Navigate to="sign-in" />} />
@@ -31,6 +32,7 @@ function App() {
           <Route path="forgot-password" element={<ForgotPassword />} />
           <Route path="oauth-redirect" element={<OAuthRedirect />} />
         </Route>
+        <Route path="*" element={<NotFound />} />
         {/** All user logged in can access to these routes */}
         <Route
           element={
@@ -42,11 +44,10 @@ function App() {
           <Route path="classes/addClass" element={<CreateClass />} />
           <Route path="classes/:classId" element={<ClassInfo />} />
           <Route path="classes" element={<ClassesDashboard />} />
-
           <Route path="profile" element={<Profile />} />
           <Route path="stats" element={<Stats />} />
         </Route>
-        <Route path="*" element={<NotFound />} />
+        {/**Only teacher can access to these routes */}
       </Routes>
     </div>
   );

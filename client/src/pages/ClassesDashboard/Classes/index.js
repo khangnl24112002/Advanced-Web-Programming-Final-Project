@@ -75,10 +75,11 @@ const Classes = () => {
             icon="search"
           />
           {/**Button dùng để tạo lớp học */}
-          <Link className={cn("button", styles.button)} to="addClass">
-            <Icon name="add" size="24" />
+          <Link className={cn("button-small", styles.button)} to="addClass">
+            <Icon name="add" size="20" />
             <span>Tạo lớp</span>
           </Link>
+
           {/* <div className={styles.control}>
             <button className={cn("button-stroke button-small", styles.button)}>
               Deleted
