@@ -6,24 +6,24 @@ import Head from "./Head";
 import Editor from "../../../../components/Editor";
 import PurchaseHistory from "./PurchaseHistory";
 
-const socials = [
-    {
-        title: "twitter",
-        url: "https://twitter.com/ui8",
-    },
-    {
-        title: "instagram",
-        url: "https://www.instagram.com/ui8net/",
-    },
-    {
-        title: "pinterest",
-        url: "https://www.pinterest.com/ui8m/",
-    },
-    {
-        title: "facebook",
-        url: "https://www.facebook.com/ui8.net/",
-    },
-];
+// const socials = [
+//     {
+//         title: "twitter",
+//         url: "https://twitter.com/ui8",
+//     },
+//     {
+//         title: "instagram",
+//         url: "https://www.instagram.com/ui8net/",
+//     },
+//     {
+//         title: "pinterest",
+//         url: "https://www.pinterest.com/ui8m/",
+//     },
+//     {
+//         title: "facebook",
+//         url: "https://www.facebook.com/ui8.net/",
+//     },
+// ];
 
 const Details = ({ className, onClose }) => {
     const [content, setContent] = useState();
@@ -42,15 +42,11 @@ const Details = ({ className, onClose }) => {
                 tooltip="Description Private note"
             /> */}
             <div className={styles.group}>
-                <a
-                    className={styles.line}
-                    href="mailto:fahey.designer@robot.co"
-                    rel="noopener noreferrer"
-                >
+                <a className={styles.line} href="#!" rel="noopener noreferrer">
                     <Icon name="mail" size="24" />
-                    fahey.designer@robot.co
+                    michaelthinh1008@gmail.com
                 </a>
-                <div className={styles.socials}>
+                {/* <div className={styles.socials}>
                     {socials.map((x, index) => (
                         <a
                             className={styles.social}
@@ -62,15 +58,15 @@ const Details = ({ className, onClose }) => {
                             <Icon name={x.title} size="24" />
                         </a>
                     ))}
-                </div>
-                <a
+                </div> */}
+                {/* <a
                     className={styles.line}
                     href="https://ui8.net/"
                     rel="noopener noreferrer"
                 >
                     <Icon name="link" size="24" />
                     robot.co
-                </a>
+                </a> */}
             </div>
             {/* <PurchaseHistory className={styles.history} /> */}
         </div>
