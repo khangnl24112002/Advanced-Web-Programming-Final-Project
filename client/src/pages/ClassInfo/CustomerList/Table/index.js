@@ -35,10 +35,10 @@ const Table = ({ className, activeTable, setActiveTable }) => {
                             onChange={() => setСhooseAll(!chooseAll)}
                         />
                     </div> */}
-                    <div className={styles.col}>Name</div>
+                    <div className={styles.col}>Họ và tên</div>
                     <div className={styles.col}>Email</div>
-                    <div className={styles.col}>Date Joined</div>
-                    <div className={styles.col}>Role</div>
+                    <div className={styles.col}>Ngày tham gia</div>
+                    <div className={styles.col}>Vai trò</div>
                 </div>
                 {customers.map((x, index) => (
                     <Row

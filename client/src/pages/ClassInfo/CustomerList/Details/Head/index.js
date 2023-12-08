@@ -9,11 +9,11 @@ const Head = ({ className }) => {
         <div className={cn(styles.head, className)}>
             <div className={styles.user}>
                 <div className={styles.avatar}>
-                    <img src="/images/content/avatar-1.jpg" alt="Avatar" />
+                    <img src="/assets/male-avatar.jpg" alt="Avatar" />
                 </div>
                 <div className={styles.details}>
-                    <div className={styles.man}>Chelsie Haley</div>
-                    <div className={styles.login}>@chelsiehaly</div>
+                    <div className={styles.man}>Mai Cường Thịnh</div>
+                    <div className={styles.login}>@michaelthinh1008</div>
                 </div>
             </div>
             {/* <div className={styles.btns}>
