@@ -52,20 +52,28 @@ const SignIn = () => {
   const handleUpdateRole = () => {
     let roleId;
     if (role === "Học sinh") {
-      roleId = 1;
-    } else if (role === "Giáo viên") {
       roleId = 2;
+    } else if (role === "Giáo viên") {
+      roleId = 1;
     }
+    console.log("Role id choosen: ", roleId);
     // Gọi service để lấy role ở đây
     const response = {
-      roleId: 1,
+      roleId: roleId,
     };
     // Cập nhật dữ liệu và đưa lên redux
-    setResponse({
-      ...Response,
-      user: { ...Response.user, roleId: response.roleId },
-    });
-    login(Response.user, Response.token);
+    const updatedResponse = {
+      user: {
+        id: Response.user.id,
+        email: Response.user.email,
+        firstName: Response.user.firstName,
+        lastName: Response.user.lastName,
+        roleId: response.roleId,
+      },
+      token: Response.token,
+    };
+    console.log(updatedResponse);
+    login(updatedResponse.user, updatedResponse.token);
   };
   const validateData = (userAccount) => {
     let result = 1;
