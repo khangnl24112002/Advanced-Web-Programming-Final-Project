@@ -12,11 +12,11 @@ const items = [
     menu: [
       {
         title: "Hồ sơ cá nhân",
-        url: "/dashboard/profile",
+        url: "/profile",
       },
       {
         title: "Cài đặt",
-        url: "/dashboard/settings",
+        url: "/settings",
       },
     ],
   },

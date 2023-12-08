@@ -3,7 +3,7 @@ import cn from "classnames";
 import styles from "./Panel.module.sass";
 import Icon from "../../../../components/Icon";
 
-const Panel = ({ addStudent, outGroup }) => {
+const Panel = ({ addStudent, outGroup, roleId }) => {
   return (
     <div className={cn("panel", styles.panel)}>
       <div className={styles.info}>
@@ -11,9 +11,11 @@ const Panel = ({ addStudent, outGroup }) => {
         Last saved <span>Oct 4, 2021 - 23:32</span> */}
       </div>
       <div className={styles.btns}>
-        <button className={cn("button", styles.button)} onClick={addStudent}>
-          Thêm thành viên
-        </button>
+        {roleId === 1 ? (
+          <button className={cn("button", styles.button)} onClick={addStudent}>
+            Thêm thành viên
+          </button>
+        ) : null}
         <button
           className={cn("button-stroke", styles.button)}
           onClick={outGroup}

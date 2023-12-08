@@ -12,6 +12,7 @@ import { traffic } from "../../../mocks/traffic";
 import { viewers } from "../../../mocks/viewers";
 import { market } from "../../../mocks/market";
 import Icon from "../../../components/Icon";
+import { useAuth } from "../../../hooks/useAuth";
 const indicatorsTraffic = [
   {
     title: "Market",
@@ -47,6 +48,9 @@ const indicatorsViewers = [
 ];
 
 const Classes = () => {
+  // Lấy thông tin user
+  const { user } = useAuth();
+
   const navigation = ["Market", "Traffic sources", "Viewers"];
 
   const [activeTab, setActiveTab] = useState(navigation[0]);
@@ -75,10 +79,12 @@ const Classes = () => {
             icon="search"
           />
           {/**Button dùng để tạo lớp học */}
-          <Link className={cn("button-small", styles.button)} to="addClass">
-            <Icon name="add" size="20" />
-            <span>Tạo lớp</span>
-          </Link>
+          {user.roleId === 1 ? (
+            <Link className={cn("button-small", styles.button)} to="addClass">
+              <Icon name="add" size="20" />
+              <span>Tạo lớp</span>
+            </Link>
+          ) : null}
 
           {/* <div className={styles.control}>
             <button className={cn("button-stroke button-small", styles.button)}>

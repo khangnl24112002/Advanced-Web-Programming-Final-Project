@@ -41,13 +41,22 @@ function App() {
         >
           <Route path="home" index element={<Home />} />
           <Route path="settings" element={<Settings />} />
-          <Route path="classes/addClass" element={<CreateClass />} />
           <Route path="classes/:classId" element={<ClassInfo />} />
           <Route path="classes" element={<ClassesDashboard />} />
           <Route path="profile" element={<Profile />} />
-          <Route path="stats" element={<Stats />} />
         </Route>
         {/**Only teacher can access to these routes */}
+        <Route
+          element={
+            <ProtectedLayout
+              isAllowed={!!user && user.roleId === 1}
+              redirectPath="/home"
+            />
+          }
+        >
+          <Route path="classes/addClass" element={<CreateClass />} />
+          <Route path="stats" element={<Stats />} />
+        </Route>
       </Routes>
     </div>
   );

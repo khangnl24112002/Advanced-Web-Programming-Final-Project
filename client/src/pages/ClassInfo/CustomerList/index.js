@@ -12,9 +12,13 @@ import Details from "./Details";
 import Modal from "./Modal";
 import Icon from "../../../components/Icon";
 import { errorToast, successToast } from "../../../utils/toast";
+import { useAuth } from "../../../hooks/useAuth";
 // const navigation = ["Active", "New"];
 
 const CustomerList = () => {
+  // Lấy userInfo
+  const { user } = useAuth();
+
   const [activeIndex, setActiveIndex] = useState(0);
   const [search, setSearch] = useState("");
   const [visible, setVisible] = useState(false);
@@ -167,13 +171,15 @@ const CustomerList = () => {
               name="search"
               icon="search"
             />
-            {/**Button dùng để tạo lớp học */}
-            <button
-              className={cn("button-small", styles.button)}
-              onClick={handleGetUrl}
-            >
-              Lấy URL lớp học
-            </button>
+            {/**Button dùng để lấy url lớp học */}
+            {user.roleId === 1 ? (
+              <button
+                className={cn("button-small", styles.button)}
+                onClick={handleGetUrl}
+              >
+                Lấy URL lớp học
+              </button>
+            ) : null}
             {/* <div className={styles.nav}>
                             {navigation.map((x, index) => (
                                 <button
@@ -208,7 +214,11 @@ const CustomerList = () => {
           />
         </div>
       </Card>
-      <Panel addStudent={handleAddingStudent} outGroup={handleOutGroup} />
+      <Panel
+        roleId={user.roleId}
+        addStudent={handleAddingStudent}
+        outGroup={handleOutGroup}
+      />
       <Modal
         outerClassName={styles.outer}
         visible={openModal}
