@@ -6,12 +6,12 @@ import Form from "../../../components/Form";
 import Dropdown from "../../../components/Dropdown";
 import Market from "./Market";
 import Table from "./Table";
-
+import { Link } from "react-router-dom";
 // data
 import { traffic } from "../../../mocks/traffic";
 import { viewers } from "../../../mocks/viewers";
 import { market } from "../../../mocks/market";
-
+import Icon from "../../../components/Icon";
 const indicatorsTraffic = [
   {
     title: "Market",
@@ -74,7 +74,12 @@ const Classes = () => {
             name="search"
             icon="search"
           />
-          <div className={styles.control}>
+          {/**Button dùng để tạo lớp học */}
+          <Link className={cn("button", styles.button)} to="addClass">
+            <Icon name="add" size="24" />
+            <span>Tạo lớp</span>
+          </Link>
+          {/* <div className={styles.control}>
             <button className={cn("button-stroke button-small", styles.button)}>
               Deleted
             </button>
@@ -82,7 +87,7 @@ const Classes = () => {
               Set status
             </button>
             <div className={styles.counter}>3 selected</div>
-          </div>
+          </div> */}
           {/* <div className={cn(styles.nav, "tablet-hide")}>
                         {navigation.map((x, index) => (
                             <button
@@ -96,7 +101,7 @@ const Classes = () => {
                             </button>
                         ))}
                     </div> */}
-          <div className={cn(styles.dropdown, "tablet-show")}>
+          {/* <div className={cn(styles.dropdown, "tablet-show")}>
             <Dropdown
               classDropdownHead={styles.dropdownHead}
               value={activeTab}
@@ -104,7 +109,7 @@ const Classes = () => {
               options={navigation}
               small
             />
-          </div>
+          </div> */}
         </>
       }
     >
