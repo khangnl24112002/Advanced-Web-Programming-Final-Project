@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect } from "react";
-import cn from "classnames";
-import { Link } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { disableBodyScroll, clearAllBodyScrollLocks } from "body-scroll-lock";
-import styles from "./ModalProduct.module.sass";
-import Icon from "../Icon";
-import Product from "./Product";
+import OutsideClickHandler from "react-outside-click-handler";
+import cn from "classnames";
+import styles from "./Modal.module.sass";
+import Icon from "../../../../components/Icon";
 
-const ModalProduct = ({ visible, onClose }) => {
+const Modal = ({ outerClassName, visible, onClose, children }) => {
   const escFunction = useCallback(
     (e) => {
       if (e.keyCode === 27) {
@@ -26,7 +25,7 @@ const ModalProduct = ({ visible, onClose }) => {
 
   useEffect(() => {
     if (visible) {
-      const target = document.querySelector("#modal-product");
+      const target = document.querySelector("#modal");
       disableBodyScroll(target);
     } else {
       clearAllBodyScrollLocks();
@@ -35,17 +34,14 @@ const ModalProduct = ({ visible, onClose }) => {
 
   return createPortal(
     visible && (
-      <div id="modal-product" className={styles.modal}>
-        <div className={styles.control}>
-          <Link className={cn("button-white", styles.button)} to="/classes/u1">
-            Thông tin lớp
-          </Link>
-          <button className={styles.close} onClick={onClose}>
-            <Icon name="close" size="20" />
-          </button>
-        </div>
-        <div className={styles.outer}>
-          <Product />
+      <div id="modal" className={styles.modal}>
+        <div className={cn(styles.outer, outerClassName)}>
+          <OutsideClickHandler onOutsideClick={onClose}>
+            {children}
+            <button className={styles.close} onClick={onClose}>
+              <Icon name="close" size="20" />
+            </button>
+          </OutsideClickHandler>
         </div>
       </div>
     ),
@@ -53,4 +49,4 @@ const ModalProduct = ({ visible, onClose }) => {
   );
 };
 
-export default ModalProduct;
+export default Modal;

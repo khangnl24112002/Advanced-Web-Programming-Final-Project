@@ -8,6 +8,8 @@ import { useAuth } from "../../hooks/useAuth";
 import { EMAIL_REGEX } from "../../constants";
 import { authServices } from "../../services/AuthServices";
 import { errorToast } from "../../utils/toast";
+import SignInModal from "./SignInModal/index";
+import Dropdown from "../../components/Dropdown";
 
 const SignIn = () => {
   const initalState = {
@@ -15,15 +17,24 @@ const SignIn = () => {
     password: "",
   };
   const [userAccount, setUserAccount] = useState(initalState);
+  const [Response, setResponse] = useState(null);
+  const [visibleModal, setVisibleModal] = useState(false);
   const { login } = useAuth();
-
+  const roleList = ["Học sinh", "Giáo viên"];
+  const [role, setRole] = useState(roleList[0]);
   const handleSubmit = async (event) => {
     event.preventDefault();
     const isValidData = validateData(userAccount);
     if (isValidData === 1) {
       const response = await authServices.login(userAccount);
       if (response.status === true) {
-        login(response.data.user, response.data.token);
+        setResponse(response.data);
+        // Kiểm tra xem đã chọn role chưa
+        if (response.data.user.role !== undefined) {
+          login(response.data.user, response.data.token);
+        } else {
+          setVisibleModal(true);
+        }
       } else {
         return errorToast(response.message);
       }
@@ -38,6 +49,32 @@ const SignIn = () => {
     }));
   };
 
+  const handleUpdateRole = () => {
+    let roleId;
+    if (role === "Học sinh") {
+      roleId = 2;
+    } else if (role === "Giáo viên") {
+      roleId = 1;
+    }
+    console.log("Role id choosen: ", roleId);
+    // Gọi service để lấy role ở đây
+    const response = {
+      roleId: roleId,
+    };
+    // Cập nhật dữ liệu và đưa lên redux
+    const updatedResponse = {
+      user: {
+        id: Response.user.id,
+        email: Response.user.email,
+        firstName: Response.user.firstName,
+        lastName: Response.user.lastName,
+        roleId: response.roleId,
+      },
+      token: Response.token,
+    };
+    console.log(updatedResponse);
+    login(updatedResponse.user, updatedResponse.token);
+  };
   const validateData = (userAccount) => {
     let result = 1;
     if (userAccount.email === "") {
@@ -131,6 +168,30 @@ const SignIn = () => {
           </div>
         </form>
       </div>
+      <SignInModal
+        outerClassName={styles.outer}
+        visible={visibleModal}
+        onClose={() => setVisibleModal(false)}
+      >
+        <div>Chọn vai trò</div>
+        <Dropdown
+          className={styles.dropdown}
+          classDropdownHead={styles.dropdownHead}
+          value={role}
+          setValue={setRole}
+          options={roleList}
+          small
+        />
+        <button
+          style={{ marginTop: "10px" }}
+          className={cn("button-small", styles.button)}
+          onClick={() => {
+            handleUpdateRole();
+          }}
+        >
+          Chọn
+        </button>
+      </SignInModal>
     </div>
   );
 };
