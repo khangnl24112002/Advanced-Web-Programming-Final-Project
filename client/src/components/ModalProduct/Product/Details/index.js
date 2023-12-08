@@ -5,7 +5,7 @@ import Icon from "../../../Icon";
 import Overview from "./Overview";
 import Products from "./Products";
 
-const navigation = ["Product", "Comments"];
+// const navigation = ["Class", "Comments"];
 
 const Details = ({ className, setValue, activeIndex, setActiveIndex }) => {
     const handleClick = (index) => {
@@ -17,7 +17,7 @@ const Details = ({ className, setValue, activeIndex, setActiveIndex }) => {
     return (
         <div className={cn(styles.details, className)}>
             <div className={styles.head}>
-                <div className={styles.nav}>
+                {/* <div className={styles.nav}>
                     {navigation.map((x, index) => (
                         <button
                             className={cn(styles.link, {
@@ -29,7 +29,7 @@ const Details = ({ className, setValue, activeIndex, setActiveIndex }) => {
                             {x}
                         </button>
                     ))}
-                </div>
+                </div> */}
                 {/* <div className={styles.btns}>
           <button className={cn("button-stroke", styles.favorite)}>
             <Icon name="heart-fill" size="24" />

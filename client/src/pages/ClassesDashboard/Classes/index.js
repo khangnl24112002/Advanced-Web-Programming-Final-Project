@@ -59,7 +59,7 @@ const Classes = () => {
   return (
     <Card
       className={styles.card}
-      title="Classes"
+      title="Danh sách các lớp học"
       classTitle={cn("title-purple", styles.title)}
       classCardHead={styles.head}
       head={
@@ -69,7 +69,7 @@ const Classes = () => {
             value={search}
             setValue={setSearch}
             onSubmit={() => handleSubmit()}
-            placeholder="Search classes"
+            placeholder="Tìm lớp"
             type="text"
             name="search"
             icon="search"

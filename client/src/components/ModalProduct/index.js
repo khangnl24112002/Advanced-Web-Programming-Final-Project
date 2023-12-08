@@ -41,7 +41,7 @@ const ModalProduct = ({ visible, onClose }) => {
                         className={cn("button-white", styles.button)}
                         to="/dashboard/classes/u1"
                     >
-                        Classroom Information
+                        Thông tin lớp
                     </Link>
                     <button className={styles.close} onClick={onClose}>
                         <Icon name="close" size="20" />

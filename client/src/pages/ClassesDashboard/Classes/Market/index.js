@@ -29,10 +29,10 @@ const Market = ({ items }) => {
                             onChange={() => setСhooseAll(!chooseAll)}
                         /> */}
                     </div>
-                    <div className={styles.col}>Class</div>
-                    <div className={styles.col}>ID Class</div>
-                    <div className={styles.col}>Number of Students</div>
-                    <div className={styles.col}>Status</div>
+                    <div className={styles.col}>Lớp</div>
+                    <div className={styles.col}>ID lớp</div>
+                    <div className={styles.col}>Số lượng học sinh</div>
+                    <div className={styles.col}>Trạng thái</div>
                 </div>
                 {items.map((x, index) => (
                     <Row

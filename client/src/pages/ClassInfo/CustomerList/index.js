@@ -9,7 +9,7 @@ import Table from "./Table";
 import Panel from "./Panel";
 import Details from "./Details";
 
-const navigation = ["Active", "New"];
+// const navigation = ["Active", "New"];
 
 const CustomerList = () => {
     const [activeIndex, setActiveIndex] = useState(0);
@@ -24,7 +24,7 @@ const CustomerList = () => {
         <>
             <Card
                 className={styles.card}
-                title="Participants"
+                title="Thông tin lớp học"
                 classTitle={cn("title-purple", styles.title)}
                 classCardHead={cn(styles.head, { [styles.hidden]: visible })}
                 head={
@@ -34,12 +34,12 @@ const CustomerList = () => {
                             value={search}
                             setValue={setSearch}
                             onSubmit={() => handleSubmit()}
-                            placeholder="Search by name or email"
+                            placeholder="Tìm theo tên hoặc theo email"
                             type="text"
                             name="search"
                             icon="search"
                         />
-                        <div className={styles.nav}>
+                        {/* <div className={styles.nav}>
                             {navigation.map((x, index) => (
                                 <button
                                     className={cn(styles.link, {
@@ -51,7 +51,7 @@ const CustomerList = () => {
                                     {x}
                                 </button>
                             ))}
-                        </div>
+                        </div> */}
                         {/* <Filters
                             className={styles.filters}
                             title="Showing 10 of 24 customer"
