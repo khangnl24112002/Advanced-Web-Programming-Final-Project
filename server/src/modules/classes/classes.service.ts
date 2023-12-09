@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateClassDto } from './dto/create-class.dto';
 import { PrismaService } from 'src/prisma.service';
 import { map } from 'lodash';
 
@@ -9,7 +8,7 @@ export class ClassesService {
     // eslint-disable-next-line prettier/prettier
     private readonly prismaService: PrismaService
   ) { }
-  async create(createClassDto: CreateClassDto) {
+  async create(createClassDto) {
     return this.prismaService.classes.create({
       data: createClassDto,
     })

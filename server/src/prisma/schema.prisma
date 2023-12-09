@@ -45,6 +45,7 @@ model roles {
 model classes {
   id                   Int                    @id @default(autoincrement())
   name                 String?
+  uniqueCode           String?                @unique @map(name: "unique_code")
   maximumStudents      Int?                   @map(name: "maximum_students")
   description          String?                @db.Text
   isDisabled           Boolean                @default(false) @map(name: "is_disabled")

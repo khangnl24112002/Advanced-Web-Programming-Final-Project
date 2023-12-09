@@ -10,6 +10,8 @@ import { MAIL_TEMPLATE_ID, ROLES } from 'src/utils';
 import moment from 'moment';
 import { SendgridService } from '../mail/mail.service';
 import { JwtService } from '@nestjs/jwt';
+import * as nanoid from 'nanoid';
+
 
 @Controller('classes')
 @ApiTags('Classes')
@@ -23,13 +25,19 @@ export class ClassesController {
   @ApiCreatedResponse({ type: CreateClassResponse })
   async create(@Body() createClassDto: CreateClassDto, @CurrentUser('id') teacherId: string) {
     const exClass = await this.classesService.findOne(createClassDto.name);
+    const uniqueCode = nanoid
+        .customAlphabet(
+          '1234567890abcdefghiklmnouwpqz',
+          10
+        )(8)
+        .toUpperCase();
     if (exClass) {
       throw new BadRequestException({
         status: false,
         message: "Lớp học đã tồn tại"
       })
     }
-    const classCreated = await this.classesService.create(createClassDto);
+    const classCreated = await this.classesService.create({...createClassDto, uniqueCode});
     const isCreator = true;
     await this.classesService.addTeacherToClass(classCreated.id, teacherId, isCreator);
     const classResponse = await this.classesService.findClassById(classCreated.id);
