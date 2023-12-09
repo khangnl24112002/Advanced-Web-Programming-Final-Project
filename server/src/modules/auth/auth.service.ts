@@ -17,6 +17,16 @@ export class AuthService {
       secret: process.env.SECRET_KEY,
     });
   }
+
+  async findUserVerifyByUserId(userId: string) {
+    const user = await this.prismaService.users.findFirst({
+      where: {
+        id: userId,
+        emailVerified: true,
+      },
+    });
+    return user;
+  }
   async signUpByEmail(createUserDTO: any) {
     const { firstName, lastName, email, password, role, emailVerified } = createUserDTO;
     const roleId: number = ROLES[role?.toUpperCase() || 'USER'] as unknown as number

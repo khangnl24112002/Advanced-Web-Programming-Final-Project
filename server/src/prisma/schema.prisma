@@ -31,6 +31,7 @@ model users {
   updatedAt         DateTime        @default(now()) @updatedAt @map(name: "updated_at")
   classStudents     classStudents[]
   classes           classes[]
+  classTeachers     classTeachers[]
 }
 
 model roles {
@@ -42,17 +43,30 @@ model roles {
 }
 
 model classes {
-  id              Int             @id @default(autoincrement())
-  name            String?
-  teacherId       String?         @map(name: "teacher_id")
-  maximumStudents Int?            @map(name: "maximum_students")
-  description     String?         @db.Text
-  isDisabled      Boolean         @default(false) @map(name: "is_disabled")
-  disabledAt      DateTime?       @map(name: "disabled_at")
-  createdAt       DateTime        @default(now()) @map(name: "created_at")
-  updatedAt       DateTime        @default(now()) @updatedAt @map(name: "updated_at")
-  classStudents   classStudents[]
-  teacher         users?          @relation(fields: [teacherId], references: [id])
+  id                   Int                    @id @default(autoincrement())
+  name                 String?
+  maximumStudents      Int?                   @map(name: "maximum_students")
+  description          String?                @db.Text
+  isDisabled           Boolean                @default(false) @map(name: "is_disabled")
+  disabledAt           DateTime?              @map(name: "disabled_at")
+  createdAt            DateTime               @default(now()) @map(name: "created_at")
+  updatedAt            DateTime               @default(now()) @updatedAt @map(name: "updated_at")
+  classStudents        classStudents[]
+  users                users?                 @relation(fields: [usersId], references: [id])
+  usersId              String?
+  classTeachers        classTeachers[]
+  classLinkInvitations classLinkInvitations[]
+}
+
+model classLinkInvitations {
+  id        String    @id @default(uuid())
+  classId   Int?      @map(name: "class_id")
+  expiredAt DateTime? @map(name: "expired_at")
+  createdAt DateTime  @default(now()) @map(name: "created_at")
+  updatedAt DateTime  @default(now()) @updatedAt @map(name: "updated_at")
+  classes   classes?  @relation(fields: [classId], references: [id])
+
+  @@map("class_link_invitations")
 }
 
 model classStudents {
@@ -67,4 +81,19 @@ model classStudents {
   students   users?    @relation(fields: [studentId], references: [id])
 
   @@map("class_students")
+}
+
+model classTeachers {
+  id         Int       @id @default(autoincrement())
+  classId    Int?      @map(name: "class_id")
+  teacherId  String?   @map(name: "teacher_id")
+  isCreator  Boolean   @default(false) @map(name: "is_creator")
+  isDisabled Boolean   @default(false) @map(name: "is_disabled")
+  disabledAt DateTime? @map(name: "disabled_at")
+  createdAt  DateTime  @default(now()) @map(name: "created_at")
+  updatedAt  DateTime  @default(now()) @updatedAt @map(name: "updated_at")
+  classes    classes?  @relation(fields: [classId], references: [id])
+  teachers   users?    @relation(fields: [teacherId], references: [id])
+
+  @@map("class_teachers")
 }

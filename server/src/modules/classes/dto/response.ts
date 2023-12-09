@@ -10,11 +10,13 @@ export class CreateClassResponse {
       id: 1,
       name: 'Lớp 1',
       maximumStudents: 50,
-      teacher: {
-        id: '1',
-        name: 'Nguyễn Văn A',
-        email: 'minh@email.com',
-      },
+      teachers: [
+        {
+          id: '1',
+          name: 'Nguyễn Văn A',
+          email: 'minh@email.com',
+        },
+      ],
     },
   })
   data: any;
@@ -83,6 +85,16 @@ export class GetStudentInClassResponse {
 export class InviteStudentResponse {
   @ApiProperty({ example: true })
   status: boolean;
-  @ApiProperty({ example: 'Mời học sinh vào lớp thành công' })
+  @ApiProperty({ example: 'Mời vào lớp thành công' })
   message: string;
+}
+export class InviteGroupStudentResponse {
+  @ApiProperty({ example: true })
+  status: boolean;
+  @ApiProperty({ example: 'Tạo liên kết thành công' })
+  message: string;
+  @ApiProperty({
+    example: 'https://localhost:3000/invite/1234567890-dfghjkl-rwerew54645',
+  })
+  data: any;
 }

@@ -1,36 +1,45 @@
-import { Controller, Get, Post, Body, Param,  InternalServerErrorException, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, InternalServerErrorException, BadRequestException, UseGuards } from '@nestjs/common';
 import { ClassesService } from './classes.service';
 import { CreateClassDto } from './dto/create-class.dto';
 import { CurrentUser } from 'src/decorators/users.decorator';
-import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
-import { CreateClassResponse, GetStudentClassResponse, GetStudentInClassResponse, GetTeacherClassResponse } from './dto/response';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { CreateClassResponse, GetStudentClassResponse, GetStudentInClassResponse, GetTeacherClassResponse, InviteGroupStudentResponse, InviteStudentResponse } from './dto/response';
+import { JwtAuthGuard } from 'src/guards/jwt.auth.guard';
+import { AuthService } from '../auth/auth.service';
+import { ROLES } from 'src/utils';
+import moment from 'moment';
 
 @Controller('classes')
+@ApiTags('Classes')
+@ApiBearerAuth('Bearer')
+@UseGuards(JwtAuthGuard)
 export class ClassesController {
   // eslint-disable-next-line prettier/prettier
-  constructor(private readonly classesService: ClassesService) {}
+  constructor(private readonly classesService: ClassesService, private readonly authService: AuthService) { }
 
   @Post()
-  @ApiCreatedResponse({type: CreateClassResponse})
-  async create(@Body() createClassDto: CreateClassDto) {
+  @ApiCreatedResponse({ type: CreateClassResponse })
+  async create(@Body() createClassDto: CreateClassDto, @CurrentUser('id') teacherId: string) {
     const exClass = await this.classesService.findOne(createClassDto.name);
-      if (exClass) {
-        throw new BadRequestException({
-          status: false,
-          message: "Lớp học đã tồn tại"
-        })
-      }
-      const classCreated = await this.classesService.create(createClassDto);
-      const classResponse = await this.classesService.findClassById(classCreated.id);
-      return {
-        status: true,
-        data: classResponse,
-        message: "Tạo lớp học thành công"
-      }
+    if (exClass) {
+      throw new BadRequestException({
+        status: false,
+        message: "Lớp học đã tồn tại"
+      })
+    }
+    const classCreated = await this.classesService.create(createClassDto);
+    const isCreator = true;
+    await this.classesService.addTeacherToClass(classCreated.id, teacherId, isCreator);
+    const classResponse = await this.classesService.findClassById(classCreated.id);
+    return {
+      status: true,
+      data: classResponse,
+      message: "Tạo lớp học thành công"
+    }
   }
 
   @Get('student')
-  @ApiOkResponse({type: GetStudentClassResponse})
+  @ApiOkResponse({ type: GetStudentClassResponse })
   async findAll(@CurrentUser('id') userId: string) {
 
     try {
@@ -50,7 +59,7 @@ export class ClassesController {
   }
 
   @Get('teacher')
-  @ApiOkResponse({type: GetTeacherClassResponse})
+  @ApiOkResponse({ type: GetTeacherClassResponse })
   async getAllClassesOfTeacher(@CurrentUser('id') teacherId: string) {
     try {
       const classes = await this.classesService.getAllClassesOfTeacher(teacherId);
@@ -68,25 +77,25 @@ export class ClassesController {
   }
 
   @Get(':id')
-  @ApiOkResponse({type: CreateClassResponse})
+  @ApiOkResponse({ type: CreateClassResponse })
   async findOne(@Param('id') id: number) {
     const classResponse = await this.classesService.findClassById(+id);
-      if (!classResponse) {
-        throw new BadRequestException({
-          status: false,
-          message: "Lớp học không tồn tại"
-        })
-      }
-      return {
-        status: true,
-        data: classResponse,
-        message: "Lấy thông tin lớp học thành công"
-      }
-    
+    if (!classResponse) {
+      throw new BadRequestException({
+        status: false,
+        message: "Lớp học không tồn tại"
+      })
+    }
+    return {
+      status: true,
+      data: classResponse,
+      message: "Lấy thông tin lớp học thành công"
+    }
+
   }
 
   @Get(':id/students')
-  @ApiOkResponse({type: GetStudentInClassResponse})
+  @ApiOkResponse({ type: GetStudentInClassResponse })
   async getStudentsOfClass(@Param('id') id: string) {
     try {
       const students = await this.classesService.getStudentsOfClass(+id);
@@ -103,13 +112,77 @@ export class ClassesController {
     }
   }
 
-  @Get(':id/invite/:studentId')
-  @ApiOkResponse({type: CreateClassResponse})
-  async inviteStudentToClass(@Param('id') id: string, @Param('studentId') studentId: string) {
-    await this.classesService.inviteStudentToClass(+id, studentId);
+  @Get(':id/invite/:email')
+  @ApiOkResponse({ type: InviteStudentResponse })
+  async inviteStudentToClass(@Param('id') id: string, @Param('email') email: string) {
+    const user = await this.authService.findUserVerifyEmail(email);
+    if(!user) {
+      throw new BadRequestException({
+        status: false,
+        message: "Email không tồn tại"
+      })
+    }
+    const roleId = user.roleId;
+    if(roleId === ROLES.STUDENT) {
+      await this.classesService.inviteStudentToClass(+id, user?.id);
+    }
+     else {
+      await this.classesService.inviteTeacherToClass(+id, user?.id);
+     }
     return {
       status: true,
-      message: "Mời học sinh vào lớp thành công",
+      message: "Mời thành công",
+      data: null
+    }
+  }
+
+  @Get(':id/group-invite')
+  @ApiOkResponse({ type: InviteGroupStudentResponse })
+  async inviteGroupUserToClass(@Param('id') id: string) {
+    const expiredAt = moment().add(30, 'days').toDate().toISOString();
+    const invitationsLink = await this.classesService.inviteGroupUserToClass(+id,expiredAt);
+    const frontendUrl = process.env.FRONTEND_URL;
+    const link = `${frontendUrl}/invite/${invitationsLink.id}`;
+    return {
+      status: true,
+      message: "Mời thành công",
+      data: link
+    }
+  }
+
+  @Get(':id/accept-invite/:invitationId/:userId')
+  @ApiOkResponse({ type: InviteStudentResponse })
+  async acceptInvite(@Param('id') id: string, @Param('invitationId') invitationId: string, @Param('userId') userId: string) {
+    const invitation = await this.classesService.findInvitationById(invitationId);
+    if (!invitation) {
+      throw new BadRequestException({
+        status: false,
+        message: "Mã mời không tồn tại"
+      })
+    }
+    const expiredAt = invitation.expiredAt;
+    if(moment().isAfter(expiredAt)) {
+      throw new BadRequestException({
+        status: false,
+        message: "Mã mời đã hết hạn"
+      })
+    }
+    const user = await this.authService.findUserVerifyByUserId(userId);
+    if(!user) {
+      throw new BadRequestException({
+        status: false,
+        message: "Tài khoản không tồn tại"
+      })
+    }
+    const roleId = user.roleId;
+    if(roleId === ROLES.STUDENT) {
+      await this.classesService.inviteStudentToClass(+id, user?.id);
+    } else {
+      await this.classesService.inviteTeacherToClass(+id, user?.id);
+    }
+    return {
+      status: true,
+      message: "Tham gia lớp thành công",
       data: null
     }
   }
