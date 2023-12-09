@@ -235,4 +235,20 @@ export class ClassesService {
       }
     })
   }
+
+  async findInvitationByClassId(classId: number) {
+    return this.prismaService.classLinkInvitations.findFirst({
+      where: {
+        classId,
+      }
+    })
+  }
+
+  async deleteInvitationById(id: string) {
+    return this.prismaService.classLinkInvitations.delete({
+      where: {
+        id
+      }
+    })
+  }
 }

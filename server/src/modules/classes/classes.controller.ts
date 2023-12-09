@@ -116,19 +116,19 @@ export class ClassesController {
   @ApiOkResponse({ type: InviteStudentResponse })
   async inviteStudentToClass(@Param('id') id: string, @Param('email') email: string) {
     const user = await this.authService.findUserVerifyEmail(email);
-    if(!user) {
+    if (!user) {
       throw new BadRequestException({
         status: false,
         message: "Email không tồn tại"
       })
     }
     const roleId = user.roleId;
-    if(roleId === ROLES.STUDENT) {
+    if (roleId === ROLES.STUDENT) {
       await this.classesService.inviteStudentToClass(+id, user?.id);
     }
-     else {
+    else {
       await this.classesService.inviteTeacherToClass(+id, user?.id);
-     }
+    }
     return {
       status: true,
       message: "Mời thành công",
@@ -139,9 +139,30 @@ export class ClassesController {
   @Get(':id/group-invite')
   @ApiOkResponse({ type: InviteGroupStudentResponse })
   async inviteGroupUserToClass(@Param('id') id: string) {
-    const expiredAt = moment().add(30, 'days').toDate().toISOString();
-    const invitationsLink = await this.classesService.inviteGroupUserToClass(+id,expiredAt);
+    const exInvitation = await this.classesService.findInvitationByClassId(+id);
     const frontendUrl = process.env.FRONTEND_URL;
+    if (exInvitation) {
+      const expiredAt = exInvitation.expiredAt;
+      if (moment().isBefore(expiredAt)) {
+        const expiredAt = moment().add(30, 'days').toDate().toISOString();
+        const invitationsLink = await this.classesService.inviteGroupUserToClass(+id, expiredAt);
+       
+        const link = `${frontendUrl}/invite/${invitationsLink.id}`;
+        return {
+          status: true,
+          message: "Mời thành công",
+          data: link
+        }
+      }
+      const link = `${frontendUrl}/invite/${exInvitation.id}`;
+      return {
+        status: true,
+        message: "Mời thành công",
+        data: link
+      }
+    }
+    const expiredAt = moment().add(30, 'days').toDate().toISOString();
+    const invitationsLink = await this.classesService.inviteGroupUserToClass(+id, expiredAt);
     const link = `${frontendUrl}/invite/${invitationsLink.id}`;
     return {
       status: true,
@@ -161,21 +182,21 @@ export class ClassesController {
       })
     }
     const expiredAt = invitation.expiredAt;
-    if(moment().isAfter(expiredAt)) {
+    if (moment().isAfter(expiredAt)) {
       throw new BadRequestException({
         status: false,
         message: "Mã mời đã hết hạn"
       })
     }
     const user = await this.authService.findUserVerifyByUserId(userId);
-    if(!user) {
+    if (!user) {
       throw new BadRequestException({
         status: false,
         message: "Tài khoản không tồn tại"
       })
     }
     const roleId = user.roleId;
-    if(roleId === ROLES.STUDENT) {
+    if (roleId === ROLES.STUDENT) {
       await this.classesService.inviteStudentToClass(+id, user?.id);
     } else {
       await this.classesService.inviteTeacherToClass(+id, user?.id);
