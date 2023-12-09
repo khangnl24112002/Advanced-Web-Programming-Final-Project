@@ -10,7 +10,7 @@ import { MAIL_TEMPLATE_ID, ROLES } from 'src/utils';
 import moment from 'moment';
 import { SendgridService } from '../mail/mail.service';
 import { JwtService } from '@nestjs/jwt';
-import * as nanoid from 'nanoid';
+import {customAlphabet}  from 'nanoid';
 
 
 @Controller('classes')
@@ -19,17 +19,17 @@ import * as nanoid from 'nanoid';
 @UseGuards(JwtAuthGuard)
 export class ClassesController {
   // eslint-disable-next-line prettier/prettier
-  constructor(private readonly jwtService: JwtService,private readonly classesService: ClassesService, private readonly authService: AuthService, private readonly mailService: SendgridService) { }
+  constructor(private readonly jwtService: JwtService, private readonly classesService: ClassesService, private readonly authService: AuthService, private readonly mailService: SendgridService) { }
 
   @Post()
   @ApiCreatedResponse({ type: CreateClassResponse })
   async create(@Body() createClassDto: CreateClassDto, @CurrentUser('id') teacherId: string) {
     const exClass = await this.classesService.findOne(createClassDto.name);
-    const uniqueCode = nanoid
-        .customAlphabet(
-          '1234567890abcdefghiklmnouwpqz',
-          10
-        )(8)
+    const uniqueCode =
+      customAlphabet(
+        '1234567890abcdefghiklmnouwpqz',
+        10
+      )(8)
         .toUpperCase();
     if (exClass) {
       throw new BadRequestException({
@@ -37,7 +37,7 @@ export class ClassesController {
         message: "Lớp học đã tồn tại"
       })
     }
-    const classCreated = await this.classesService.create({...createClassDto, uniqueCode});
+    const classCreated = await this.classesService.create({ ...createClassDto, uniqueCode });
     const isCreator = true;
     await this.classesService.addTeacherToClass(classCreated.id, teacherId, isCreator);
     const classResponse = await this.classesService.findClassById(classCreated.id);
@@ -135,7 +135,7 @@ export class ClassesController {
     const frontendUrl = process.env.FRONTEND_URL;
     const token = await this.authService.generateAccessToken({ id: user.id, email: user.email });
     const dynamic_template_data = {
-      link :`${frontendUrl}/invite/${token}`,
+      link: `${frontendUrl}/invite/${token}`,
     };
     const msg = this.mailService.messageSignUpGenerate(
       [email as string],
@@ -208,7 +208,7 @@ export class ClassesController {
       if (moment().isBefore(expiredAt)) {
         const expiredAt = moment().add(30, 'days').toDate().toISOString();
         const invitationsLink = await this.classesService.inviteGroupUserToClass(+id, expiredAt);
-       
+
         const link = `${frontendUrl}/group-invite/${invitationsLink.id}`;
         return {
           status: true,
