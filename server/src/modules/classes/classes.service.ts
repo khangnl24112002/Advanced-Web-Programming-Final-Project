@@ -53,6 +53,8 @@ export class ClassesService {
                 firstName: true,
                 lastName: true,
                 email: true,
+                avatar: true,
+
               }
             }
           }
@@ -93,6 +95,8 @@ export class ClassesService {
                 firstName: true,
                 lastName: true,
                 email: true,
+                avatar: true,
+
               }
             }
           },
@@ -111,6 +115,8 @@ export class ClassesService {
                 firstName: true,
                 lastName: true,
                 email: true,
+                avatar: true,
+
               }
             }
           }
@@ -146,6 +152,8 @@ export class ClassesService {
                 id: true,
                 firstName: true,
                 lastName: true,
+                avatar: true,
+
                 email: true,
               }
             }
@@ -159,6 +167,8 @@ export class ClassesService {
                 firstName: true,
                 lastName: true,
                 email: true,
+                avatar: true,
+
               }
             }
           }
@@ -190,6 +200,7 @@ export class ClassesService {
             email: true,
             firstName: true,
             lastName: true,
+            avatar: true,
           },
           where: {
             isDisabled: false,

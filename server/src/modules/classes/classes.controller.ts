@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, InternalServerErrorException, BadRequestException, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, InternalServerErrorException, BadRequestException, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
 import { ClassesService } from './classes.service';
 import { CreateClassDto } from './dto/create-class.dto';
 import { CurrentUser } from 'src/decorators/users.decorator';
@@ -6,8 +6,10 @@ import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nest
 import { CreateClassResponse, GetStudentClassResponse, GetStudentInClassResponse, GetTeacherClassResponse, InviteGroupStudentResponse, InviteStudentResponse } from './dto/response';
 import { JwtAuthGuard } from 'src/guards/jwt.auth.guard';
 import { AuthService } from '../auth/auth.service';
-import { ROLES } from 'src/utils';
+import { MAIL_TEMPLATE_ID, ROLES } from 'src/utils';
 import moment from 'moment';
+import { SendgridService } from '../mail/mail.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('classes')
 @ApiTags('Classes')
@@ -15,7 +17,7 @@ import moment from 'moment';
 @UseGuards(JwtAuthGuard)
 export class ClassesController {
   // eslint-disable-next-line prettier/prettier
-  constructor(private readonly classesService: ClassesService, private readonly authService: AuthService) { }
+  constructor(private readonly jwtService: JwtService,private readonly classesService: ClassesService, private readonly authService: AuthService, private readonly mailService: SendgridService) { }
 
   @Post()
   @ApiCreatedResponse({ type: CreateClassResponse })
@@ -114,7 +116,7 @@ export class ClassesController {
 
   @Get(':id/invite/:email')
   @ApiOkResponse({ type: InviteStudentResponse })
-  async inviteStudentToClass(@Param('id') id: string, @Param('email') email: string) {
+  async inviteStudentToClass(@Param('email') email: string) {
     const user = await this.authService.findUserVerifyEmail(email);
     if (!user) {
       throw new BadRequestException({
@@ -122,13 +124,17 @@ export class ClassesController {
         message: "Email không tồn tại"
       })
     }
-    const roleId = user.roleId;
-    if (roleId === ROLES.STUDENT) {
-      await this.classesService.inviteStudentToClass(+id, user?.id);
-    }
-    else {
-      await this.classesService.inviteTeacherToClass(+id, user?.id);
-    }
+    const frontendUrl = process.env.FRONTEND_URL;
+    const token = await this.authService.generateAccessToken({ id: user.id, email: user.email });
+    const dynamic_template_data = {
+      link :`${frontendUrl}/invite/${token}`,
+    };
+    const msg = this.mailService.messageSignUpGenerate(
+      [email as string],
+      MAIL_TEMPLATE_ID.REGISTER as string,
+      dynamic_template_data,
+    );
+    await this.mailService.send(msg)
     return {
       status: true,
       message: "Mời thành công",
@@ -136,9 +142,57 @@ export class ClassesController {
     }
   }
 
+
+  @Get(':id/accept-invite/:token')
+  async acceptInvite(@Param('id') id: string, @Param('token') token: string) {
+    const jwtSercret = process.env.SECRET_KEY;
+    const decoded = await this.jwtService.verifyAsync(token, {
+      secret: jwtSercret,
+    });
+    if (!decoded) {
+      throw new HttpException(
+        {
+          message: 'Lỗi xác thực',
+          data: null,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // Validate expired token
+    const isTokenExpired = Date.now() >= decoded.exp * 1000;
+    if (isTokenExpired) {
+      throw new HttpException(
+        {
+          message: 'Đường dẫn đã hết hạn. Vui lòng thử lại sau',
+          data: null,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const user = await this.authService.findUserVerifyByUserId(decoded.id);
+    if (!user) {
+      throw new BadRequestException({
+        status: false,
+        message: "Tài khoản không tồn tại"
+      })
+    }
+    const roleId = user.roleId;
+    if (roleId === ROLES.STUDENT) {
+      await this.classesService.inviteStudentToClass(+id, user?.id);
+    } else {
+      await this.classesService.inviteTeacherToClass(+id, user?.id);
+    }
+    return {
+      status: true,
+      message: "Tham gia lớp thành công",
+      data: null
+    }
+  }
+
   @Get(':id/group-invite')
   @ApiOkResponse({ type: InviteGroupStudentResponse })
-  async inviteGroupUserToClass(@Param('id') id: string) {
+  async inviteGroupUserToClass(@Param('id') id: number) {
     const exInvitation = await this.classesService.findInvitationByClassId(+id);
     const frontendUrl = process.env.FRONTEND_URL;
     if (exInvitation) {
@@ -147,7 +201,7 @@ export class ClassesController {
         const expiredAt = moment().add(30, 'days').toDate().toISOString();
         const invitationsLink = await this.classesService.inviteGroupUserToClass(+id, expiredAt);
        
-        const link = `${frontendUrl}/invite/${invitationsLink.id}`;
+        const link = `${frontendUrl}/group-invite/${invitationsLink.id}`;
         return {
           status: true,
           message: "Mời thành công",
@@ -171,9 +225,9 @@ export class ClassesController {
     }
   }
 
-  @Get(':id/accept-invite/:invitationId/:userId')
+  @Get(':id/accept-group-invite/:invitationId/:userId')
   @ApiOkResponse({ type: InviteStudentResponse })
-  async acceptInvite(@Param('id') id: string, @Param('invitationId') invitationId: string, @Param('userId') userId: string) {
+  async acceptGroupInvite(@Param('id') id: number, @Param('invitationId') invitationId: string, @Param('userId') userId: string) {
     const invitation = await this.classesService.findInvitationById(invitationId);
     if (!invitation) {
       throw new BadRequestException({

@@ -94,7 +94,8 @@ export class InviteGroupStudentResponse {
   @ApiProperty({ example: 'Tạo liên kết thành công' })
   message: string;
   @ApiProperty({
-    example: 'https://localhost:3000/invite/1234567890-dfghjkl-rwerew54645',
+    example:
+      'https://localhost:3000/group-invite/1234567890-dfghjkl-rwerew54645',
   })
   data: any;
 }

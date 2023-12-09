@@ -37,6 +37,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         provider,
         password,
         emailVerified: true,
+        avatar: user.picture,
       });
       existUser = {...response.user, role: "user"};
     }

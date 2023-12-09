@@ -39,6 +39,7 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
         provider,
         password,
         emailVerified: true,
+        avatar: user.picture,
       });
       existUser = {...response.user, role: "user"};
     }

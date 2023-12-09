@@ -28,7 +28,7 @@ export class AuthService {
     return user;
   }
   async signUpByEmail(createUserDTO: any) {
-    const { firstName, lastName, email, password, role, emailVerified } = createUserDTO;
+    const { firstName, lastName, email, password, role, emailVerified, avatar} = createUserDTO;
     const roleId: number = ROLES[role?.toUpperCase() || 'USER'] as unknown as number
     const encryptedPassword = await hashPassword(password);
     let user: any = await this.prismaService.users.findFirst({
@@ -63,6 +63,7 @@ export class AuthService {
           encryptedPassword,
           roleId,
           emailVerified: emailVerified || false,
+          avatar: avatar || 'https://www.kindpng.com/picc/m/303-3032000_blue-class-dojo-monsters-hd-png-download.png'
         },
       });
     }
