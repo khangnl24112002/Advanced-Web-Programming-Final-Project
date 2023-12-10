@@ -78,8 +78,10 @@ const Classes = () => {
             name="search"
             icon="search"
           />
-          {/**Button dùng để tạo lớp học */}
-          {user.roleId === 1 ? (
+          {/**Button dùng để tạo lớp học
+           * nếu roleId = 4 (teacher thì mới có quyền tạo lớp)
+           */}
+          {user.roleId === 4 ? (
             <Link className={cn("button-small", styles.button)} to="addClass">
               <Icon name="add" size="20" />
               <span>Tạo lớp</span>

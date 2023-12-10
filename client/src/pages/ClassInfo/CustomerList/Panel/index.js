@@ -10,8 +10,11 @@ const Panel = ({ addStudent, outGroup, roleId }) => {
         {/* <Icon name="check-all" size="24" />
         Last saved <span>Oct 4, 2021 - 23:32</span> */}
       </div>
+      {/**Button thêm thành viên vào lớp học.
+       * Chỉ có giáo viên (RoleId === 4) mới có quyền này
+       */}
       <div className={styles.btns}>
-        {roleId === 1 ? (
+        {roleId === 4 ? (
           <button className={cn("button", styles.button)} onClick={addStudent}>
             Thêm thành viên
           </button>

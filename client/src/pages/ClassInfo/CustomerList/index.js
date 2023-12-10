@@ -171,8 +171,10 @@ const CustomerList = () => {
               name="search"
               icon="search"
             />
-            {/**Button dùng để lấy url lớp học */}
-            {user.roleId === 1 ? (
+            {/**Button dùng để lấy url lớp học.
+             * Nếu roleId = 4 (Giáo viên) thì mới có thể lấy URL lớp học
+             */}
+            {user.roleId === 4 ? (
               <button
                 className={cn("button-small", styles.button)}
                 onClick={handleGetUrl}
