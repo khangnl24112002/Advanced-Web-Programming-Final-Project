@@ -4,8 +4,11 @@ import styles from "./CreateClass.module.sass";
 import Card from "../../components/Card";
 import TextInput from "../../components/TextInput";
 import Panel from "./Panel";
-import { errorToast } from "../../utils/toast";
+import { errorToast, successToast } from "../../utils/toast";
 import { helper } from "../../utils/helper";
+import { classServices } from "../../services/ClassServices";
+import { useNavigate } from "react-router-dom";
+
 // Giao diện màn hình tạo lớp học cho giáo viên
 const CreateClass = ({ className }) => {
   // State cho tạo lớp học
@@ -15,6 +18,9 @@ const CreateClass = ({ className }) => {
     description: "",
   };
 
+  // dùng hook useNavigate để redirect
+  const navigate = useNavigate();
+
   // Khởi tạo state từ initialState
   const [createClass, setCreateClass] = useState(initialState);
 
@@ -22,11 +28,21 @@ const CreateClass = ({ className }) => {
   const handleCreateClass = async () => {
     if (validateData(createClass) === 1) {
       // Chuyển số lượng về number
-      setCreateClass({
+      const classRequest = {
         ...createClass,
         maximumStudents: parseInt(createClass.maximumStudents),
-      });
-      console.log(createClass);
+      };
+      console.log(classRequest);
+      // Gọi API xử lý
+      const response = await classServices.createClass(classRequest);
+      if (response.status) {
+        // Nếu thành công: thông báo thành công và quay về trang class
+        successToast("Tạo lớp học thành công!", 2000);
+        navigate("/classes", { replace: true });
+      } else {
+        // Nếu thất bại: thông báo lỗi
+        return errorToast(response.message);
+      }
     }
   };
 
