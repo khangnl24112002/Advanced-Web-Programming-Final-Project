@@ -2,6 +2,7 @@ import axios from "axios";
 const getToken = () => JSON.parse(localStorage.getItem("token"));
 
 export const baseURL = "https://final.clinus.live";
+// export const baseURL = "https://e5ea-42-116-127-108.ngrok-free.app";
 export const axiosInstance = axios.create({
   baseURL: baseURL,
   timeout: 10000,

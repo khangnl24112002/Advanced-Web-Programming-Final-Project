@@ -50,7 +50,7 @@ const indicatorsViewers = [
 
 const Classes = () => {
   // Lấy thông tin user
-  const { user } = useAuth();
+  const { user, token } = useAuth();
 
   const navigation = ["Market", "Traffic sources", "Viewers"];
 
@@ -65,12 +65,12 @@ const Classes = () => {
   useEffect(() => {
     const getClassList = async () => {
       if (user.role === "teacher") {
-        const response = await classServices.getTeacherClass();
+        const response = await classServices.getTeacherClass(token);
         if (response.status) {
           setClassList(response.data);
         }
       } else if (user.role === "student") {
-        const response = await classServices.getStudentClass();
+        const response = await classServices.getStudentClass(token);
         if (response.status) {
           setClassList(response.data);
         }

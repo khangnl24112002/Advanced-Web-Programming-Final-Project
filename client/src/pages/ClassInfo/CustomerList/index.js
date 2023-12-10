@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./CustomerList.module.sass";
 import cn from "classnames";
 import Card from "../../../components/Card";
@@ -13,6 +13,7 @@ import { errorToast, successToast } from "../../../utils/toast";
 import { useAuth } from "../../../hooks/useAuth";
 import { classServices } from "../../../services/ClassServices";
 import { EMAIL_REGEX } from "../../../constants";
+import { useRef } from "react";
 
 // const navigation = ["Active", "New"];
 
@@ -22,17 +23,17 @@ const CustomerList = ({ classId }) => {
   const [search, setSearch] = useState("");
   const [visible, setVisible] = useState(false);
   const [openModal, setOpenModal] = useState(false);
-  const [email, setEmail] = useState("");
+
   const [content, setContent] = useState(null);
   const [urlClass, setUrlClass] = useState("http://example.com");
-
+  const inputRef = useRef(null);
   const handleSubmit = (e) => {
     alert();
   };
   const handleInviteMember = async () => {
-    // 1. email validation
-    const isValidData = validateData(email);
-    if (isValidData === 1) {
+    // Sử dụng current để truy cập đến phần tử DOM
+    const email = inputRef.current.value;
+    if (validateData(email) === 1) {
       // 2. Gọi API để kiểm tra xem email có tồn tại hay không
       const response = await classServices.checkEmailExist(classId, email);
       console.log(response);
@@ -42,6 +43,19 @@ const CustomerList = ({ classId }) => {
 
   // Xử lí việc rời khỏi lớp học
   const handleOutClass = () => {};
+
+  // Xử lí việc lấy URL của lớp học
+  useEffect(() => {
+    const getUrlClass = async () => {
+      const response = await classServices.getInviteLinkClass(classId);
+      console.log(response);
+      if (response.status) {
+        setUrlClass(response.data);
+      } else {
+      }
+    };
+    getUrlClass();
+  }, []);
 
   const validateData = (email) => {
     console.log(email);
@@ -64,7 +78,7 @@ const CustomerList = ({ classId }) => {
           Lấy URL lớp học
         </div>
         <div className={styles.info}>
-          Đây là đường dẫn đến lớp học của bạn <a href={urlClass}>{urlClass}</a>
+          Đây là đường dẫn đến lớp học của bạn: {urlClass}
         </div>
         <div className={styles.foot}>
           <button
@@ -121,9 +135,7 @@ const CustomerList = ({ classId }) => {
             name="title"
             type="text"
             required
-            onChange={(e) => {
-              setEmail(e.target.value);
-            }}
+            innerRef={inputRef}
           />
           <button
             className={cn("button-stroke", styles.button)}

@@ -18,6 +18,8 @@ import OAuthRedirect from "./pages/OAuthRedirect/OAuthRedirect";
 import CreateClass from "./pages/CreateClass/CreateClass";
 import Classes from "./pages/ClassesDashboard/Classes";
 import { useAuth } from "./hooks/useAuth";
+import GroupInvite from "./pages/GroupInvite/GroupInvite";
+import EmailInvite from "./pages/EmailInvite/EmailInvite";
 function App() {
   const { user, token } = useAuth();
   return (
@@ -47,6 +49,8 @@ function App() {
             <Route path=":classId" element={<ClassInfo />} />
           </Route>
           <Route path="profile" element={<Profile />} />
+          <Route path="group-invite" element={<GroupInvite />} />
+          <Route path="invite" element={<EmailInvite />} />
         </Route>
         {/**Only teacher can access to these routes */}
         <Route
