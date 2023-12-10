@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./Classes.module.sass";
 import cn from "classnames";
 import Card from "../../../components/Card";
 import Form from "../../../components/Form";
 import Dropdown from "../../../components/Dropdown";
-import Market from "./Market";
+import ClassList from "./ClassList";
 import Table from "./Table";
 import { Link } from "react-router-dom";
 // data
@@ -13,6 +13,7 @@ import { viewers } from "../../../mocks/viewers";
 import { market } from "../../../mocks/market";
 import Icon from "../../../components/Icon";
 import { useAuth } from "../../../hooks/useAuth";
+import { classServices } from "../../../services/ClassServices";
 const indicatorsTraffic = [
   {
     title: "Market",
@@ -59,6 +60,24 @@ const Classes = () => {
   const handleSubmit = (e) => {
     alert();
   };
+  const [classList, setClassList] = useState([]);
+  // Fetch dữ liệu lớp học từ server
+  useEffect(() => {
+    const getClassList = async () => {
+      if (user.role === "teacher") {
+        const response = await classServices.getTeacherClass();
+        if (response.status) {
+          setClassList(response.data);
+        }
+      } else if (user.role === "student") {
+        const response = await classServices.getStudentClass();
+        if (response.status) {
+          setClassList(response.data);
+        }
+      }
+    };
+    getClassList();
+  }, [user.role]);
 
   return (
     <Card
@@ -79,9 +98,9 @@ const Classes = () => {
             icon="search"
           />
           {/**Button dùng để tạo lớp học
-           * nếu roleId = 4 (teacher thì mới có quyền tạo lớp)
+           * nếu role = 'teacher' (teacher thì mới có quyền tạo lớp)
            */}
-          {user.roleId === 4 ? (
+          {user.role === "teacher" ? (
             <Link className={cn("button-small", styles.button)} to="addClass">
               <Icon name="add" size="20" />
               <span>Tạo lớp</span>
@@ -124,7 +143,8 @@ const Classes = () => {
     >
       <div className={styles.classes}>
         <div className={styles.wrapper}>
-          {activeTab === navigation[0] && <Market items={market} />}
+          <ClassList items={classList} />
+          {/* {activeTab === navigation[0] && <ClassList items={classList} />}
           {activeTab === navigation[1] && (
             <Table
               title="Traffic source"
@@ -134,7 +154,7 @@ const Classes = () => {
           )}
           {activeTab === navigation[2] && (
             <Table title="Viewers" items={viewers} legend={indicatorsViewers} />
-          )}
+          )} */}
         </div>
       </div>
     </Card>

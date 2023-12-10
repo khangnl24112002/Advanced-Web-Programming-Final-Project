@@ -49,7 +49,7 @@ function App() {
         <Route
           element={
             <ProtectedLayout
-              isAllowed={!!user && user.roleId === 4}
+              isAllowed={!!user && user.role === "teacher"}
               redirectPath="/home"
             />
           }

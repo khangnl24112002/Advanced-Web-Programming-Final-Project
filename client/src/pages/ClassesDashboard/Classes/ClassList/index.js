@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import styles from "./Market.module.sass";
+import styles from "./ClassList.module.sass";
 // import cn from "classnames";
 // import Checkbox from "../../../../components/Checkbox";
 import Row from "./Row";
 
-const Market = ({ items }) => {
+const ClassList = ({ items }) => {
   // const [chooseAll, setСhooseAll] = useState(false);
 
   const [selectedFilters, setSelectedFilters] = useState([]);
@@ -21,17 +21,11 @@ const Market = ({ items }) => {
     <div className={styles.market}>
       <div className={styles.table}>
         <div className={styles.row}>
-          <div className={styles.col}>
-            {/* <Checkbox
-                            className={styles.checkbox}
-                            value={chooseAll}
-                            onChange={() => setСhooseAll(!chooseAll)}
-                        /> */}
-          </div>
+          <div className={styles.col}></div>
           <div className={styles.col}>Lớp</div>
           <div className={styles.col}>ID lớp</div>
           <div className={styles.col}>Số lượng học sinh</div>
-          <div className={styles.col}>Trạng thái</div>
+          <div className={styles.col}>Mô tả</div>
         </div>
         {items.map((x, index) => (
           <Row
@@ -55,4 +49,4 @@ const Market = ({ items }) => {
   );
 };
 
-export default Market;
+export default ClassList;

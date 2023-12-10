@@ -7,7 +7,7 @@ import styles from "./ModalProduct.module.sass";
 import Icon from "../Icon";
 import Product from "./Product";
 
-const ModalProduct = ({ visible, onClose }) => {
+const ModalProduct = ({ visible, onClose, classDetail }) => {
   const escFunction = useCallback(
     (e) => {
       if (e.keyCode === 27) {
@@ -45,7 +45,7 @@ const ModalProduct = ({ visible, onClose }) => {
           </button>
         </div>
         <div className={styles.outer}>
-          <Product />
+          <Product classDetail={classDetail} />
         </div>
       </div>
     ),

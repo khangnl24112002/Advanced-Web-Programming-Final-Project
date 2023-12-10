@@ -83,7 +83,7 @@ const SignIn = () => {
           email: Response.user.email,
           firstName: Response.user.firstName,
           lastName: Response.user.lastName,
-          roleId: userRole,
+          role: userRole,
         },
         token: Response.token,
       };

@@ -172,9 +172,9 @@ const CustomerList = () => {
               icon="search"
             />
             {/**Button dùng để lấy url lớp học.
-             * Nếu roleId = 4 (Giáo viên) thì mới có thể lấy URL lớp học
+             * Nếu role = 4 (Giáo viên) thì mới có thể lấy URL lớp học
              */}
-            {user.roleId === 4 ? (
+            {user.role === "teacher" ? (
               <button
                 className={cn("button-small", styles.button)}
                 onClick={handleGetUrl}
@@ -217,7 +217,7 @@ const CustomerList = () => {
         </div>
       </Card>
       <Panel
-        roleId={user.roleId}
+        role={user.role}
         addStudent={handleAddingStudent}
         outGroup={handleOutGroup}
       />

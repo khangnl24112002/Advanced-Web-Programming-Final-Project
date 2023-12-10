@@ -9,4 +9,22 @@ export const classServices = {
       return error.response.data;
     }
   },
+  // API lấy danh sách lớp học giáo viên tham gia
+  getTeacherClass: async () => {
+    try {
+      const response = await axiosInstance.get("/classes/teacher");
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  },
+  // API lấy danh sách lớp học học sinh tham gia
+  getStudentClass: async () => {
+    try {
+      const response = await axiosInstance.get("/classes/student");
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  },
 };
