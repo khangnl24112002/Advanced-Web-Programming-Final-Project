@@ -14,18 +14,21 @@ import { useAuth } from "../../../hooks/useAuth";
 import { classServices } from "../../../services/ClassServices";
 import { EMAIL_REGEX } from "../../../constants";
 import { useRef } from "react";
-
+import LoadingSpinner from "../../../components/LoadingSpinner/LoadingSpinner";
 // const navigation = ["Active", "New"];
 
 const CustomerList = ({ classId }) => {
   // Lấy userInfo
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [search, setSearch] = useState("");
   const [visible, setVisible] = useState(false);
   const [openModal, setOpenModal] = useState(false);
-
   const [content, setContent] = useState(null);
   const [urlClass, setUrlClass] = useState("http://example.com");
+  const [teachers, setTeachers] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [students, setStudents] = useState([]);
+  const [activeUser, setActiveUser] = useState({});
   const inputRef = useRef(null);
   const handleSubmit = (e) => {
     alert();
@@ -41,6 +44,10 @@ const CustomerList = ({ classId }) => {
     }
   };
 
+  const handleActive = (user) => {
+    setActiveUser(user);
+    console.log(user);
+  };
   // Xử lí việc rời khỏi lớp học
   const handleOutClass = () => {};
 
@@ -54,6 +61,44 @@ const CustomerList = ({ classId }) => {
       } else {
       }
     };
+    const fetchData = async () => {
+      setIsLoading(true);
+      const response = await classServices.getClassDetail(token, classId);
+
+      const responseData = await response.data;
+
+      const loadTeachers = [];
+      for (const key in responseData.teachers) {
+        loadTeachers.push({
+          key: key,
+          name:
+            responseData.teachers[key].firstName +
+            " " +
+            responseData.teachers[key].lastName,
+          email: responseData.teachers[key].email,
+          role: "Giáo viên",
+        });
+      }
+      console.log(loadTeachers);
+      setTeachers(loadTeachers);
+
+      const loadStudents = [];
+      for (const key in responseData.students) {
+        loadStudents.push({
+          key: key,
+          name:
+            responseData.teachers[key].firstName +
+            " " +
+            responseData.teachers[key].lastName,
+          email: responseData.teachers[key].email,
+          role: "Học sinh",
+        });
+      }
+      setStudents(loadStudents);
+
+      setIsLoading(false);
+    };
+    fetchData();
     getUrlClass();
   }, []);
 
@@ -219,17 +264,30 @@ const CustomerList = ({ classId }) => {
           </>
         }
       >
-        <div className={cn(styles.row, { [styles.flex]: visible })}>
-          <Table
-            className={styles.table}
-            activeTable={visible}
-            setActiveTable={setVisible}
-          />
-          <Details
-            className={styles.details}
-            onClose={() => setVisible(false)}
-          />
-        </div>
+        {isLoading && <LoadingSpinner />}
+        {!isLoading && (students || teachers) && (
+          <div className={cn(styles.row, { [styles.flex]: visible })}>
+            <Table
+              className={styles.table}
+              activeTable={visible}
+              setActiveTable={setVisible}
+              teachers={teachers}
+              students={students}
+              onActive={handleActive}
+            />
+
+            <Details
+              className={styles.details}
+              onClose={() => setVisible(false)}
+              activeUser={activeUser}
+            />
+          </div>
+        )}
+        {!isLoading && !teachers && !students && (
+          <div style={{ textAlign: "center" }}>
+            Không tìm thấy thành viên nào trong lớp
+          </div>
+        )}
       </Card>
       <Panel
         role={user.role}

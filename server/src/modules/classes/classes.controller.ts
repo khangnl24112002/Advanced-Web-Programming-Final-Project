@@ -7,7 +7,7 @@ import { CreateClassResponse, GetStudentClassResponse, GetStudentInClassResponse
 import { JwtAuthGuard } from 'src/guards/jwt.auth.guard';
 import { AuthService } from '../auth/auth.service';
 import { MAIL_TEMPLATE_ID, ROLES } from 'src/utils';
-import moment from 'moment';
+import * as moment from "moment";
 import { SendgridService } from '../mail/mail.service';
 import { JwtService } from '@nestjs/jwt';
 import {customAlphabet}  from 'nanoid';
@@ -124,7 +124,7 @@ export class ClassesController {
 
   @Get(':id/invite/:email')
   @ApiOkResponse({ type: InviteStudentResponse })
-  async inviteStudentToClass(@Param('email') email: string) {
+  async inviteStudentToClass(@Param('email') email: string, @Param('id') id: number) {
     const user = await this.authService.findUserVerifyEmail(email);
     if (!user) {
       throw new BadRequestException({
@@ -133,9 +133,9 @@ export class ClassesController {
       })
     }
     const frontendUrl = process.env.FRONTEND_URL;
-    const token = await this.authService.generateAccessToken({ id: user.id, email: user.email });
+    const token = await this.authService.generateAccessToken({ id: user.id, email: user.email, classId: id });
     const dynamic_template_data = {
-      link: `${frontendUrl}/invite/${token}`,
+      link: `${frontendUrl}/invite?token=${token}`,
     };
     const msg = this.mailService.messageSignUpGenerate(
       [email as string],
@@ -151,8 +151,8 @@ export class ClassesController {
   }
 
 
-  @Get(':id/accept-invite/:token')
-  async acceptInvite(@Param('id') id: string, @Param('token') token: string) {
+  @Get('accept-invite/:token')
+  async acceptInvite(@Param('token') token: string) {
     const jwtSercret = process.env.SECRET_KEY;
     const decoded = await this.jwtService.verifyAsync(token, {
       secret: jwtSercret,
@@ -186,10 +186,17 @@ export class ClassesController {
       })
     }
     const roleId = user.roleId;
+    const exUser = await this.classesService.findStudentOrTeacherInClass(decoded.classId, user?.id, roleId);
+    if(exUser) {
+      throw new BadRequestException({
+        status: false,
+        message: "Bạn đã tham gia lớp học này"
+      })
+    }
     if (roleId === ROLES.STUDENT) {
-      await this.classesService.inviteStudentToClass(+id, user?.id);
+      await this.classesService.inviteStudentToClass(decoded.classId, user?.id);
     } else {
-      await this.classesService.inviteTeacherToClass(+id, user?.id);
+      await this.classesService.inviteTeacherToClass(decoded.classId, user?.id);
     }
     return {
       status: true,
@@ -205,18 +212,19 @@ export class ClassesController {
     const frontendUrl = process.env.FRONTEND_URL;
     if (exInvitation) {
       const expiredAt = exInvitation.expiredAt;
-      if (moment().isBefore(expiredAt)) {
+      if (moment().isAfter(expiredAt)) {
+        await this.classesService.deleteInvitations(exInvitation.classId);
         const expiredAt = moment().add(30, 'days').toDate().toISOString();
         const invitationsLink = await this.classesService.inviteGroupUserToClass(+id, expiredAt);
 
-        const link = `${frontendUrl}/group-invite/${invitationsLink.id}`;
+        const link = `${frontendUrl}/group-invite?invitation=${invitationsLink.id}`;
         return {
           status: true,
           message: "Mời thành công",
           data: link
         }
       }
-      const link = `${frontendUrl}/invite/${exInvitation.id}`;
+      const link = `${frontendUrl}/group-invite?invitation=${exInvitation.id}`;
       return {
         status: true,
         message: "Mời thành công",
@@ -225,7 +233,7 @@ export class ClassesController {
     }
     const expiredAt = moment().add(30, 'days').toDate().toISOString();
     const invitationsLink = await this.classesService.inviteGroupUserToClass(+id, expiredAt);
-    const link = `${frontendUrl}/invite/${invitationsLink.id}`;
+    const link = `${frontendUrl}/group-invite?invitation=${invitationsLink.id}`;
     return {
       status: true,
       message: "Mời thành công",
@@ -233,9 +241,9 @@ export class ClassesController {
     }
   }
 
-  @Get(':id/accept-group-invite/:invitationId/:userId')
+  @Get('accept-group-invite/:invitationId/:userId')
   @ApiOkResponse({ type: InviteStudentResponse })
-  async acceptGroupInvite(@Param('id') id: number, @Param('invitationId') invitationId: string, @Param('userId') userId: string) {
+  async acceptGroupInvite(@Param('invitationId') invitationId: string, @Param('userId') userId: string) {
     const invitation = await this.classesService.findInvitationById(invitationId);
     if (!invitation) {
       throw new BadRequestException({
@@ -258,10 +266,17 @@ export class ClassesController {
       })
     }
     const roleId = user.roleId;
+    const exUser = await this.classesService.findStudentOrTeacherInClass(invitation.classId, user?.id, roleId);
+    if(exUser) {
+      throw new BadRequestException({
+        status: false,
+        message: "Bạn đã tham gia lớp học này"
+      })
+    }
     if (roleId === ROLES.STUDENT) {
-      await this.classesService.inviteStudentToClass(+id, user?.id);
+      await this.classesService.inviteStudentToClass(invitation.classId, user?.id);
     } else {
-      await this.classesService.inviteTeacherToClass(+id, user?.id);
+      await this.classesService.inviteTeacherToClass(invitation.classId, user?.id);
     }
     return {
       status: true,

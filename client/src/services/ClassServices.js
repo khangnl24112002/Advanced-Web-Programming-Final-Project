@@ -79,4 +79,23 @@ export const classServices = {
       return error.response.data;
     }
   },
+  getClassDetail: async (token, classId) => {
+    try {
+      const response = await axiosInstance.get(
+        `/classes/${classId}`,
+
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return error.response.data;
+    }
+  },
 };

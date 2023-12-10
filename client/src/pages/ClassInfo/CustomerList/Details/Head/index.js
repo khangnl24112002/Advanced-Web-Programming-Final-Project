@@ -4,7 +4,7 @@ import styles from "./Head.module.sass";
 import { Link } from "react-router-dom";
 import Icon from "../../../../../components/Icon";
 
-const Head = ({ className }) => {
+const Head = ({ className, user }) => {
     return (
         <div className={cn(styles.head, className)}>
             <div className={styles.user}>
@@ -12,8 +12,8 @@ const Head = ({ className }) => {
                     <img src="/assets/male-avatar.jpg" alt="Avatar" />
                 </div>
                 <div className={styles.details}>
-                    <div className={styles.man}>Mai Cường Thịnh</div>
-                    <div className={styles.login}>@michaelthinh1008</div>
+                    <div className={styles.man}>{user.name}</div>
+                    <div className={styles.login}>{user.email}</div>
                 </div>
             </div>
             {/* <div className={styles.btns}>

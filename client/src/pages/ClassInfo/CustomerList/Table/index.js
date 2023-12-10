@@ -8,7 +8,14 @@ import Row from "./Row";
 // data
 import { customers } from "../../../../mocks/customers";
 
-const Table = ({ className, activeTable, setActiveTable }) => {
+const Table = ({
+    className,
+    activeTable,
+    setActiveTable,
+    teachers,
+    students,
+    onActive,
+}) => {
     const [chooseAll, setСhooseAll] = useState(false);
     const [activeId, setActiveId] = useState(customers[0].id);
 
@@ -40,7 +47,20 @@ const Table = ({ className, activeTable, setActiveTable }) => {
                     <div className={styles.col}>Ngày tham gia</div>
                     <div className={styles.col}>Vai trò</div>
                 </div>
-                {customers.map((x, index) => (
+                {teachers.map((x, index) => (
+                    <Row
+                        item={x}
+                        onChoose={onActive}
+                        key={index}
+                        activeTable={activeTable}
+                        setActiveTable={setActiveTable}
+                        activeId={activeId}
+                        setActiveId={setActiveId}
+                        value={selectedFilters.includes(x.id)}
+                        onChange={() => handleChange(x.id)}
+                    />
+                ))}
+                {students.map((x, index) => (
                     <Row
                         item={x}
                         key={index}
