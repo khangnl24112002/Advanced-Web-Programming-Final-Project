@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./Classes.module.sass";
 import cn from "classnames";
 import Card from "../../../components/Card";
@@ -6,6 +6,7 @@ import Form from "../../../components/Form";
 import Dropdown from "../../../components/Dropdown";
 import Market from "./Market";
 import Table from "./Table";
+import LoadingSpinner from "../../../components/LoadingSpinner/LoadingSpinner";
 import { Link } from "react-router-dom";
 // data
 import { traffic } from "../../../mocks/traffic";
@@ -13,80 +14,110 @@ import { viewers } from "../../../mocks/viewers";
 import { market } from "../../../mocks/market";
 import Icon from "../../../components/Icon";
 import { useAuth } from "../../../hooks/useAuth";
+
+import { userServices } from "../../../services/UserServices";
+
 const indicatorsTraffic = [
-  {
-    title: "Market",
-    color: "#FFBC99",
-  },
-  {
-    title: "Social media",
-    color: "#CABDFF",
-  },
-  {
-    title: "Direct",
-    color: "#B5E4CA",
-  },
-  {
-    title: "UI8",
-    color: "#B1E5FC",
-  },
-  {
-    title: "Others",
-    color: "#FFD88D",
-  },
+    {
+        title: "Market",
+        color: "#FFBC99",
+    },
+    {
+        title: "Social media",
+        color: "#CABDFF",
+    },
+    {
+        title: "Direct",
+        color: "#B5E4CA",
+    },
+    {
+        title: "UI8",
+        color: "#B1E5FC",
+    },
+    {
+        title: "Others",
+        color: "#FFD88D",
+    },
 ];
 
 const indicatorsViewers = [
-  {
-    title: "Followers",
-    color: "#B5E4CA",
-  },
-  {
-    title: "Others",
-    color: "#CABDFF",
-  },
+    {
+        title: "Followers",
+        color: "#B5E4CA",
+    },
+    {
+        title: "Others",
+        color: "#CABDFF",
+    },
 ];
 
 const Classes = () => {
-  // Lấy thông tin user
-  const { user } = useAuth();
+    // Lấy thông tin user
+    const { user } = useAuth();
 
-  const navigation = ["Market", "Traffic sources", "Viewers"];
+    const navigation = ["Market", "Traffic sources", "Viewers"];
 
-  const [activeTab, setActiveTab] = useState(navigation[0]);
-  const [search, setSearch] = useState("");
+    const [activeTab, setActiveTab] = useState(navigation[0]);
+    const [search, setSearch] = useState("");
 
-  const handleSubmit = (e) => {
-    alert();
-  };
+    const { token } = useAuth();
+    const [classes, setClasses] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    useEffect(() => {
+        const fetchData = async () => {
+            setIsLoading(true);
+            const response = await userServices.getUserClasses(token);
+            const responseData = await response.data;
+            const loadClasses = [];
+            for (const key in responseData) {
+                loadClasses.push({
+                    key: key,
+                    classId: responseData[key].id,
+                    name: responseData[key].name,
+                    numberOfStudents: responseData[key].students.length,
+                });
+            }
+            setClasses(loadClasses);
+            setIsLoading(false);
+        };
 
-  return (
-    <Card
-      className={styles.card}
-      title="Danh sách các lớp học"
-      classTitle={cn("title-purple", styles.title)}
-      classCardHead={styles.head}
-      head={
-        <>
-          <Form
-            className={styles.form}
-            value={search}
-            setValue={setSearch}
-            onSubmit={() => handleSubmit()}
-            placeholder="Tìm lớp"
-            type="text"
-            name="search"
-            icon="search"
-          />
-          {/**Button dùng để tạo lớp học */}
-          {user.roleId === 1 ? (
-            <Link className={cn("button-small", styles.button)} to="addClass">
-              <Icon name="add" size="20" />
-              <span>Tạo lớp</span>
-            </Link>
-          ) : null}
+        fetchData();
+    }, [token]);
 
-          {/* <div className={styles.control}>
+    const handleSubmit = (e) => {
+        alert();
+    };
+
+    return (
+        <Card
+            className={styles.card}
+            title="Danh sách các lớp học"
+            classTitle={cn("title-purple", styles.title)}
+            classCardHead={styles.head}
+            head={
+                <>
+                    <Form
+                        className={styles.form}
+                        value={search}
+                        setValue={setSearch}
+                        onSubmit={() => handleSubmit()}
+                        placeholder="Tìm lớp"
+                        type="text"
+                        name="search"
+                        icon="search"
+                    />
+                    {/**Button dùng để tạo lớp học */}
+                    {user.roleId === 1 ? (
+                        <Link
+                            className={cn("button-small", styles.button)}
+                            to="addClass"
+                        >
+                            <Icon name="add" size="20" />
+                            <span>Tạo lớp</span>
+                        </Link>
+                    ) : null}
+
+                    {/* <div className={styles.control}>
             <button className={cn("button-stroke button-small", styles.button)}>
               Deleted
             </button>
@@ -95,7 +126,7 @@ const Classes = () => {
             </button>
             <div className={styles.counter}>3 selected</div>
           </div> */}
-          {/* <div className={cn(styles.nav, "tablet-hide")}>
+                    {/* <div className={cn(styles.nav, "tablet-hide")}>
                         {navigation.map((x, index) => (
                             <button
                                 className={cn(styles.link, {
@@ -108,7 +139,7 @@ const Classes = () => {
                             </button>
                         ))}
                     </div> */}
-          {/* <div className={cn(styles.dropdown, "tablet-show")}>
+                    {/* <div className={cn(styles.dropdown, "tablet-show")}>
             <Dropdown
               classDropdownHead={styles.dropdownHead}
               value={activeTab}
@@ -117,26 +148,38 @@ const Classes = () => {
               small
             />
           </div> */}
-        </>
-      }
-    >
-      <div className={styles.classes}>
-        <div className={styles.wrapper}>
-          {activeTab === navigation[0] && <Market items={market} />}
-          {activeTab === navigation[1] && (
-            <Table
-              title="Traffic source"
-              items={traffic}
-              legend={indicatorsTraffic}
-            />
-          )}
-          {activeTab === navigation[2] && (
-            <Table title="Viewers" items={viewers} legend={indicatorsViewers} />
-          )}
-        </div>
-      </div>
-    </Card>
-  );
+                </>
+            }
+        >
+            <div className={styles.classes}>
+                <div className={styles.wrapper}>
+                    {isLoading && <LoadingSpinner />}
+                    {activeTab === navigation[0] &&
+                        !isLoading &&
+                        classes.length > 0 && <Market items={classes} />}
+                    {!isLoading && classes.length === 0 && (
+                        <div style={{ textAlign: "center" }}>
+                            Không tìm thấy lớp học
+                        </div>
+                    )}
+                    {activeTab === navigation[1] && (
+                        <Table
+                            title="Traffic source"
+                            items={traffic}
+                            legend={indicatorsTraffic}
+                        />
+                    )}
+                    {activeTab === navigation[2] && (
+                        <Table
+                            title="Viewers"
+                            items={viewers}
+                            legend={indicatorsViewers}
+                        />
+                    )}
+                </div>
+            </div>
+        </Card>
+    );
 };
 
 export default Classes;

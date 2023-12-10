@@ -25,7 +25,7 @@ import PurchaseHistory from "./PurchaseHistory";
 //     },
 // ];
 
-const Details = ({ className, onClose }) => {
+const Details = ({ className, onClose, activeUser }) => {
     const [content, setContent] = useState();
 
     return (
@@ -33,7 +33,7 @@ const Details = ({ className, onClose }) => {
             <button className={styles.close} onClick={onClose}>
                 <Icon name="close" size="20" />
             </button>
-            <Head className={styles.head} />
+            <Head className={styles.head} user={activeUser} />
             {/* <Editor
                 state={content}
                 onChange={setContent}
@@ -44,7 +44,7 @@ const Details = ({ className, onClose }) => {
             <div className={styles.group}>
                 <a className={styles.line} href="#!" rel="noopener noreferrer">
                     <Icon name="mail" size="24" />
-                    michaelthinh1008@gmail.com
+                    {activeUser.email ? activeUser.email : "Email"}
                 </a>
                 {/* <div className={styles.socials}>
                     {socials.map((x, index) => (

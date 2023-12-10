@@ -38,13 +38,13 @@ const Row = ({ item, value, onChange, up }) => {
                             />
                         </div>
                         <div className={styles.details}>
-                            <div className={styles.product}>{item.product}</div>
+                            <div className={styles.product}>{item.name}</div>
                             <div className={styles.wrap}>
                                 <div className={styles.price}>
                                     ${item.price}
                                 </div>
                                 <div className={styles.category}>
-                                    {item.category}
+                                    Mã lớp: {item.classId}
                                 </div>
                             </div>
                         </div>
