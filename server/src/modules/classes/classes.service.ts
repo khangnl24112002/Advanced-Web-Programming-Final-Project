@@ -254,6 +254,14 @@ export class ClassesService {
     })
   }
 
+  async deleteInvitations(classId: number) {
+    return this.prismaService.classLinkInvitations.deleteMany({
+      where: {
+        classId,
+      }
+    })
+  }
+
   async deleteInvitationById(id: string) {
     return this.prismaService.classLinkInvitations.delete({
       where: {
