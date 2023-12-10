@@ -259,6 +259,13 @@ export class ClassesController {
       })
     }
     const roleId = user.roleId;
+    const exUser = await this.classesService.findStudentOrTeacherInClass(invitation.classId, user?.id, roleId);
+    if(exUser) {
+      throw new BadRequestException({
+        status: false,
+        message: "Bạn đã tham gia lớp học này"
+      })
+    }
     if (roleId === ROLES.STUDENT) {
       await this.classesService.inviteStudentToClass(invitation.classId, user?.id);
     } else {

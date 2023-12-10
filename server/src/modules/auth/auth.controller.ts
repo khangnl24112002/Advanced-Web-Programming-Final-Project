@@ -69,14 +69,14 @@ export class AuthController {
   @UseGuards(GoogleOAuthGuard)
   async googleAuthRedirect(@Request() req, @Res() res: Response) {
     const { user } = req;
-    return res.redirect(`${process.env.FRONTEND_URL}/auth/oauth-redirect?id=${user.id}&email=${user.email}&firstName=${user.firstName}&lastName=${user.lastName}&picture=${user.picture}&accessToken=${user.accessToken}`);
+    return res.redirect(`${process.env.FRONTEND_URL}/auth/oauth-redirect?id=${user.id}&email=${user.email}&firstName=${user.firstName}&lastName=${user.lastName}&picture=${user.picture}&accessToken=${user.accessToken}&role=${user.role}`);
   }
 
   @Get("facebook-redirect")
   @UseGuards(FacebookAuthGuard)
   async facebookLogin(@Request() req, @Res() res: Response): Promise<any> {
     const { user } = req;
-    return res.redirect(`${process.env.FRONTEND_URL}/auth/oauth-redirect?id=${user.id}&email=${user.email}&firstName=${user.firstName}&lastName=${user.lastName}&picture=${user.picture}&accessToken=${user.accessToken}`);
+    return res.redirect(`${process.env.FRONTEND_URL}/auth/oauth-redirect?id=${user.id}&email=${user.email}&firstName=${user.firstName}&lastName=${user.lastName}&picture=${user.picture}&accessToken=${user.accessToken}&role=${user.role}`);
   }
 
   @Get("facebook")

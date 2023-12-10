@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { map } from 'lodash';
+import { ROLES } from 'src/utils';
 
 @Injectable()
 export class ClassesService {
@@ -227,6 +228,25 @@ export class ClassesService {
         teacherId,
       }
     })
+  }
+
+  async findStudentOrTeacherInClass(classId: number, userId: string, roleId: number) {
+    if(roleId === ROLES.TEACHER) {
+      const teacher = await this.prismaService.classTeachers.findFirst({
+        where: {
+          classId,
+          teacherId: userId,
+        },
+      });
+      return teacher;
+    }
+    const student = await this.prismaService.classStudents.findFirst({
+      where: {
+        classId,
+        studentId: userId,
+      },
+    });
+    return student;
   }
 
   async inviteGroupUserToClass(classId: number, expiredAt: string) {

@@ -27,6 +27,9 @@ export class AuthService {
     });
     return user;
   }
+
+ 
+
   async signUpByEmail(createUserDTO: any) {
     const { firstName, lastName, email, password, role, emailVerified, avatar} = createUserDTO;
     const roleId: number = ROLES[role?.toUpperCase() || 'USER'] as unknown as number
