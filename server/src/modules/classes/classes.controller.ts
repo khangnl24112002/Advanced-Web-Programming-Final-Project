@@ -210,14 +210,14 @@ export class ClassesController {
         const expiredAt = moment().add(30, 'days').toDate().toISOString();
         const invitationsLink = await this.classesService.inviteGroupUserToClass(+id, expiredAt);
 
-        const link = `${frontendUrl}/group-invite?invitaion=${invitationsLink.id}`;
+        const link = `${frontendUrl}/group-invite?invitation=${invitationsLink.id}`;
         return {
           status: true,
           message: "Mời thành công",
           data: link
         }
       }
-      const link = `${frontendUrl}/group-invite?invitaion=${exInvitation.id}`;
+      const link = `${frontendUrl}/group-invite?invitation=${exInvitation.id}`;
       return {
         status: true,
         message: "Mời thành công",
@@ -226,7 +226,7 @@ export class ClassesController {
     }
     const expiredAt = moment().add(30, 'days').toDate().toISOString();
     const invitationsLink = await this.classesService.inviteGroupUserToClass(+id, expiredAt);
-    const link = `${frontendUrl}/group-invite?invitaion=${invitationsLink.id}`;
+    const link = `${frontendUrl}/group-invite?invitation=${invitationsLink.id}`;
     return {
       status: true,
       message: "Mời thành công",
