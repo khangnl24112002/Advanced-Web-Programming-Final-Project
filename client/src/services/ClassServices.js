@@ -27,4 +27,14 @@ export const classServices = {
       return error.response.data;
     }
   },
+  checkEmailExist: async (id, email) => {
+    try {
+      const response = await axiosInstance.get(
+        `/classes/${id}/invite/${email}`
+      );
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  },
 };

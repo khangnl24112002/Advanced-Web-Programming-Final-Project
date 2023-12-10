@@ -3,9 +3,7 @@ import styles from "./CustomerList.module.sass";
 import cn from "classnames";
 import Card from "../../../components/Card";
 import Form from "../../../components/Form";
-import Filters from "../../../components/Filters";
 import TextInput from "../../../components/TextInput";
-import Settings from "./Settings";
 import Table from "./Table";
 import Panel from "./Panel";
 import Details from "./Details";
@@ -13,28 +11,49 @@ import Modal from "./Modal";
 import Icon from "../../../components/Icon";
 import { errorToast, successToast } from "../../../utils/toast";
 import { useAuth } from "../../../hooks/useAuth";
+import { classServices } from "../../../services/ClassServices";
+import { EMAIL_REGEX } from "../../../constants";
+
 // const navigation = ["Active", "New"];
 
-const CustomerList = () => {
+const CustomerList = ({ classId }) => {
   // Lấy userInfo
   const { user } = useAuth();
-
-  const [activeIndex, setActiveIndex] = useState(0);
   const [search, setSearch] = useState("");
   const [visible, setVisible] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [email, setEmail] = useState("");
+  const [content, setContent] = useState(null);
+  const [urlClass, setUrlClass] = useState("http://example.com");
 
   const handleSubmit = (e) => {
     alert();
   };
-  const handleInviteMember = () => {
-    return successToast("Đã gửi lời mời!", 2000);
+  const handleInviteMember = async () => {
+    // 1. email validation
+    const isValidData = validateData(email);
+    if (isValidData === 1) {
+      // 2. Gọi API để kiểm tra xem email có tồn tại hay không
+      const response = await classServices.checkEmailExist(classId, email);
+      console.log(response);
+      return successToast("Đã gửi lời mời!", 2000);
+    }
   };
-  const [openModal, setOpenModal] = useState(false);
-  const [email, setEmail] = useState(true);
-  const [content, setContent] = useState(null);
-  const [urlClass, setUrlClass] = useState("http://example.com");
+
   // Xử lí việc rời khỏi lớp học
   const handleOutClass = () => {};
+
+  const validateData = (email) => {
+    console.log(email);
+    let result = 1;
+    if (email === "") {
+      return errorToast("Email không được để trống");
+    }
+    if (EMAIL_REGEX.test(email) === false) {
+      return errorToast("Email không hợp lệ");
+    }
+    return result;
+  };
 
   // Modal xử lí việc lấy url lớp học
   const handleGetUrl = () => {
@@ -102,6 +121,9 @@ const CustomerList = () => {
             name="title"
             type="text"
             required
+            onChange={(e) => {
+              setEmail(e.target.value);
+            }}
           />
           <button
             className={cn("button-stroke", styles.button)}
@@ -182,25 +204,6 @@ const CustomerList = () => {
                 Lấy URL lớp học
               </button>
             ) : null}
-            {/* <div className={styles.nav}>
-                            {navigation.map((x, index) => (
-                                <button
-                                    className={cn(styles.link, {
-                                        [styles.active]: index === activeIndex,
-                                    })}
-                                    onClick={() => setActiveIndex(index)}
-                                    key={index}
-                                >
-                                    {x}
-                                </button>
-                            ))}
-                        </div> */}
-            {/* <Filters
-                            className={styles.filters}
-                            title="Showing 10 of 24 customer"
-                        >
-                            <Settings />
-                        </Filters> */}
           </>
         }
       >
