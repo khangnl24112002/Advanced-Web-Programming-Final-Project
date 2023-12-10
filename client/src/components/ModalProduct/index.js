@@ -7,7 +7,7 @@ import styles from "./ModalProduct.module.sass";
 import Icon from "../Icon";
 import Product from "./Product";
 
-const ModalProduct = ({ visible, onClose }) => {
+const ModalProduct = ({ visible, onClose, classDetail }) => {
   const escFunction = useCallback(
     (e) => {
       if (e.keyCode === 27) {
@@ -37,7 +37,10 @@ const ModalProduct = ({ visible, onClose }) => {
     visible && (
       <div id="modal-product" className={styles.modal}>
         <div className={styles.control}>
-          <Link className={cn("button-white", styles.button)} to="/classes/u1">
+          <Link
+            className={cn("button-white", styles.button)}
+            to={`${classDetail.id}`}
+          >
             Thông tin lớp
           </Link>
           <button className={styles.close} onClick={onClose}>
@@ -45,7 +48,7 @@ const ModalProduct = ({ visible, onClose }) => {
           </button>
         </div>
         <div className={styles.outer}>
-          <Product />
+          <Product classDetail={classDetail} />
         </div>
       </div>
     ),

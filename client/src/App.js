@@ -16,7 +16,10 @@ import "./styles/app.sass";
 import AuthLayout from "./layouts/Auth/AuthLayout";
 import OAuthRedirect from "./pages/OAuthRedirect/OAuthRedirect";
 import CreateClass from "./pages/CreateClass/CreateClass";
+import Classes from "./pages/ClassesDashboard/Classes";
 import { useAuth } from "./hooks/useAuth";
+import GroupInvite from "./pages/GroupInvite/GroupInvite";
+import EmailInvite from "./pages/EmailInvite/EmailInvite";
 function App() {
   const { user, token } = useAuth();
   return (
@@ -41,15 +44,19 @@ function App() {
         >
           <Route path="home" index element={<Home />} />
           <Route path="settings" element={<Settings />} />
-          <Route path="classes/:classId" element={<ClassInfo />} />
-          <Route path="classes" element={<ClassesDashboard />} />
+          <Route path="classes" element={<ClassesDashboard />}>
+            <Route index element={<Classes />} />
+            <Route path=":classId" element={<ClassInfo />} />
+          </Route>
           <Route path="profile" element={<Profile />} />
+          <Route path="group-invite" element={<GroupInvite />} />
+          <Route path="invite" element={<EmailInvite />} />
         </Route>
         {/**Only teacher can access to these routes */}
         <Route
           element={
             <ProtectedLayout
-              isAllowed={!!user && user.roleId === 1}
+              isAllowed={!!user && user.role === "teacher"}
               redirectPath="/home"
             />
           }

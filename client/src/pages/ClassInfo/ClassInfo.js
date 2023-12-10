@@ -1,15 +1,18 @@
 import React from "react";
 import styles from "./ClassInfo.module.sass";
 import CustomerList from "./CustomerList";
+import { useParams } from "react-router-dom";
 
 const ClassInfo = () => {
-    return (
-        <>
-            <div className={styles.section}>
-                <CustomerList />
-            </div>
-        </>
-    );
+  const { classId } = useParams();
+  console.log(classId);
+  return (
+    <>
+      <div className={styles.section}>
+        <CustomerList classId={classId} />
+      </div>
+    </>
+  );
 };
 
 export default ClassInfo;

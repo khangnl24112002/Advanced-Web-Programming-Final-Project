@@ -19,15 +19,6 @@ export const authServices = {
       return error.response.data;
     }
   },
-  updateRole: async (userId, roleId) => {
-    try {
-      const response = await axiosInstance.put(`/auth?id=${userId}`, roleId);
-      return response.data;
-    } catch (error) {
-      console.log(error.response.data);
-      return error.response.data;
-    }
-  },
   handleOAuthLogin: async (provider) => {
     console.log(provider);
     try {

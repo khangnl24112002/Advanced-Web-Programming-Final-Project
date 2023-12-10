@@ -3,15 +3,18 @@ import cn from "classnames";
 import styles from "./Panel.module.sass";
 import Icon from "../../../../components/Icon";
 
-const Panel = ({ addStudent, outGroup, roleId }) => {
+const Panel = ({ addStudent, outGroup, role }) => {
   return (
     <div className={cn("panel", styles.panel)}>
       <div className={styles.info}>
         {/* <Icon name="check-all" size="24" />
         Last saved <span>Oct 4, 2021 - 23:32</span> */}
       </div>
+      {/**Button thêm thành viên vào lớp học.
+       * Chỉ có giáo viên (RoleId === 4) mới có quyền này
+       */}
       <div className={styles.btns}>
-        {roleId === 1 ? (
+        {role === "teacher" ? (
           <button className={cn("button", styles.button)} onClick={addStudent}>
             Thêm thành viên
           </button>

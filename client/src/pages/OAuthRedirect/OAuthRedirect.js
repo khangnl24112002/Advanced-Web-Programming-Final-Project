@@ -13,7 +13,9 @@ const OAUthRedirect = () => {
     lastName: searchParams.get("lastName"),
     email: searchParams.get("email"),
     picture: searchParams.get("picture"),
+    role: searchParams.get("role"),
   };
+  console.log(userInfo);
   if (userInfo.picture === "undefined") {
     userInfo.picture = undefined;
   }

@@ -10,6 +10,8 @@ import { authServices } from "../../services/AuthServices";
 import { errorToast } from "../../utils/toast";
 import SignInModal from "./SignInModal/index";
 import Dropdown from "../../components/Dropdown";
+import { getRoleIdFromRole } from "../../utils/Role";
+import { userServices } from "../../services/UserServices";
 
 const SignIn = () => {
   const initalState = {
@@ -22,15 +24,20 @@ const SignIn = () => {
   const { login } = useAuth();
   const roleList = ["Học sinh", "Giáo viên"];
   const [role, setRole] = useState(roleList[0]);
+
+  // Xử lý việc đăng nhập thông thường
   const handleSubmit = async (event) => {
     event.preventDefault();
     const isValidData = validateData(userAccount);
+    // Nếu dữ liệu hợp lệ thì gọi API
     if (isValidData === 1) {
       const response = await authServices.login(userAccount);
       if (response.status === true) {
         setResponse(response.data);
         // Kiểm tra xem đã chọn role chưa
-        if (response.data.user.role !== undefined) {
+        // Nếu chưa có role (role === 'user') thì yêu cầu chọn role, ngược lại cho vào trang chủ
+        console.log(response.data);
+        if (response.data.user.role !== "user") {
           login(response.data.user, response.data.token);
         } else {
           setVisibleModal(true);
@@ -49,31 +56,45 @@ const SignIn = () => {
     }));
   };
 
-  const handleUpdateRole = () => {
-    let roleId;
+  const handleUpdateRole = async () => {
+    let userRole;
+    // role=1: admin
+    // role=2: user
+    // role=3: student
+    // role=4: teacher
     if (role === "Học sinh") {
-      roleId = 2;
+      userRole = getRoleIdFromRole("student");
     } else if (role === "Giáo viên") {
-      roleId = 1;
+      userRole = getRoleIdFromRole("teacher");
     }
-    console.log("Role id choosen: ", roleId);
     // Gọi service để lấy role ở đây
-    const response = {
-      roleId: roleId,
-    };
-    // Cập nhật dữ liệu và đưa lên redux
-    const updatedResponse = {
-      user: {
-        id: Response.user.id,
-        email: Response.user.email,
-        firstName: Response.user.firstName,
-        lastName: Response.user.lastName,
-        roleId: response.roleId,
-      },
-      token: Response.token,
-    };
-    console.log(updatedResponse);
-    login(updatedResponse.user, updatedResponse.token);
+    const response = await userServices.updateRole(
+      Response.user.email,
+      Response.user.firstName,
+      Response.user.lastName,
+      userRole,
+      Response.token
+    );
+    // Nếu thành công: update lên localStorage, cho vào trang đăng nhập
+    if (response.status) {
+      const updatedResponse = {
+        user: {
+          id: Response.user.id,
+          email: Response.user.email,
+          firstName: Response.user.firstName,
+          lastName: Response.user.lastName,
+          role: userRole,
+        },
+        token: Response.token,
+      };
+      login(updatedResponse.user, updatedResponse.token);
+    }
+    // Nếu thất bại: thông báo lỗi
+    else {
+      return errorToast(
+        "Có lỗi xảy ra trong quá trình cập nhật, vui lòng thử lại sau."
+      );
+    }
   };
   const validateData = (userAccount) => {
     let result = 1;
