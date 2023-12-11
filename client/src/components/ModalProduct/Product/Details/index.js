@@ -7,7 +7,13 @@ import Products from "./Products";
 
 // const navigation = ["Class", "Comments"];
 
-const Details = ({ className, setValue, activeIndex, setActiveIndex }) => {
+const Details = ({
+    className,
+    setValue,
+    activeIndex,
+    setActiveIndex,
+    item,
+}) => {
     const handleClick = (index) => {
         setActiveIndex(index);
         index === 0 && setValue(false);
@@ -44,8 +50,8 @@ const Details = ({ className, setValue, activeIndex, setActiveIndex }) => {
           </button>
         </div> */}
             </div>
-            <Overview />
-            <Products />
+            <Overview item={item} />
+            <Products item={item} />
         </div>
     );
 };

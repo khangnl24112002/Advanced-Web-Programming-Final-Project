@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import styles from "./Row.module.sass";
 import cn from "classnames";
 // import Checkbox from "../../../../../components/Checkbox";
-import Balance from "../../../../../components/Balance";
-import ModalProduct from "../../../../../components/ModalProduct";
-import Control from "../../Control";
+import Balance from "../../../../components/Balance/index.js";
+import ModalProduct from "../../../../components/ModalProduct/index.js";
+import Control from "../Control/index.js";
 
-import { numberWithCommas } from "../../../../../utils.js";
+import { numberWithCommas } from "../../../../utils.js";
 
 const Row = ({ item, value, onChange, up }) => {
     const [visibleActions, setVisibleActions] = useState(false);

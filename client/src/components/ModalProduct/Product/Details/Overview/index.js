@@ -11,25 +11,29 @@ const gallery = [
     "/images/content/photo-2.jpg",
 ];
 
+function padTo2Digits(num) {
+    return num.toString().padStart(2, "0");
+}
+
+function formatDate(date) {
+    return [
+        date.getFullYear(),
+        padTo2Digits(date.getMonth() + 1),
+        padTo2Digits(date.getDate()),
+    ].join("-");
+}
+
 const features = ["1 giáo viên", "3 học sinh", "Ngày tạo: 21/10/2023"];
 
-const Overview = () => {
+const Overview = ({ item }) => {
     const [visibleModalPreview, setVisibleModalPreview] = useState(false);
 
     return (
         <>
             <div className={styles.overview}>
-                <div className={cn("h4", styles.title)}>
-                    Toán ứng dụng và thống kê
-                </div>
-                <div className={styles.info}>Mã lớp: 20_1</div>
+                <div className={cn("h4", styles.title)}>{item.name}</div>
+                <div className={styles.info}>Mã lớp: {item.uniqueCode}</div>
                 <div className={styles.line}>
-                    <div className={styles.author}>
-                        <div className={styles.avatar}>
-                            <img src="/assets/male-avatar.jpg" alt="Avatar" />
-                        </div>
-                        by <span>Nguyễn Hữu Toàn</span>
-                    </div>
                     {/* <div className={styles.rating}>
                         <Icon name="star-fill" size="24" />
                         4.8
@@ -59,18 +63,7 @@ const Overview = () => {
                         </div>
                         <div className={styles.content}>
                             <p style={{ textAlign: "justify" }}>
-                                Lớp học toán mang đến một trải nghiệm đa dạng và
-                                thú vị cho học sinh, khám phá nhiều khía cạnh
-                                của môn toán thông qua các bài giảng sáng tạo và
-                                các hoạt động thực hành. Giáo viên tập trung vào
-                                việc khuyến khích sự hiểu biết sâu rộng hơn thay
-                                vì chỉ việc nhớ các kiến thức cụ thể. Các chủ đề
-                                được chọn một cách ngẫu nhiên nhằm kích thích tò
-                                mò và sự sáng tạo, giúp học sinh xây dựng kỹ
-                                năng tư duy logic và giải quyết vấn đề. Qua lớp
-                                học này, học sinh được khích lệ tự tin, linh
-                                hoạt và có khả năng áp dụng kiến thức toán học
-                                vào thực tế.
+                                {item.description}
                             </p>
                         </div>
                     </div>
@@ -79,9 +72,11 @@ const Overview = () => {
                             Thống kê
                         </div>
                         <ul className={styles.features}>
-                            {features.map((x, index) => (
-                                <li key={index}>{x}</li>
-                            ))}
+                            <li>{item.teachers.length} giáo viên</li>
+                            <li>{item.students.length} học sinh</li>
+                            <li>
+                                Ngày tạo: {formatDate(new Date(item.createdAt))}
+                            </li>
                         </ul>
                     </div>
                 </div>
