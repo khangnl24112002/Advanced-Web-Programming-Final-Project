@@ -5,7 +5,6 @@ import { useParams } from "react-router-dom";
 
 const ClassInfo = () => {
   const { classId } = useParams();
-  console.log(classId);
   return (
     <>
       <div className={styles.section}>

@@ -36,7 +36,6 @@ const SignIn = () => {
         setResponse(response.data);
         // Kiểm tra xem đã chọn role chưa
         // Nếu chưa có role (role === 'user') thì yêu cầu chọn role, ngược lại cho vào trang chủ
-        console.log(response.data);
         if (response.data.user.role !== "user") {
           login(response.data.user, response.data.token);
         } else {

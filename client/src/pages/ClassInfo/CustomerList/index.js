@@ -30,7 +30,6 @@ const CustomerList = () => {
 
   const handleActive = (user) => {
     setActiveUser(user);
-    console.log(user);
   };
 
   const [isLoading, setIsLoading] = useState(false);
@@ -109,7 +108,6 @@ const CustomerList = () => {
   };
 
   const validateData = (email) => {
-    console.log(email);
     let result = 1;
     if (email === "") {
       return errorToast("Email không được để trống");
