@@ -6,7 +6,7 @@ import Comments from "./Comments";
 import Panel from "./Panel";
 import Icon from "../../Icon";
 
-const Product = () => {
+const Product = ({ item }) => {
     const [visible, setVisible] = useState(false);
     const [activeIndex, setActiveIndex] = useState(0);
 
@@ -22,6 +22,7 @@ const Product = () => {
                 setValue={setVisible}
                 activeIndex={activeIndex}
                 setActiveIndex={setActiveIndex}
+                item={item}
             />
             <Comments
                 className={styles.comments}
