@@ -32,7 +32,7 @@ const SignIn = () => {
     // Nếu dữ liệu hợp lệ thì gọi API
     if (isValidData === 1) {
       const response = await authServices.login(userAccount);
-      if (response.status === true) {
+      if (response?.status === true) {
         setResponse(response.data);
         // Kiểm tra xem đã chọn role chưa
         // Nếu chưa có role (role === 'user') thì yêu cầu chọn role, ngược lại cho vào trang chủ

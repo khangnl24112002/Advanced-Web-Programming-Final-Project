@@ -25,17 +25,16 @@ const OAUthRedirect = () => {
   };
   const token = searchParams.get("token");
   console.log(userInfo);
-  useEffect(() => {
-    // Get user info from URL
-    if (userInfo.picture === "undefined") {
-      userInfo.picture = undefined;
-    }
-    // Nếu không có role: render màn hình yêu cầu nhập role
-    if (userInfo.role === "user") {
-      setVisibleModal(true);
-    }
-    // login(userInfo, searchParams.get("accessToken"));
-  }, []);
+
+  // Get user info from URL
+  if (userInfo.picture === "undefined") {
+    userInfo.picture = undefined;
+  }
+  // Nếu không có role: render màn hình yêu cầu nhập role
+  if (userInfo.role === "user") {
+    setVisibleModal(true);
+  }
+  // login(userInfo, searchParams.get("accessToken"));
 
   const handleUpdateRole = async () => {
     let userRole;
