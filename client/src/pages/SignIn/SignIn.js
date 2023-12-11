@@ -66,8 +66,7 @@ const SignIn = () => {
       userRole = getRoleIdFromRole("student");
     } else if (role === "Giáo viên") {
       userRole = getRoleIdFromRole("teacher");
-    }
-    // Gọi service để lấy role ở đây
+    } // Gọi service để lấy role ở đây
     const response = await userServices.updateRole(
       Response.user.email,
       Response.user.firstName,

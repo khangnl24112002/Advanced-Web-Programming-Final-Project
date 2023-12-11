@@ -44,8 +44,7 @@ export const axiosInstance = axios.create({
 const InterceptorsRequest = async (config) => {
   // lấy token từ cookie và gắn vào header trước khi gửi request
   const token = getToken();
-
-  if (token === undefined) {
+  if (token === undefined || token === null) {
     return config;
   }
 
