@@ -21,7 +21,6 @@ export const userServices = {
   },
   updateRole: async (email, firstName, lastName, roleId, token) => {
     try {
-      console.log("Bearer " + token);
       const response = await axiosInstance.put(
         `/user?email=${email}`,
         {

@@ -32,7 +32,6 @@ const CreateClass = ({ className }) => {
         ...createClass,
         maximumStudents: parseInt(createClass.maximumStudents),
       };
-      console.log(classRequest);
       // Gọi API xử lý
       const response = await classServices.createClass(classRequest);
       if (response.status) {
