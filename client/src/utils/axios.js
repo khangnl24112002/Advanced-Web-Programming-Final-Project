@@ -1,9 +1,9 @@
 import axios from "axios";
 const getToken = () => JSON.parse(localStorage.getItem("token"));
 
-// export const baseURL = "https://final.clinus.live";
+export const baseURL = "https://final.clinus.live";
 
-export const baseURL = "http://localhost:3333";
+// export const baseURL = "http://localhost:3333";
 export const axiosInstance = axios.create({
     baseURL: baseURL,
     timeout: 10000,
