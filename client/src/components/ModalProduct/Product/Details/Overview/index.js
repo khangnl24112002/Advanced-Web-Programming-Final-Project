@@ -72,8 +72,14 @@ const Overview = ({ item }) => {
                             Thống kê
                         </div>
                         <ul className={styles.features}>
-                            <li>{item.teachers.length} giáo viên</li>
-                            <li>{item.students.length} học sinh</li>
+                            <li>
+                                {item.teachers ? item.teachers.length : "0"}{" "}
+                                giáo viên
+                            </li>
+                            <li>
+                                {item.students ? item.students.length : "0"} học
+                                sinh
+                            </li>
                             <li>
                                 Ngày tạo: {formatDate(new Date(item.createdAt))}
                             </li>

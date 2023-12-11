@@ -17,6 +17,7 @@ const Row = ({
     const handleClick = (id) => {
         setActiveTable(true);
         setActiveId(id);
+        console.log(id);
         onChoose(id);
     };
 
