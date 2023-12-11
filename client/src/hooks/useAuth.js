@@ -10,7 +10,6 @@ export const AuthProvider = ({ children }) => {
   // const [token, setToken] = useLocalStorage("token", null);
   const navigate = useNavigate();
   const login = async (data, token) => {
-    console.log("Data: ", data);
     setUser(data);
     setToken(token);
     navigate("/home", { replace: true });

@@ -3,9 +3,7 @@ import styles from "./CustomerList.module.sass";
 import cn from "classnames";
 import Card from "../../../components/Card";
 import Form from "../../../components/Form";
-import Filters from "../../../components/Filters";
 import TextInput from "../../../components/TextInput";
-import Settings from "./Settings";
 import Table from "./Table";
 import Panel from "./Panel";
 import Details from "./Details";
@@ -13,22 +11,22 @@ import Modal from "./Modal";
 import Icon from "../../../components/Icon";
 import { errorToast, successToast } from "../../../utils/toast";
 import { useAuth } from "../../../hooks/useAuth";
-import { userServices } from "../../../services/UserServices";
 import { classServices } from "../../../services/ClassServices";
 import { useParams } from "react-router-dom";
+import { useRef } from "react";
 import LoadingSpinner from "../../../components/LoadingSpinner/LoadingSpinner";
 // const navigation = ["Active", "New"];
-
+import { EMAIL_REGEX } from "../../../constants";
 const CustomerList = () => {
   // Lấy userInfo
   const { user } = useAuth();
 
   const { token } = useAuth();
   const [teachers, setTeachers] = useState([]);
-
   const [students, setStudents] = useState([]);
-
+  const [urlClass, setUrlClass] = useState("http://example.com");
   const [activeUser, setActiveUser] = useState({});
+  const inputRef = useRef(null);
 
   const handleActive = (user) => {
     setActiveUser(user);
@@ -37,7 +35,6 @@ const CustomerList = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const { classId } = useParams();
-  console.log(classId);
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -57,9 +54,7 @@ const CustomerList = () => {
           role: "Giáo viên",
         });
       }
-      console.log(loadTeachers);
       setTeachers(loadTeachers);
-
       const loadStudents = [];
       for (const key in responseData.students) {
         loadStudents.push({
@@ -73,27 +68,58 @@ const CustomerList = () => {
         });
       }
       setStudents(loadStudents);
-
       setIsLoading(false);
+
+      const getUrlClass = async () => {
+        const response = await classServices.getInviteLinkClass(classId);
+        console.log(response);
+        if (response.status) {
+          setUrlClass(response.data);
+        } else {
+        }
+      };
+      getUrlClass();
     };
 
     fetchData();
   }, [token]);
 
-  const [activeIndex, setActiveIndex] = useState(0);
   const [search, setSearch] = useState("");
   const [visible, setVisible] = useState(false);
 
   const handleSubmit = (e) => {
     alert();
   };
-  const handleInviteMember = () => {
-    return successToast("Đã gửi lời mời!", 2000);
-  };
+
   const [openModal, setOpenModal] = useState(false);
-  const [email, setEmail] = useState(true);
   const [content, setContent] = useState(null);
-  const [urlClass, setUrlClass] = useState("http://example.com");
+
+  const handleInviteMember = async () => {
+    // Sử dụng current để truy cập đến phần tử DOM
+    const email = inputRef.current.value;
+    if (validateData(email) === 1) {
+      // 2. Gọi API để kiểm tra xem email có tồn tại hay không
+      const response = await classServices.checkEmailExist(classId, email);
+      if (response.status) {
+        return successToast("Đã gửi lời mời!", 2000);
+      } else {
+        return errorToast("Tài khoản này chưa tham gia vào ứng dụng!");
+      }
+    }
+  };
+
+  const validateData = (email) => {
+    console.log(email);
+    let result = 1;
+    if (email === "") {
+      return errorToast("Email không được để trống");
+    }
+    if (EMAIL_REGEX.test(email) === false) {
+      return errorToast("Email không hợp lệ");
+    }
+    return result;
+  };
+
   // Xử lí việc rời khỏi lớp học
   const handleOutClass = () => {};
 
@@ -106,7 +132,7 @@ const CustomerList = () => {
           Lấy URL lớp học
         </div>
         <div className={styles.info}>
-          Đây là đường dẫn đến lớp học của bạn <a href={urlClass}>{urlClass}</a>
+          Đây là đường dẫn đến lớp học của bạn: {urlClass}
         </div>
         <div className={styles.foot}>
           <button
@@ -163,6 +189,7 @@ const CustomerList = () => {
             name="title"
             type="text"
             required
+            innerRef={inputRef}
           />
           <button
             className={cn("button-stroke", styles.button)}
