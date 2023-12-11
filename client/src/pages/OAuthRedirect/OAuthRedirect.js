@@ -32,6 +32,7 @@ const OAUthRedirect = () => {
       userInfo.picture = undefined;
     }
     // Nếu không có role: render màn hình yêu cầu nhập role
+    console.log(userInfo);
     if (userInfo.role === "user") {
       setVisibleModal(true);
     } else {
@@ -44,10 +45,10 @@ const OAUthRedirect = () => {
     // role=2: user
     // role=3: student
     // role=4: teacher
-    if (role === "student") {
+    if (role === "Học sinh") {
       userRole = getRoleIdFromRole("student");
     } else if (role === "teacher") {
-      userRole = getRoleIdFromRole("teacher");
+      userRole = getRoleIdFromRole("Giáo viên");
     }
     const userInfo = {
       id: searchParams.get("id"),
