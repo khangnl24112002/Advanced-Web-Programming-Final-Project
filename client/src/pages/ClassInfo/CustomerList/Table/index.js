@@ -64,6 +64,7 @@ const Table = ({
                     <Row
                         item={x}
                         key={index}
+                        onChoose={onActive}
                         activeTable={activeTable}
                         setActiveTable={setActiveTable}
                         activeId={activeId}

@@ -9,6 +9,7 @@ import Control from "../../Control";
 import { numberWithCommas } from "../../../../../utils.js";
 
 const Row = ({ item, value, onChange, up }) => {
+    console.log(item);
     const [visibleModalProduct, setVisibleModalProduct] = useState(false);
 
     return (
@@ -20,9 +21,7 @@ const Row = ({ item, value, onChange, up }) => {
                 <div className={styles.col}></div>
                 <div className={styles.col}>{item.name}</div>
                 <div className={styles.col}>{item.uniqueCode}</div>
-                <div className={styles.col}>
-                    {item.students.length + item.teachers.length}
-                </div>
+                <div className={styles.col}>{item.maximumStudents}</div>
                 <div className={styles.col}>
                     {!item.isDisabled ? (
                         <div className={cn("status-green", styles.status)}>

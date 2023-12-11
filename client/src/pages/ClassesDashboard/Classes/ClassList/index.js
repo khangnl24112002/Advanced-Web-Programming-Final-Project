@@ -24,7 +24,7 @@ const ClassList = ({ items }) => {
                     <div className={styles.col}></div>
                     <div className={styles.col}>Lớp</div>
                     <div className={styles.col}>ID lớp</div>
-                    <div className={styles.col}>Số người trong lớp</div>
+                    <div className={styles.col}>Số lượng thành viên tối đa</div>
                     <div className={styles.col}>Mô tả</div>
                 </div>
                 {items.map((x, index) => (
