@@ -10,8 +10,10 @@ import { MAIL_TEMPLATE_ID, ROLES } from 'src/utils';
 import * as moment from "moment";
 import { SendgridService } from '../mail/mail.service';
 import { JwtService } from '@nestjs/jwt';
-import {customAlphabet}  from 'nanoid';
-
+import { customAlphabet } from 'nanoid';
+import { CreateGradeDto } from '../assignments/dto/body.dto';
+import * as xlsx from 'xlsx'
+import { CloudinaryService } from '../files/cloudinary.service';
 
 @Controller('classes')
 @ApiTags('Classes')
@@ -19,7 +21,11 @@ import {customAlphabet}  from 'nanoid';
 @UseGuards(JwtAuthGuard)
 export class ClassesController {
   // eslint-disable-next-line prettier/prettier
-  constructor(private readonly jwtService: JwtService, private readonly classesService: ClassesService, private readonly authService: AuthService, private readonly mailService: SendgridService) { }
+  constructor(private readonly jwtService: JwtService,
+    private readonly classesService: ClassesService,
+    private readonly authService: AuthService,
+    private readonly mailService: SendgridService,
+    private readonly cloudinaryService: CloudinaryService) { }
 
   @Post()
   @ApiCreatedResponse({ type: CreateClassResponse })
@@ -187,7 +193,7 @@ export class ClassesController {
     }
     const roleId = user.roleId;
     const exUser = await this.classesService.findStudentOrTeacherInClass(decoded.classId, user?.id, roleId);
-    if(exUser) {
+    if (exUser) {
       throw new BadRequestException({
         status: false,
         message: "Bạn đã tham gia lớp học này"
@@ -267,7 +273,7 @@ export class ClassesController {
     }
     const roleId = user.roleId;
     const exUser = await this.classesService.findStudentOrTeacherInClass(invitation.classId, user?.id, roleId);
-    if(exUser) {
+    if (exUser) {
       throw new BadRequestException({
         status: false,
         message: "Bạn đã tham gia lớp học này"
@@ -282,6 +288,57 @@ export class ClassesController {
       status: true,
       message: "Tham gia lớp thành công",
       data: null
+    }
+  }
+
+
+  @Post(':id/grades')
+  async createGrade(
+    @Param('id') id: number,
+    @Body() body: CreateGradeDto,
+  ) {
+    // delete old grade
+    await this.classesService.deleteGrades(+id);
+    const grades = await this.classesService.createGrade(+id, body);
+    return {
+      status: true,
+      data: grades,
+      message: "Tạo bài tập thành công"
+    }
+  }
+
+  @Get(':id/grades')
+  async getGrades(@Param('id') id: number) {
+    const grades = await this.classesService.getGrades(+id);
+    return {
+      status: true,
+      data: grades,
+      message: "Lấy danh sách bài tập thành công"
+    }
+  }
+
+  @Get(":id/export-student-list")
+  async exportStudentList(@Param('id') id: number) {
+    const students = await this.classesService.getStudentsOfClass(+id);
+    const refactorStudents = students?.map((student) => {
+      return {
+        "StudentId": student?.uniqueId || Math.floor(Math.random() * 1000000000),
+        "Fullname": `${student.firstName} ${student.lastName}`
+      }
+    })
+    const workbook = xlsx.utils.book_new();
+    const worksheet = xlsx.utils.json_to_sheet(refactorStudents);
+    xlsx.utils.book_append_sheet(workbook, worksheet, 'Students');
+    const buffer = xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+    const today = moment().format('YYYY-MM-DD HH:mm:ss');
+    const UploadedFile = await this.cloudinaryService.uploadFile({
+      buffer,
+      filename: `Students-${today}.xlsx`,
+    });
+    return {
+      status: true,
+      data: UploadedFile.url,
+      message: "Lấy danh sách học sinh thành công"
     }
   }
 }

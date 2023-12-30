@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { map } from 'lodash';
 import { ROLES } from 'src/utils';
+import { CreateGradeDto } from '../assignments/dto/body.dto';
 
 @Injectable()
 export class ClassesService {
@@ -201,6 +202,7 @@ export class ClassesService {
             firstName: true,
             lastName: true,
             avatar: true,
+            uniqueId: true,
           },
           where: {
             isDisabled: false,
@@ -231,7 +233,7 @@ export class ClassesService {
   }
 
   async findStudentOrTeacherInClass(classId: number, userId: string, roleId: number) {
-    if(roleId === ROLES.TEACHER) {
+    if (roleId === ROLES.TEACHER) {
       const teacher = await this.prismaService.classTeachers.findFirst({
         where: {
           classId,
@@ -286,6 +288,33 @@ export class ClassesService {
     return this.prismaService.classLinkInvitations.delete({
       where: {
         id
+      }
+    })
+  }
+
+  async deleteGrades(classId: number) {
+    return this.prismaService.grades.deleteMany({
+      where: {
+        classId,
+      }
+    })
+  }
+
+  async createGrade(classId: number, createGradeDto: CreateGradeDto) {
+    return Promise.all(createGradeDto.grades.map(async (grade) => {
+      return this.prismaService.grades.create({
+        data: {
+          classId,
+          name: grade.name,
+          percentage: grade.percentage,
+        }
+      })
+    }))
+  }
+  async getGrades(classId: number) {
+    return this.prismaService.grades.findMany({
+      where: {
+        classId,
       }
     })
   }

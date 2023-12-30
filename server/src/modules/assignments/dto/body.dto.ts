@@ -22,3 +22,31 @@ export class CreateAssignmentDTO {
   @Transform(({ value }) => new Date(value).toISOString())
   dueDate: string;
 }
+
+class CreateGrade {
+  @ApiProperty({ required: true, example: 'CKI' })
+  @IsNotEmpty()
+  name: string;
+
+  @ApiProperty({ required: true, example: 'Minh' })
+  @IsNotEmpty()
+  percentage: number;
+}
+
+export class CreateGradeDto {
+  @IsNotEmpty()
+  @ApiProperty({
+    required: true,
+    example: [
+      {
+        name: 'CKI',
+        percentage: 40,
+      },
+      {
+        name: 'CKII',
+        percentage: 60,
+      },
+    ],
+  })
+  grades: CreateGrade[];
+}

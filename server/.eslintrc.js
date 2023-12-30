@@ -29,5 +29,6 @@ module.exports = {
         parser: 'flow',
       },
     ],
+    'prettier/prettier': ['error', { printWidth: 120 }],
   },
 };
