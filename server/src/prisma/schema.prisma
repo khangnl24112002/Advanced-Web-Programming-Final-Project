@@ -11,27 +11,30 @@ datasource db {
 }
 
 model users {
-  id                String          @id @default(uuid())
-  email             String?         @unique
-  encryptedPassword String          @map(name: "encrypted_password")
-  firstName         String?         @map(name: "first_name")
-  lastName          String?         @map(name: "last_name")
-  provider          String?
-  gender            String?
-  roleId            Int?            @map(name: "role_id")
-  address           String?
-  avatar            String?
-  emailVerifiedAt   DateTime?       @map(name: "email_verified_at")
-  emailVerified     Boolean?        @default(false) @map(name: "email_verified")
-  status            Boolean?
-  isDisabled        Boolean         @default(false) @map(name: "is_disabled")
-  isDeleted         Boolean         @default(false) @map(name: "is_deleted")
-  deletedAt         DateTime?       @map(name: "deleted_at")
-  role              roles?          @relation(fields: [roleId], references: [id])
-  createdAt         DateTime        @default(now()) @map(name: "created_at")
-  updatedAt         DateTime        @default(now()) @updatedAt @map(name: "updated_at")
-  classStudents     classStudents[]
-  classTeachers     classTeachers[]
+  id                        String                      @id @default(uuid())
+  email                     String?                     @unique
+  encryptedPassword         String                      @map(name: "encrypted_password")
+  firstName                 String?                     @map(name: "first_name")
+  lastName                  String?                     @map(name: "last_name")
+  provider                  String?
+  gender                    String?
+  roleId                    Int?                        @map(name: "role_id")
+  address                   String?
+  avatar                    String?
+  uniqueId                  String?                     @unique @map(name: "unique_id")
+  emailVerifiedAt           DateTime?                   @map(name: "email_verified_at")
+  emailVerified             Boolean?                    @default(false) @map(name: "email_verified")
+  status                    Boolean?
+  isDisabled                Boolean                     @default(false) @map(name: "is_disabled")
+  isDeleted                 Boolean                     @default(false) @map(name: "is_deleted")
+  deletedAt                 DateTime?                   @map(name: "deleted_at")
+  role                      roles?                      @relation(fields: [roleId], references: [id])
+  createdAt                 DateTime                    @default(now()) @map(name: "created_at")
+  updatedAt                 DateTime                    @default(now()) @updatedAt @map(name: "updated_at")
+  classStudents             classStudents[]
+  classTeachers             classTeachers[]
+  studentAssignments        studentAssignments[]
+  assignmentsScoreHistories assignmentsScoreHistories[]
 }
 
 model roles {
@@ -55,6 +58,79 @@ model classes {
   classStudents        classStudents[]
   classTeachers        classTeachers[]
   classLinkInvitations classLinkInvitations[]
+  assignments          assignments[]
+  grades               grades[]
+}
+
+model grades {
+  id          Int          @id @default(autoincrement())
+  name        String?
+  percentage  Int?
+  classId     Int?         @map(name: "class_id")
+  createdAt   DateTime     @default(now()) @map(name: "created_at")
+  updatedAt   DateTime     @default(now()) @updatedAt @map(name: "updated_at")
+  classes     classes?     @relation(fields: [classId], references: [id])
+  assignments assignments?
+}
+
+model assignments {
+  id                        Int                         @id @default(autoincrement())
+  classId                   Int?                        @map(name: "class_id")
+  name                      String?
+  gradeId                   Int?                        @unique @map(name: "grade_id")
+  description               String?                     @db.Text
+  metadata                  String?                     @db.Text
+  publishedAt               DateTime?                   @default(now()) @map(name: "published_at")
+  dueDate                   DateTime?                   @map(name: "due_date")
+  createdAt                 DateTime                    @default(now()) @map(name: "created_at")
+  updatedAt                 DateTime                    @default(now()) @updatedAt @map(name: "updated_at")
+  classes                   classes?                    @relation(fields: [classId], references: [id])
+  grades                    grades?                     @relation(fields: [gradeId], references: [id])
+  studentAssignments        studentAssignments[]
+  assignmentsScoreHistories assignmentsScoreHistories[]
+
+  @@map("assignments")
+}
+
+model studentAssignments {
+  id                           Int                            @id @default(autoincrement())
+  studentId                    String?                        @map(name: "student_id")
+  assignmentId                 Int?                           @map(name: "assignment_id")
+  status                       String?
+  score                        Float?
+  metadata                     String?                        @db.Text
+  createdAt                    DateTime                       @default(now()) @map(name: "created_at")
+  updatedAt                    DateTime                       @default(now()) @updatedAt @map(name: "updated_at")
+  students                     users?                         @relation(fields: [studentId], references: [id])
+  assignments                  assignments?                   @relation(fields: [assignmentId], references: [id])
+  studentAssignmentSubmissions studentAssignmentSubmissions[]
+
+  @@map("student_assignments")
+}
+
+model assignmentsScoreHistories {
+  id           Int          @id @default(autoincrement())
+  studentId    String?      @map(name: "student_id")
+  assignmentId Int?         @map(name: "assignment_id")
+  score        Float?
+  metadata     String?      @db.Text
+  createdAt    DateTime     @default(now()) @map(name: "created_at")
+  updatedAt    DateTime     @default(now()) @updatedAt @map(name: "updated_at")
+  students     users?       @relation(fields: [studentId], references: [id])
+  assignments  assignments? @relation(fields: [assignmentId], references: [id])
+
+  @@map("assignments_score_histories")
+}
+
+model studentAssignmentSubmissions {
+  id                  Int                 @id @default(autoincrement())
+  studentAssignmentId Int?                @map(name: "student_assignment_id")
+  metadata            String?             @db.Text
+  createdAt           DateTime            @default(now()) @map(name: "created_at")
+  updatedAt           DateTime            @default(now()) @updatedAt @map(name: "updated_at")
+  studentAssignments  studentAssignments? @relation(fields: [studentAssignmentId], references: [id])
+
+  @@map("student_assignment_submissions")
 }
 
 model classLinkInvitations {
