@@ -98,4 +98,33 @@ export const classServices = {
       return error.response.data;
     }
   },
+  updateClassGradeComposition: async (classId, grades) => {
+    try {
+      const response = await axiosInstance.post(
+        `/classes/${classId}/grades`,
+        grades
+      );
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  },
+  getClassGradeComposition: async (classId) => {
+    try {
+      const response = await axiosInstance.get(`/classes/${classId}/grades`);
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  },
+  downloadClassList: async (classId) => {
+    try {
+      const response = await axiosInstance.get(
+        `/classes/${classId}/export-student-list`
+      );
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  },
 };

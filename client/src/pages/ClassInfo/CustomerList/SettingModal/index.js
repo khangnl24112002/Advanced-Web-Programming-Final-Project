@@ -9,6 +9,7 @@ import TextInput from "../../../../components/TextInput";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import Dropdown from "../../../../components/Dropdown";
 import { errorToast, successToast } from "../../../../utils/toast";
+import { classServices } from "../../../../services/ClassServices";
 
 const SettingModal = ({
   visible,
@@ -18,13 +19,14 @@ const SettingModal = ({
   classId,
   urlClass,
   keyInvite,
+  gradeComposition,
 }) => {
-  const { control: controlScore, handleSubmit: handleSubmitScore } = useForm({
-    // defaultValues: {}; you can populate the fields by this attribute
-    defaultValues: {
-      score: [{ name: "zzz", percentage: 3 }],
-    },
-  });
+  const {
+    control: controlScore,
+    setValue: setValueScore,
+    handleSubmit: handleSubmitScore,
+  } = useForm();
+
   const { control: controlClassInfo, handleSubmit: handleSubmitClassInfo } =
     useForm({
       defaultValues: {
@@ -39,7 +41,7 @@ const SettingModal = ({
     remove: removeScore,
   } = useFieldArray({
     control: controlScore,
-    name: "score",
+    name: "grades",
   });
 
   const arrangeOption = ["Tăng dần", "Giảm dần"];
@@ -69,18 +71,57 @@ const SettingModal = ({
     }
   }, [visible]);
 
+  useEffect(() => {
+    setValueScore("grades", gradeComposition);
+  }, [gradeComposition]);
+
   // Handle submit score compositions
-  const onSubmitScore = (data) => {
-    const requestData = { ...data, classId };
-    console.log(requestData);
+  const onSubmitScore = async (data) => {
+    // Validate data before submit
+    data.grades = data.grades.map((item, index) => {
+      return {
+        name: item.name,
+        percentage: parseInt(item.percentage),
+      };
+    });
+    const calculateTotalPercentage = (grades) => {
+      let sum = 0;
+      for (let i = 0; i < grades.length; i++) {
+        sum = sum + grades[i].percentage;
+      }
+      return sum;
+    };
+    const totalPercent = calculateTotalPercentage(data.grades);
+    if (totalPercent !== 100) {
+      return errorToast("Tổng điểm thành phần phải là 100%");
+    }
+    // call API to send data to server
+    const response = await classServices.updateClassGradeComposition(
+      classId,
+      data
+    );
+    if (response.status) {
+      return successToast("Cập nhật thành công!", 3000);
+    } else {
+      return errorToast("Cập nhật thất bại!");
+    }
   };
 
   // Handle submit class info
   const onSubmitClassInfo = (classInfo) => {
     const requestData = { ...classInfo, classId };
+    // call API to send data to server
     console.log(requestData);
   };
 
+  const handleDownloadClassList = async () => {
+    const response = await classServices.downloadClassList(classId);
+    if (response.status) {
+      window.open(response.data);
+    } else {
+      return errorToast("Lấy danh sách thất bại");
+    }
+  };
   return createPortal(
     visible && (
       <div id="modal-product" className={styles.modal}>
@@ -203,7 +244,7 @@ const SettingModal = ({
                         value={value}
                       />
                     )}
-                    name={`score.${index}.name`}
+                    name={`grades.${index}.name`}
                     control={controlScore}
                   />
                   <Controller
@@ -219,7 +260,7 @@ const SettingModal = ({
                         value={value}
                       />
                     )}
-                    name={`score.${index}.percentage`}
+                    name={`grades.${index}.percentage`}
                     control={controlScore}
                   />
                   <button
@@ -318,6 +359,7 @@ const SettingModal = ({
               Upload danh sách
             </button>
             <button
+              onClick={handleDownloadClassList}
               className={cn("button-white", styles.button)}
               style={{ marginTop: "20px", marginLeft: "20px" }}
             >

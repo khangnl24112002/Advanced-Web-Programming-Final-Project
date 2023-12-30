@@ -24,6 +24,7 @@ const CustomerList = () => {
   const { user, token } = useAuth();
   const [teachers, setTeachers] = useState([]);
   const [students, setStudents] = useState([]);
+  const [gradeComposition, setGradeComposition] = useState([]);
   const [urlClass, setUrlClass] = useState("http://example.com");
   const [activeUser, setActiveUser] = useState({});
   const inputRef = useRef(null);
@@ -68,7 +69,7 @@ const CustomerList = () => {
         });
       }
       setStudents(loadStudents);
-      setIsLoading(false);
+
       const getUrlClass = async () => {
         const response = await classServices.getInviteLinkClass(classId);
         if (response.status) {
@@ -77,6 +78,25 @@ const CustomerList = () => {
         }
       };
       getUrlClass();
+
+      // Fetch grade composition
+      const getClassGradeComposition = async () => {
+        const response = await classServices.getClassGradeComposition(classId);
+        if (response.status) {
+          let gradeCompositionData = [];
+          response.data.map((grade, index) => {
+            gradeCompositionData.push({
+              name: grade.name,
+              percentage: grade.percentage,
+            });
+          });
+          setGradeComposition(gradeCompositionData);
+        } else {
+        }
+      };
+      getClassGradeComposition();
+
+      setIsLoading(false);
     };
 
     fetchData();
@@ -274,25 +294,30 @@ const CustomerList = () => {
           </div>
         )}
       </Card>
-      <Panel
-        role={user.role}
-        addStudent={handleAddingStudent}
-        outGroup={handleOutGroup}
-      />
-      <Modal
-        outerClassName={styles.outer}
-        visible={openModal}
-        onClose={() => setOpenModal(false)}
-      >
-        {content}
-      </Modal>
-      <SettingModal
-        urlClass={urlClass}
-        keyInvite={"ZA412F"}
-        classId={classId}
-        visible={visibleSettingModal}
-        onClose={() => setVisibleSettingModal(false)}
-      />
+      {!isLoading && gradeComposition && (
+        <>
+          <Panel
+            role={user.role}
+            addStudent={handleAddingStudent}
+            outGroup={handleOutGroup}
+          />
+          <Modal
+            outerClassName={styles.outer}
+            visible={openModal}
+            onClose={() => setOpenModal(false)}
+          >
+            {content}
+          </Modal>
+          <SettingModal
+            urlClass={urlClass}
+            keyInvite={"ZA412F"}
+            classId={classId}
+            gradeComposition={gradeComposition}
+            visible={visibleSettingModal}
+            onClose={() => setVisibleSettingModal(false)}
+          />
+        </>
+      )}
     </>
   );
 };
