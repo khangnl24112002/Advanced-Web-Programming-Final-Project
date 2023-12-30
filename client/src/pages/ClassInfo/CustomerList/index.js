@@ -69,11 +69,8 @@ const CustomerList = () => {
       }
       setStudents(loadStudents);
       setIsLoading(false);
-      console.log(loadTeachers);
-      console.log(loadStudents);
       const getUrlClass = async () => {
         const response = await classServices.getInviteLinkClass(classId);
-        console.log(response);
         if (response.status) {
           setUrlClass(response.data);
         } else {
@@ -122,47 +119,6 @@ const CustomerList = () => {
 
   // Xử lí việc rời khỏi lớp học
   const handleOutClass = () => {};
-
-  // Modal xử lí việc lấy url lớp học
-  const handleGetUrl = () => {
-    setOpenModal(true);
-    setContent(
-      <>
-        <div className={cn("title-green", styles.modaltitle)}>
-          Lấy URL lớp học
-        </div>
-        <div className={styles.info}>
-          Đây là đường dẫn đến lớp học của bạn: {urlClass}
-        </div>
-        <div className={styles.foot}>
-          <button
-            onClick={() => {
-              setOpenModal(false);
-            }}
-            className={cn("button-stroke", styles.button)}
-          >
-            <span>Quay lại</span>
-          </button>
-          <button
-            onClick={() => {
-              navigator.clipboard
-                .writeText(urlClass)
-                .then(() => {
-                  return successToast("Đã sao chép!", 1000);
-                })
-                .catch((err) => {
-                  return errorToast("Sao chép thất bại!", 1000);
-                });
-            }}
-            className={cn("button", styles.button)}
-          >
-            <span>Copy</span>
-            <Icon name="arrow-right" size="24" />
-          </button>
-        </div>
-      </>
-    );
-  };
 
   // Modal để thêm học sinh
   const handleAddingStudent = () => {
@@ -259,7 +215,6 @@ const CustomerList = () => {
               name="search"
               icon="search"
             />
-
             <div className={styles.dropdownBox}>
               <Dropdown
                 className={styles.dropdown}
@@ -270,16 +225,9 @@ const CustomerList = () => {
                 small
               />
             </div>
-            {user.role === "teacher" ? (
-              <button
-                className={cn("button-small", styles.button)}
-                onClick={handleGetUrl}
-              >
-                Lấy URL lớp học
-              </button>
-            ) : null}
             {/**Button xem thông tin cài đặt của lớp học */}
             <button
+              style={{ marginLeft: "20px" }}
               className={cn("button-square-stroke button-small", styles.button)}
               onClick={() => setVisibleSettingModal(true)}
             >
@@ -339,8 +287,9 @@ const CustomerList = () => {
         {content}
       </Modal>
       <SettingModal
-        // item={item}
-        // classDetail={item}
+        urlClass={urlClass}
+        keyInvite={"ZA412F"}
+        classId={classId}
         visible={visibleSettingModal}
         onClose={() => setVisibleSettingModal(false)}
       />

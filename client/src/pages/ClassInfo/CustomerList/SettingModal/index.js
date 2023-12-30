@@ -6,18 +6,39 @@ import styles from "./SettingModal.module.sass";
 import Icon from "../../../../components/Icon";
 import Card from "../../../../components/Card";
 import TextInput from "../../../../components/TextInput";
-import { errorToast, successToast } from "../../../../utils/toast";
-import { helper } from "../../../../utils/helper";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import Dropdown from "../../../../components/Dropdown";
+import { errorToast, successToast } from "../../../../utils/toast";
 
-import { useNavigate } from "react-router-dom";
-const SettingModal = ({ visible, onClose, classDetail, item }) => {
-  const { control, handleSubmit, setError } = useForm({
+const SettingModal = ({
+  visible,
+  onClose,
+  classDetail,
+  item,
+  classId,
+  urlClass,
+  keyInvite,
+}) => {
+  const { control: controlScore, handleSubmit: handleSubmitScore } = useForm({
     // defaultValues: {}; you can populate the fields by this attribute
+    defaultValues: {
+      score: [{ name: "zzz", percentage: 3 }],
+    },
   });
-  const { fields, append, remove } = useFieldArray({
-    control,
+  const { control: controlClassInfo, handleSubmit: handleSubmitClassInfo } =
+    useForm({
+      defaultValues: {
+        name: "fff",
+        maximumStudents: "zzz",
+        description: "aaa",
+      },
+    });
+  const {
+    fields: fieldsScore,
+    append: appendScore,
+    remove: removeScore,
+  } = useFieldArray({
+    control: controlScore,
     name: "score",
   });
 
@@ -48,38 +69,16 @@ const SettingModal = ({ visible, onClose, classDetail, item }) => {
     }
   }, [visible]);
 
-  // State cho tạo lớp học
-  const initialState = {
-    name: "",
-    maximumStudents: "",
-    description: "",
-  };
-  // Khởi tạo state từ initialState
-  const [createClass, setCreateClass] = useState(initialState);
-  // Xử lý việc tạo lớp
-  const handleCreateClass = async () => {};
-
-  // Xử lý validate data
-  const validateData = (classInfo) => {
-    let result = 1;
-    if (classInfo.name === "") {
-      return errorToast("Tên lớp không được để trống");
-    }
-    if (!helper.isPositiveNumber(classInfo.maximumStudents)) {
-      return errorToast("Số lượng tối đa không hợp lệ");
-    }
-    if (classInfo.description === "") {
-      return errorToast("Mô tả không được để trống");
-    }
-    return result;
+  // Handle submit score compositions
+  const onSubmitScore = (data) => {
+    const requestData = { ...data, classId };
+    console.log(requestData);
   };
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setCreateClass((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+  // Handle submit class info
+  const onSubmitClassInfo = (classInfo) => {
+    const requestData = { ...classInfo, classId };
+    console.log(requestData);
   };
 
   return createPortal(
@@ -97,32 +96,71 @@ const SettingModal = ({ visible, onClose, classDetail, item }) => {
             title="Thông tin chung"
             classTitle={cn("title-green", styles.title)}
           >
-            <div className={styles.description}>
-              <TextInput
-                className={styles.field}
-                label="Tên lớp học"
+            <form
+              onSubmit={handleSubmitClassInfo(onSubmitClassInfo)}
+              className={styles.description}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "20px",
+              }}
+            >
+              <Controller
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput
+                    className={styles.field}
+                    label="Tên lớp học"
+                    type="text"
+                    required
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    value={value}
+                  />
+                )}
                 name="name"
-                type="text"
-                required
-                onChange={handleChange}
+                control={controlClassInfo}
               />
-              <TextInput
-                className={styles.field}
-                label="Mô tả lớp học"
+
+              <Controller
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput
+                    className={styles.field}
+                    label="Mô tả lớp học"
+                    type="text"
+                    required
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    value={value}
+                  />
+                )}
                 name="description"
-                type="text"
-                required
-                onChange={handleChange}
+                control={controlClassInfo}
               />
-              <TextInput
-                className={styles.field}
-                label="Số lượng tối đa"
+              <Controller
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput
+                    className={styles.field}
+                    label="Số lượng tối đa"
+                    type="number"
+                    required
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    value={value}
+                  />
+                )}
                 name="maximumStudents"
-                type="text"
-                required
-                onChange={handleChange}
+                control={controlClassInfo}
               />
-            </div>
+              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <button
+                  className={cn("button", styles.button)}
+                  style={{ marginTop: "20px", marginLeft: "20px" }}
+                  type="submit"
+                >
+                  Cập nhật
+                </button>
+              </div>
+            </form>
           </Card>
           <Card
             className={cn(styles.card)}
@@ -144,9 +182,9 @@ const SettingModal = ({ visible, onClose, classDetail, item }) => {
           >
             <form
               className={styles.description}
-              onSubmit={handleSubmit((data) => console.log(data))}
+              onSubmit={handleSubmitScore(onSubmitScore)}
             >
-              {fields.map((item, index) => (
+              {fieldsScore.map((item, index) => (
                 <div
                   key={item.id}
                   className={styles.group}
@@ -166,7 +204,7 @@ const SettingModal = ({ visible, onClose, classDetail, item }) => {
                       />
                     )}
                     name={`score.${index}.name`}
-                    control={control}
+                    control={controlScore}
                   />
                   <Controller
                     render={({ field: { onChange, onBlur, value } }) => (
@@ -182,33 +220,35 @@ const SettingModal = ({ visible, onClose, classDetail, item }) => {
                       />
                     )}
                     name={`score.${index}.percentage`}
-                    control={control}
+                    control={controlScore}
                   />
                   <button
                     className={`${styles.field} ${styles.close}`}
                     onClick={() => {
-                      remove(index);
+                      removeScore(index);
                     }}
                   >
                     <Icon name="close" size="20" />
                   </button>
                 </div>
               ))}
-              <button
-                type="button"
-                className={cn("button-white", styles.button)}
-                style={{ marginTop: "20px" }}
-                onClick={() => append({ name: "", percentage: "" })}
-              >
-                Thêm loại điểm
-              </button>
-              <button
-                className={cn("button-white", styles.button)}
-                style={{ marginTop: "20px", marginLeft: "20px" }}
-                type="submit"
-              >
-                Submit
-              </button>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <button
+                  type="button"
+                  className={cn("button", styles.button)}
+                  style={{ marginTop: "20px" }}
+                  onClick={() => appendScore({ name: "", percentage: "" })}
+                >
+                  Thêm loại điểm
+                </button>
+                <button
+                  className={cn("button", styles.button)}
+                  style={{ marginTop: "20px", marginLeft: "20px" }}
+                  type="submit"
+                >
+                  Cập nhật
+                </button>
+              </div>
             </form>
           </Card>
           <Card
@@ -216,7 +256,55 @@ const SettingModal = ({ visible, onClose, classDetail, item }) => {
             title="Liên kết mời"
             classTitle={cn("title-green", styles.title)}
           >
-            <div className={styles.description}>Liên kết</div>
+            {/**Url invite */}
+            <div className={styles.description}>
+              <div className={styles.info}>
+                Đây là đường dẫn đến lớp học của bạn: <br /> {urlClass}
+              </div>
+              <div>
+                <button
+                  onClick={() => {
+                    navigator.clipboard
+                      .writeText(urlClass)
+                      .then(() => {
+                        return successToast("Đã sao chép!", 1000);
+                      })
+                      .catch((err) => {
+                        return errorToast("Sao chép thất bại!", 1000);
+                      });
+                  }}
+                  className={cn("button", styles.button)}
+                >
+                  <span>Copy</span>
+                  <Icon name="arrow-right" size="24" />
+                </button>
+              </div>
+            </div>
+
+            <div className={styles.description}>
+              <div className={styles.info}>
+                Đây là mã mời đến lớp học của bạn: <br /> {keyInvite}
+              </div>
+              {/**Key Invite */}
+              <div>
+                <button
+                  onClick={() => {
+                    navigator.clipboard
+                      .writeText(keyInvite)
+                      .then(() => {
+                        return successToast("Đã sao chép!", 1000);
+                      })
+                      .catch((err) => {
+                        return errorToast("Sao chép thất bại!", 1000);
+                      });
+                  }}
+                  className={cn("button", styles.button)}
+                >
+                  <span>Copy</span>
+                  <Icon name="arrow-right" size="24" />
+                </button>
+              </div>
+            </div>
           </Card>
           <Card
             className={cn(styles.card)}
@@ -236,11 +324,6 @@ const SettingModal = ({ visible, onClose, classDetail, item }) => {
               Download danh sách
             </button>
           </Card>
-          <div style={{ display: "flex", justifyContent: "flex-end" }}>
-            <button className={cn("button", styles.button)}>
-              Lưu thay đổi
-            </button>
-          </div>
         </div>
       </div>
     ),
