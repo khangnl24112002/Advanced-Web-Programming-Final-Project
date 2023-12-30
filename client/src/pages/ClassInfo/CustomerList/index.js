@@ -5,6 +5,7 @@ import Card from "../../../components/Card";
 import Form from "../../../components/Form";
 import TextInput from "../../../components/TextInput";
 import Table from "./Table";
+import GradeTable from "./GradeTable";
 import Panel from "./Panel";
 import Details from "./Details";
 import Modal from "./Modal";
@@ -15,10 +16,11 @@ import { classServices } from "../../../services/ClassServices";
 import { useParams } from "react-router-dom";
 import { useRef } from "react";
 import LoadingSpinner from "../../../components/LoadingSpinner/LoadingSpinner";
-// const navigation = ["Active", "New"];
 import { EMAIL_REGEX } from "../../../constants";
+
+const navigation = ["Danh sách", "Bảng điểm"];
 const CustomerList = () => {
-    // Lấy userInfo
+    const [activeIndex, setActiveIndex] = useState(0);
     const { user } = useAuth();
 
     const { token } = useAuth();
@@ -267,6 +269,22 @@ const CustomerList = () => {
                             icon="search"
                         />
                         {/**Button dùng để lấy url lớp học */}
+                        <div className={styles.nav}>
+                            {navigation.map((x, index) => (
+                                <button
+                                    className={cn(styles.link, {
+                                        [styles.active]: index === activeIndex,
+                                    })}
+                                    onClick={() => {
+                                        console.log(index);
+                                        setActiveIndex(index);
+                                    }}
+                                    key={index}
+                                >
+                                    {x}
+                                </button>
+                            ))}
+                        </div>
                         {user.role === "teacher" ? (
                             <button
                                 className={cn("button-small", styles.button)}
@@ -275,19 +293,7 @@ const CustomerList = () => {
                                 Lấy URL lớp học
                             </button>
                         ) : null}
-                        {/* <div className={styles.nav}>
-                            {navigation.map((x, index) => (
-                                <button
-                                    className={cn(styles.link, {
-                                        [styles.active]: index === activeIndex,
-                                    })}
-                                    onClick={() => setActiveIndex(index)}
-                                    key={index}
-                                >
-                                    {x}
-                                </button>
-                            ))}
-                        </div> */}
+
                         {/* <Filters
                             className={styles.filters}
                             title="Showing 10 of 24 customer"
@@ -300,14 +306,27 @@ const CustomerList = () => {
                 {isLoading && <LoadingSpinner />}
                 {!isLoading && (students || teachers) && (
                     <div className={cn(styles.row, { [styles.flex]: visible })}>
-                        <Table
-                            className={styles.table}
-                            activeTable={visible}
-                            setActiveTable={setVisible}
-                            teachers={teachers}
-                            students={students}
-                            onActive={handleActive}
-                        />
+                        {activeIndex === 0 && (
+                            <Table
+                                className={styles.table}
+                                activeTable={visible}
+                                setActiveTable={setVisible}
+                                teachers={teachers}
+                                students={students}
+                                onActive={handleActive}
+                            />
+                        )}
+
+                        {activeIndex === 1 && (
+                            <GradeTable
+                                className={styles.table}
+                                activeTable={visible}
+                                setActiveTable={setVisible}
+                                teachers={teachers}
+                                students={students}
+                                onActive={handleActive}
+                            />
+                        )}
 
                         <Details
                             className={styles.details}

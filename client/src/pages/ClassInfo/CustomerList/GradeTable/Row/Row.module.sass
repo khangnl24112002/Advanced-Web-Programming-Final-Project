@@ -101,10 +101,8 @@
 .item
     display: flex
     align-items: center
-    cursor: pointer
     transition: color .2s
-    &:hover
-        color: $p1
+    
     .email
         display: none
         +t
@@ -166,3 +164,21 @@
     +m
         margin: 4px 0 0
 
+.editbutton
+    display: inline-flex
+    justify-content: center
+    align-items: center
+    height: 40px
+    padding: 0 20px
+    background: #2A85FF
+    border-radius: 12px
+    font-size: 15px
+    font-weight: 700
+    line-height: 1.6
+    text-align: center
+    color: #FCFCFC
+    transition: all 0.2s
+    &:hover
+        cursor: pointer
+        background: #00F
+        opacity: 0.8
