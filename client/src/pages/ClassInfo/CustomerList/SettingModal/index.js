@@ -8,9 +8,21 @@ import Card from "../../../../components/Card";
 import TextInput from "../../../../components/TextInput";
 import { errorToast, successToast } from "../../../../utils/toast";
 import { helper } from "../../../../utils/helper";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
+import Dropdown from "../../../../components/Dropdown";
 
 import { useNavigate } from "react-router-dom";
 const SettingModal = ({ visible, onClose, classDetail, item }) => {
+  const { control, handleSubmit, setError } = useForm({
+    // defaultValues: {}; you can populate the fields by this attribute
+  });
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "score",
+  });
+
+  const arrangeOption = ["Tăng dần", "Giảm dần"];
+  const [optionValue, setOptionValue] = useState(arrangeOption[0]);
   const escFunction = useCallback(
     (e) => {
       if (e.keyCode === 27) {
@@ -42,33 +54,10 @@ const SettingModal = ({ visible, onClose, classDetail, item }) => {
     maximumStudents: "",
     description: "",
   };
-
-  // dùng hook useNavigate để redirect
-  const navigate = useNavigate();
-
   // Khởi tạo state từ initialState
   const [createClass, setCreateClass] = useState(initialState);
-
   // Xử lý việc tạo lớp
-  const handleCreateClass = async () => {
-    // if (validateData(createClass) === 1) {
-    //   // Chuyển số lượng về number
-    //   const classRequest = {
-    //     ...createClass,
-    //     maximumStudents: parseInt(createClass.maximumStudents),
-    //   };
-    //   // Gọi API xử lý
-    //   const response = await classServices.createClass(classRequest);
-    //   if (response.status) {
-    //     // Nếu thành công: thông báo thành công và quay về trang class
-    //     successToast("Tạo lớp học thành công!", 2000);
-    //     navigate("/classes", { replace: true });
-    //   } else {
-    //     // Nếu thất bại: thông báo lỗi
-    //     return errorToast(response.message);
-    //   }
-    // }
-  };
+  const handleCreateClass = async () => {};
 
   // Xử lý validate data
   const validateData = (classInfo) => {
@@ -139,8 +128,88 @@ const SettingModal = ({ visible, onClose, classDetail, item }) => {
             className={cn(styles.card)}
             title="Thang điểm"
             classTitle={cn("title-green", styles.title)}
+            classCardHead={cn(styles.head, { [styles.hidden]: visible })}
+            head={
+              <div className={styles.dropdownBox}>
+                <Dropdown
+                  className={styles.dropdown}
+                  classDropdownHead={styles.dropdownHead}
+                  value={optionValue}
+                  setValue={setOptionValue}
+                  options={arrangeOption}
+                  small
+                />
+              </div>
+            }
           >
-            <div className={styles.description}>Thang điểm ở đây</div>
+            <form
+              className={styles.description}
+              onSubmit={handleSubmit((data) => console.log(data))}
+            >
+              {fields.map((item, index) => (
+                <div
+                  key={item.id}
+                  className={styles.group}
+                  style={{ marginTop: "20px" }}
+                >
+                  <Controller
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        className={styles.field}
+                        label=""
+                        type="text"
+                        placeholder="Tên cột điểm"
+                        required
+                        onChange={onChange}
+                        onBlur={onBlur}
+                        value={value}
+                      />
+                    )}
+                    name={`score.${index}.name`}
+                    control={control}
+                  />
+                  <Controller
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        className={styles.field}
+                        label=""
+                        type="number"
+                        placeholder="Tỉ lệ điểm (%)"
+                        required
+                        onChange={onChange}
+                        onBlur={onBlur}
+                        value={value}
+                      />
+                    )}
+                    name={`score.${index}.percentage`}
+                    control={control}
+                  />
+                  <button
+                    className={`${styles.field} ${styles.close}`}
+                    onClick={() => {
+                      remove(index);
+                    }}
+                  >
+                    <Icon name="close" size="20" />
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                className={cn("button-white", styles.button)}
+                style={{ marginTop: "20px" }}
+                onClick={() => append({ name: "", percentage: "" })}
+              >
+                Thêm loại điểm
+              </button>
+              <button
+                className={cn("button-white", styles.button)}
+                style={{ marginTop: "20px", marginLeft: "20px" }}
+                type="submit"
+              >
+                Submit
+              </button>
+            </form>
           </Card>
           <Card
             className={cn(styles.card)}
@@ -148,6 +217,24 @@ const SettingModal = ({ visible, onClose, classDetail, item }) => {
             classTitle={cn("title-green", styles.title)}
           >
             <div className={styles.description}>Liên kết</div>
+          </Card>
+          <Card
+            className={cn(styles.card)}
+            title="Upload và Download danh sách học sinh"
+            classTitle={cn("title-green", styles.title)}
+          >
+            <button
+              className={cn("button-white", styles.button)}
+              style={{ marginTop: "20px" }}
+            >
+              Upload danh sách
+            </button>
+            <button
+              className={cn("button-white", styles.button)}
+              style={{ marginTop: "20px", marginLeft: "20px" }}
+            >
+              Download danh sách
+            </button>
           </Card>
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <button className={cn("button", styles.button)}>

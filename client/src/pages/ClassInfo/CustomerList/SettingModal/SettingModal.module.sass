@@ -73,3 +73,32 @@
 
 .card
     margin-top: 10px
+
+// .group
+//     display: flex
+//     flex-wrap: wrap
+//     align-items: flex-end
+//     margin: 0 -6px -12px
+//     +m
+//         display: block
+//         margin: 0
+//     .field
+//         flex: 0 0 calc(50% - 12px)
+//         width: calc(50% - 12px)
+//         margin: 0 6px 12px
+//         +m
+//             width: 100%
+//             margin: 12px 0 0
+
+.group
+    display: flex
+    flex-wrap: wrap
+    align-items: center
+    margin: 0 -6px -12px
+    .field
+        &:nth-child(1), &:nth-child(2)
+            flex: 0 0 45%
+            width: 45%
+            margin: 0 10px 15px
+        &:last-child
+            margin: 0 10px 15px
