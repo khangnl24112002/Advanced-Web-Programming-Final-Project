@@ -13,4 +13,8 @@ export class UpdateUserDto {
   @IsOptional()
   @ApiProperty({ required: false, example: '1' })
   roleId: number;
+
+  @IsOptional()
+  @ApiProperty({ required: false, example: '20120331' })
+  uniqueId: string;
 }
