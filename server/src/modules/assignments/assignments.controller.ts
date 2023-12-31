@@ -27,7 +27,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { AuthService } from '../auth/auth.service';
-import { find, map } from 'lodash';
+import { map } from 'lodash';
 import { Prisma } from '@prisma/client';
 import { CurrentUser } from 'src/decorators/users.decorator';
 
@@ -79,7 +79,7 @@ export class AssignmentsController {
   @Get(':id/download-score')
   async downloadScoreForAssignment(@Param('id') id: number) {
     const grade = await this.assignmentsService.getAssignment(+id);
-    const { studentAssignments, grades } = grade;
+    const { studentAssignments } = grade;
     const refactoredData = studentAssignments.map((studentAssignment) => {
       const { students } = studentAssignment;
       return {
@@ -106,7 +106,7 @@ export class AssignmentsController {
     @Body() body: MarkScoreStudentDto,
   ) {
     const { scores } = body;
-    const refactoredScores = scores?.map((score) => ({
+    const refactoredScores = map(scores, (score) => ({
       ...score,
       assignmentId: +id,
       status: ASSIGNMENT_STATUS.GRADED,
