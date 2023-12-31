@@ -10,7 +10,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AssignmentsService } from './assignments.service';
 import {
   CreateAssignmentDTO,
@@ -38,6 +38,7 @@ import { NotificationService } from '../notification/notification.service';
 @Controller('assignments')
 @ApiTags('Assignments')
 @UseGuards(JwtAuthGuard)
+@ApiBearerAuth('Bearer')
 export class AssignmentsController {
   constructor(
     private readonly assignmentsService: AssignmentsService,
