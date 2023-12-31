@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { compact, map } from 'lodash';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
@@ -38,9 +39,30 @@ export class AssignmentsService {
   async markScoreForAssignment(
     data: Prisma.studentAssignmentsUncheckedCreateInput[],
   ) {
-    return this.primsaService.studentAssignments.createMany({
-      data,
-    });
+    return compact(
+      await Promise.all(
+        map(data, async (assignment) => {
+          const { studentId, assignmentId } = assignment;
+          const studentAssignment =
+            await this.primsaService.studentAssignments.findFirst({
+              where: {
+                studentId,
+                assignmentId,
+              },
+            });
+          if (studentAssignment) {
+            return this.primsaService.studentAssignments.upsert({
+              where: {
+                id: studentAssignment.id,
+              },
+              create: assignment,
+              update: assignment,
+            });
+          }
+          return null;
+        }),
+      ),
+    );
   }
 
   async getAssignment(id: number) {

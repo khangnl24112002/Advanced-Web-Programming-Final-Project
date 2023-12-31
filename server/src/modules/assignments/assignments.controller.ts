@@ -155,6 +155,7 @@ export class AssignmentsController {
           studentId: student.id,
           score: data.Grade,
           assignmentId: +id,
+          status: ASSIGNMENT_STATUS.GRADED,
         };
       }),
     );
