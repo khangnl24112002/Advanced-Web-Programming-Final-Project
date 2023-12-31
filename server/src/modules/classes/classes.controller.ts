@@ -43,7 +43,7 @@ import { customAlphabet } from 'nanoid';
 import { CreateGradeDto, UpdateGradeDto } from '../assignments/dto/body.dto';
 import * as xlsx from 'xlsx';
 import { CloudinaryService } from '../files/cloudinary.service';
-import { map, toNumber } from 'lodash';
+import { includes, map, toNumber } from 'lodash';
 import { NotificationService } from '../notification/notification.service';
 
 @Controller('classes')
@@ -511,6 +511,40 @@ export class ClassesController {
       status: true,
       data: uploadedFile.url,
       message: 'Tải file Grade thành công',
+    };
+  }
+
+  @Get(':id/grade-board')
+  async getGradeBoard(
+    @Param('id') id: number,
+    @CurrentUser('id') userId: string,
+  ) {
+    const grades = await this.classesService.getGrades(+id);
+    const teachers = await this.classesService.getTeachersOfClass(+id);
+    const refactorTeachers = map(teachers, ({ teachers }) => teachers);
+    const isStudent = !includes(map(refactorTeachers, 'id'), userId);
+    map(grades, (studentAssignment) => {
+      const { assignments, status } = studentAssignment;
+      const { studentAssignments } = assignments;
+      const refactoredStudentsData = map(studentAssignments, (student) => {
+        const { students } = student;
+        const isViewedByStudent =
+          status === 'COMPLETE' && isStudent && students.id === userId;
+        return {
+          fullName: students.firstName + ' ' + students.lastName,
+          studentId: students?.uniqueId,
+          Grade: !isStudent || isViewedByStudent ? student.score : null,
+        };
+      });
+      return {
+        name: studentAssignment.name,
+        scores: refactoredStudentsData,
+      };
+    });
+    return {
+      status: true,
+      data: grades,
+      message: 'Lấy danh sách bảng điểm thành công',
     };
   }
 }

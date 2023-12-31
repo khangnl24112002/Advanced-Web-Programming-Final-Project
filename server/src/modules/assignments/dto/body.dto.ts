@@ -88,7 +88,10 @@ export class UpdateGradeDto {
   @IsOptional()
   percentage: number;
 
-  @ApiProperty({ required: true, example: 'COMPlETE' })
+  @ApiProperty({
+    required: true,
+    example: 'STATUS cần nhập ở đây là: COMPLETE nha',
+  })
   @IsOptional()
   status: string;
 }

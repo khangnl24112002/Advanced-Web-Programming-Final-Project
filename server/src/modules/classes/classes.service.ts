@@ -351,6 +351,7 @@ export class ClassesService {
                 studentId: true,
                 students: {
                   select: {
+                    id: true,
                     firstName: true,
                     lastName: true,
                     uniqueId: true,
@@ -358,6 +359,25 @@ export class ClassesService {
                 },
               },
             },
+          },
+        },
+      },
+    });
+  }
+
+  async getTeachersOfClass(classId: number) {
+    return this.prismaService.classTeachers.findMany({
+      where: {
+        classId,
+      },
+      include: {
+        teachers: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatar: true,
+            email: true,
           },
         },
       },
