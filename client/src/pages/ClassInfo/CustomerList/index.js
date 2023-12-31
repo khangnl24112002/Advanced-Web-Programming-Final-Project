@@ -22,6 +22,7 @@ import SettingModal from "./SettingModal";
 const optionListTeacher = ["Danh sách", "Bảng điểm"];
 const CustomerList = () => {
   const { user, token } = useAuth();
+  const [classInfo, setClassInfo] = useState();
   const [teachers, setTeachers] = useState([]);
   const [students, setStudents] = useState([]);
   const [gradeComposition, setGradeComposition] = useState([]);
@@ -41,9 +42,12 @@ const CustomerList = () => {
     const fetchData = async () => {
       setIsLoading(true);
       const response = await classServices.getClassDetail(token, classId);
-
       const responseData = await response.data;
-
+      setClassInfo({
+        name: response.data.name,
+        description: response.data.description,
+        maximumStudents: response.data.maximumStudents,
+      });
       const loadTeachers = [];
       for (const key in responseData.teachers) {
         loadTeachers.push({
@@ -312,6 +316,7 @@ const CustomerList = () => {
             urlClass={urlClass}
             keyInvite={"ZA412F"}
             classId={classId}
+            classInfo={classInfo}
             gradeComposition={gradeComposition}
             visible={visibleSettingModal}
             onClose={() => setVisibleSettingModal(false)}
