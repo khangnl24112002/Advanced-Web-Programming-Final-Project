@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, InternalServerErrorException, BadRequestException, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, InternalServerErrorException, BadRequestException, UseGuards, HttpException, HttpStatus, Put } from '@nestjs/common';
 import { ClassesService } from './classes.service';
 import { CreateClassDto } from './dto/create-class.dto';
 import { CurrentUser } from 'src/decorators/users.decorator';
@@ -51,6 +51,33 @@ export class ClassesController {
       status: true,
       data: classResponse,
       message: "Tạo lớp học thành công"
+    }
+  }
+
+
+  @Put(':id')
+  @ApiOkResponse({ type: CreateClassResponse })
+  async update(@Param('id') id: number, @Body() createClassDto: CreateClassDto) {
+    const exClass = await this.classesService.findClassById(+id);
+    if (!exClass) {
+      throw new BadRequestException({
+        status: false,
+        message: "Lớp học không tồn tại"
+      })
+    }
+    const { maximumStudents: currentStudent } = exClass;
+    if (currentStudent > createClassDto.maximumStudents) {
+      throw new BadRequestException({
+        status: false,
+        message: "Số lượng học sinh không được nhỏ hơn số lượng hiện tại"
+      })
+    }
+    const classUpdated = await this.classesService.updateClass(+id, createClassDto);
+    const classResponse = await this.classesService.findClassById(classUpdated.id);
+    return {
+      status: true,
+      data: classResponse,
+      message: "Cập nhật lớp học thành công"
     }
   }
 

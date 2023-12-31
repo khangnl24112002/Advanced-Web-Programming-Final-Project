@@ -135,6 +135,14 @@ export class ClassesService {
     }
   }
 
+  async updateClass(id: number, updateClassDto) {
+    return this.prismaService.classes.update({
+      where: {
+        id,
+      },
+      data: updateClassDto,
+    })
+  }
   async getAllClassesOfTeacher(teacherId: string) {
     const exClasses = await this.prismaService.classes.findMany({
       where: {
