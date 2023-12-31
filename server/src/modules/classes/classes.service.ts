@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma.service';
 import { map } from 'lodash';
 import { ROLES } from 'src/utils';
 import { CreateGradeDto } from '../assignments/dto/body.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ClassesService {
@@ -323,6 +324,18 @@ export class ClassesService {
         });
       }),
     );
+  }
+
+  async updateGrade(
+    id: number,
+    updateGradeDto: Prisma.gradesUncheckedUpdateInput,
+  ) {
+    return this.prismaService.grades.update({
+      where: {
+        id,
+      },
+      data: updateGradeDto,
+    });
   }
   async getGrades(classId: number) {
     return this.prismaService.grades.findMany({

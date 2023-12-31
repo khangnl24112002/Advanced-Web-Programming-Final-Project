@@ -6,6 +6,7 @@ import {
   Post,
   Put,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
@@ -30,9 +31,11 @@ import { AuthService } from '../auth/auth.service';
 import { map } from 'lodash';
 import { Prisma } from '@prisma/client';
 import { CurrentUser } from 'src/decorators/users.decorator';
+import { JwtAuthGuard } from 'src/guards/jwt.auth.guard';
 
 @Controller('assignments')
 @ApiTags('Assignments')
+@UseGuards(JwtAuthGuard)
 export class AssignmentsController {
   constructor(
     private readonly assignmentsService: AssignmentsService,

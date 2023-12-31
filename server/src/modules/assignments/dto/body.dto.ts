@@ -79,6 +79,20 @@ export class CreateGradeDto {
   grades: CreateGrade[];
 }
 
+export class UpdateGradeDto {
+  @ApiProperty({ required: true, example: 'CKI' })
+  @IsOptional()
+  name: string;
+
+  @ApiProperty({ required: true, example: 'Minh' })
+  @IsOptional()
+  percentage: number;
+
+  @ApiProperty({ required: true, example: 'COMPlETE' })
+  @IsOptional()
+  status: string;
+}
+
 class MarkScoreStudent {
   @ApiProperty({ required: true, example: '1711060777' })
   @IsNotEmpty()

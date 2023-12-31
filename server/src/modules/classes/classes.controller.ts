@@ -40,23 +40,24 @@ import * as moment from 'moment';
 import { SendgridService } from '../mail/mail.service';
 import { JwtService } from '@nestjs/jwt';
 import { customAlphabet } from 'nanoid';
-import { CreateGradeDto } from '../assignments/dto/body.dto';
+import { CreateGradeDto, UpdateGradeDto } from '../assignments/dto/body.dto';
 import * as xlsx from 'xlsx';
 import { CloudinaryService } from '../files/cloudinary.service';
-import { map } from 'lodash';
+import { map, toNumber } from 'lodash';
+import { NotificationService } from '../notification/notification.service';
 
 @Controller('classes')
 @ApiTags('Classes')
 @ApiBearerAuth('Bearer')
 @UseGuards(JwtAuthGuard)
 export class ClassesController {
-  // eslint-disable-next-line prettier/prettier
   constructor(
     private readonly jwtService: JwtService,
     private readonly classesService: ClassesService,
     private readonly authService: AuthService,
     private readonly mailService: SendgridService,
     private readonly cloudinaryService: CloudinaryService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   @Post()
@@ -413,6 +414,45 @@ export class ClassesController {
       status: true,
       data: grades,
       message: 'Lấy danh sách bài tập thành công',
+    };
+  }
+
+  @Put(':id/grades/:gradeId')
+  async updateGrade(
+    @Param('gradeId') gradeId: number,
+    @Param('id') id: number,
+    @Body() body: UpdateGradeDto,
+  ) {
+    const grades = await this.classesService.updateGrade(+gradeId, body);
+    const students = await this.classesService.getStudentsOfClass(+id);
+    const exClass = await this.classesService.findClassById(+id);
+    await Promise.all(
+      map(students, async (student) => {
+        const userId = student?.id;
+        const notiLength =
+          await this.notificationService.readNotiLengthFromDB(userId);
+        const id = notiLength ? notiLength + 1 : 0;
+        const payload = {
+          content: `Giáo viên lóp ${exClass.name} vừa cập nhật điểm số bài tập`,
+          createdAt: new Date().toISOString(),
+          isRead: false,
+          title: 'Bạn vừa được cập nhật điểm số bài tập',
+          type: 'finish_grade_composition',
+        };
+        return this.notificationService.saveNewNotiToUser({
+          userId,
+          currentNotiLength: notiLength || 0,
+          newData: {
+            ...payload,
+            id,
+          },
+        });
+      }),
+    );
+    return {
+      status: true,
+      data: grades,
+      message: 'Cập nhật bài tập thành công',
     };
   }
 
