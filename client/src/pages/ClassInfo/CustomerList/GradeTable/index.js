@@ -4,9 +4,12 @@ import cn from "classnames";
 import Checkbox from "../../../../components/Checkbox";
 import Loader from "../../../../components/Loader";
 import Row from "./Row";
+import Dropdown from "../../../../components/Dropdown";
 import { useAuth } from "../../../../hooks/useAuth";
 // data
 import { customers } from "../../../../mocks/customers";
+
+const gradeOptions = ["Xuất", "Nhập"];
 
 const Table = ({
     className,
@@ -15,11 +18,12 @@ const Table = ({
     teachers,
     students,
     onActive,
+    gradeComposition,
 }) => {
     const { user } = useAuth();
     const [chooseAll, setСhooseAll] = useState(false);
     const [activeId, setActiveId] = useState(customers[0].id);
-
+    const [gradeOptionValue, setGradeOptionValue] = useState("...");
     const [selectedFilters, setSelectedFilters] = useState([]);
 
     const handleChange = (id) => {
@@ -45,8 +49,22 @@ const Table = ({
                     </div> */}
                     <div className={styles.col}>Họ và tên</div>
                     <div className={styles.col}>MSSV</div>
-                    <div className={styles.col}>Điểm GK</div>
-                    <div className={styles.col}>Điểm CK</div>
+                    {gradeComposition &&
+                        gradeComposition.map((grade) => (
+                            <div className={styles.col}>
+                                <div className={styles.flex}>
+                                    <div>{grade.name} </div>
+                                    <div className={styles.dropdownBox}>
+                                        <Dropdown
+                                            className={styles.dropdown}
+                                            setValue={setGradeOptionValue}
+                                            options={gradeOptions}
+                                            small
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
                     {user.role === "teacher" && (
                         <div className={styles.col}></div>
                     )}
@@ -54,6 +72,7 @@ const Table = ({
                 {teachers.map((x, index) => (
                     <Row
                         item={x}
+                        gradeComposition={gradeComposition}
                         onChoose={onActive}
                         key={index}
                         activeTable={activeTable}
@@ -66,6 +85,7 @@ const Table = ({
                 ))}
                 {students.map((x, index) => (
                     <Row
+                        gradeComposition={gradeComposition}
                         item={x}
                         key={index}
                         onChoose={onActive}
