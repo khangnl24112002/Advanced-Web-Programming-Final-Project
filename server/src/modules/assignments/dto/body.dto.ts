@@ -139,3 +139,9 @@ export class UpdateRequestedGradeViewDto {
   @IsNotEmpty()
   studentAssignmentId: number;
 }
+
+export class CreateConversationDto {
+  @ApiProperty({ required: false, example: 'test' })
+  @IsNotEmpty()
+  message: string;
+}

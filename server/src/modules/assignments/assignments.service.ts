@@ -120,4 +120,35 @@ export class AssignmentsService {
       data,
     });
   }
+
+  async createConversation(
+    id: number,
+    data: Prisma.studentRequestedReviewConversationUncheckedCreateInput,
+  ) {
+    return this.primsaService.studentRequestedReviewConversation.create({
+      data: {
+        ...data,
+        studentRequestedId: id,
+      },
+    });
+  }
+
+  async getConversation(id: number) {
+    return this.primsaService.studentRequestedReviewConversation.findMany({
+      where: {
+        studentRequestedId: id,
+      },
+      include: {
+        users: {
+          select: {
+            id: true,
+            firstName: true,
+            avatar: true,
+            lastName: true,
+            uniqueId: true,
+          },
+        },
+      },
+    });
+  }
 }

@@ -29,6 +29,7 @@ import { extname } from 'path';
 import { AuthService } from '../auth/auth.service';
 import { find, map } from 'lodash';
 import { Prisma } from '@prisma/client';
+import { CurrentUser } from 'src/decorators/users.decorator';
 
 @Controller('assignments')
 @ApiTags('Assignments')
@@ -255,6 +256,43 @@ export class AssignmentsController {
     return {
       status: true,
       data: requestedGradeView,
+      message: 'Tải file Grade thành công',
+    };
+  }
+
+  @Post('requested-grade-view/:studentRequestedReviewId/conversation')
+  async createConversation(
+    @Param('studentRequestedReviewId') studentRequestedReviewId: number,
+    @Body() body: any,
+    @CurrentUser('id') userId: string,
+  ) {
+    const { message } = body;
+    const requestedGradeView = await this.assignmentsService.createConversation(
+      +studentRequestedReviewId,
+      {
+        message,
+        userId,
+      },
+    );
+    return {
+      status: true,
+      data: requestedGradeView,
+      message: 'Tải file Grade thành công',
+    };
+  }
+  @Get('requested-grade-view/:studentRequestedReviewId/conversation')
+  async getConversation(
+    @Param('studentRequestedReviewId') studentRequestedReviewId: number,
+  ) {
+    const requestedGradeView = await this.assignmentsService.getConversation(
+      +studentRequestedReviewId,
+    );
+    return {
+      status: true,
+      data: map(requestedGradeView, ({ users, ...conversation }) => ({
+        ...conversation,
+        user: users?.firstName + ' ' + users?.lastName,
+      })),
       message: 'Tải file Grade thành công',
     };
   }

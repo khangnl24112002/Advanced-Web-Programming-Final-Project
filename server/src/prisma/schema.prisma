@@ -140,6 +140,7 @@ model studentRequestedReviewConversation {
   id                 Int                      @id @default(autoincrement())
   studentRequestedId Int?                     @map(name: "student_requested_id")
   metadata           String?                  @db.Text
+  message            String?                  @db.Text
   userId             String?                  @map(name: "user_id")
   createdAt          DateTime                 @default(now()) @map(name: "created_at")
   updatedAt          DateTime                 @default(now()) @updatedAt @map(name: "updated_at")
