@@ -117,6 +117,7 @@ model studentRequestedReviews {
   metadata            String?             @db.Text
   status              String?
   expectedScore       Float?              @map(name: "expected_score")
+  actualScore         Float?              @map(name: "actual_score")
   comment             String?
   assignmentId        Int?                @map(name: "assignment_id")
   studentId           String?             @map(name: "student_id")

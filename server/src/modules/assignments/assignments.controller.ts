@@ -10,9 +10,14 @@ import {
 } from '@nestjs/common';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AssignmentsService } from './assignments.service';
-import { CreateAssignmentDTO, MarkScoreStudentDto } from './dto/body.dto';
+import {
+  CreateAssignmentDTO,
+  MarkScoreStudentDto,
+  RequestedGradeViewDto,
+} from './dto/body.dto';
 import {
   ASSIGNMENT_STATUS,
+  REQUESTED_REVIEW_STATUS,
   createBufferFromExcelFile,
   readFileExcel,
 } from 'src/utils';
@@ -22,6 +27,7 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { AuthService } from '../auth/auth.service';
 import { find } from 'lodash';
+import { Prisma } from '@prisma/client';
 
 @Controller('assignments')
 @ApiTags('Assignments')
@@ -165,6 +171,59 @@ export class AssignmentsController {
       status: true,
       data: assignments,
       message: 'Chấm điểm thành công',
+    };
+  }
+
+  @Get(':id/requested-grade-view')
+  async getRequestedGradeView(@Param('id') id: number) {
+    const assignment = await this.assignmentsService.getAssignment(+id);
+    const { studentAssignments, grades } = assignment;
+    const refactoredData = studentAssignments.map((studentAssignment) => {
+      const { students } = studentAssignment;
+      return {
+        'Student Id': students?.uniqueId,
+        'Full Name': students.firstName + ' ' + students.lastName,
+        Grade: studentAssignment.score,
+      };
+    });
+    const buffer = createBufferFromExcelFile(refactoredData, 'Grade');
+    const uploadedFile = await this.cloudinaryService.uploadFile({
+      buffer,
+      filename: `Grade_${new Date().toISOString()}.xlsx`,
+    });
+    return {
+      status: true,
+      data: uploadedFile.url,
+      message: 'Tải file Grade thành công',
+    };
+  }
+
+  @Post(':id/requested-grade-view')
+  async requestedGradeView(
+    @Param('id') id: number,
+    @Body() body: RequestedGradeViewDto,
+  ) {
+    const { studentId, expectedScore, studentAssignmentId, comment } = body;
+    const inputData: Prisma.studentRequestedReviewsUncheckedCreateInput = {
+      assignmentId: +id,
+      studentId,
+      expectedScore,
+      comment,
+      status: REQUESTED_REVIEW_STATUS.OPENED,
+    };
+    const requestedGradeView =
+      await this.assignmentsService.createRequestedGradeView(inputData);
+    // UPDATE STATUS OF STUDENT ASSIGNMENT
+    await this.assignmentsService.updateStudentAssignment(
+      +studentAssignmentId,
+      {
+        status: ASSIGNMENT_STATUS.REQUESTED_REVIEW,
+      },
+    );
+    return {
+      status: true,
+      data: requestedGradeView,
+      message: 'Tải file Grade thành công',
     };
   }
 }

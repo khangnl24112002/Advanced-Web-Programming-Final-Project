@@ -13,5 +13,10 @@ export enum ASSIGNMENT_STATUS {
   SUBMITTED = 'SUBMITTED', // đã nộp
   LATE = 'LATE', // nộp muộn
   GRADED = 'GRADED', // đã chấm điểm
-  RE_MARK = 'RE_MARK', // phúc khảo
+  REQUESTED_REVIEW = 'REQUESTED_REVIEW', // phúc khảo
+}
+
+export enum REQUESTED_REVIEW_STATUS {
+  OPENED = 'OPENED',
+  CLOSED = 'CLOSED',
 }

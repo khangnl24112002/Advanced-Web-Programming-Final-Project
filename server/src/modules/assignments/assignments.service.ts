@@ -23,6 +23,16 @@ export class AssignmentsService {
     });
   }
 
+  async updateStudentAssignment(
+    id: number,
+    data: Prisma.studentAssignmentsUncheckedUpdateInput,
+  ) {
+    return this.primsaService.studentAssignments.update({
+      where: { id },
+      data,
+    });
+  }
+
   async getAllAssignments() {
     return this.primsaService.assignments.findMany({
       include: {
@@ -77,6 +87,14 @@ export class AssignmentsService {
           },
         },
       },
+    });
+  }
+
+  async createRequestedGradeView(
+    data: Prisma.studentRequestedReviewsUncheckedCreateInput,
+  ) {
+    return this.primsaService.studentRequestedReviews.create({
+      data,
     });
   }
 }

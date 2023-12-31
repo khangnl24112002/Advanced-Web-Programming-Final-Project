@@ -79,3 +79,21 @@ export class MarkScoreStudentDto {
   @IsNotEmpty()
   scores: MarkScoreStudent[];
 }
+
+export class RequestedGradeViewDto {
+  @ApiProperty({ required: false, example: 10 })
+  @IsNotEmpty()
+  studentAssignmentId: number;
+
+  @ApiProperty({ required: false, example: 10 })
+  @IsNotEmpty()
+  studentId: string;
+
+  @ApiProperty({ required: false, example: 10 })
+  @IsNotEmpty()
+  expectedScore: number;
+
+  @ApiProperty({ required: false, example: 10 })
+  @IsNotEmpty()
+  comment: string;
+}
