@@ -14,6 +14,7 @@ import {
   CreateAssignmentDTO,
   MarkScoreStudentDto,
   RequestedGradeViewDto,
+  UpdateRequestedGradeViewDto,
 } from './dto/body.dto';
 import {
   ASSIGNMENT_STATUS,
@@ -26,7 +27,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { AuthService } from '../auth/auth.service';
-import { find } from 'lodash';
+import { find, map } from 'lodash';
 import { Prisma } from '@prisma/client';
 
 @Controller('assignments')
@@ -176,25 +177,26 @@ export class AssignmentsController {
 
   @Get(':id/requested-grade-view')
   async getRequestedGradeView(@Param('id') id: number) {
-    const assignment = await this.assignmentsService.getAssignment(+id);
-    const { studentAssignments, grades } = assignment;
-    const refactoredData = studentAssignments.map((studentAssignment) => {
+    const requestedReviews =
+      await this.assignmentsService.getRequestedGradeView(+id);
+    const refactoredData = map(requestedReviews, (studentAssignment) => {
       const { students } = studentAssignment;
       return {
-        'Student Id': students?.uniqueId,
-        'Full Name': students.firstName + ' ' + students.lastName,
-        Grade: studentAssignment.score,
+        studentId: students?.id,
+        firstName: students?.firstName,
+        lastName: students?.lastName,
+        uniqueId: students?.uniqueId,
+        expectedScore: studentAssignment.expectedScore,
+        comment: studentAssignment.comment,
+        status: studentAssignment.status,
+        studentRequestedReviewId: studentAssignment.id,
       };
     });
-    const buffer = createBufferFromExcelFile(refactoredData, 'Grade');
-    const uploadedFile = await this.cloudinaryService.uploadFile({
-      buffer,
-      filename: `Grade_${new Date().toISOString()}.xlsx`,
-    });
+
     return {
       status: true,
-      data: uploadedFile.url,
-      message: 'Tải file Grade thành công',
+      data: refactoredData,
+      message: 'Lấy danh sách phúc khảo thành công',
     };
   }
 
@@ -218,6 +220,36 @@ export class AssignmentsController {
       +studentAssignmentId,
       {
         status: ASSIGNMENT_STATUS.REQUESTED_REVIEW,
+      },
+    );
+    return {
+      status: true,
+      data: requestedGradeView,
+      message: 'Tải file Grade thành công',
+    };
+  }
+
+  @Put('requested-grade-view/:studentRequestedReviewId')
+  async updateRequestedGradeView(
+    @Param('studentRequestedReviewId') studentRequestedReviewId: number,
+    @Body() body: UpdateRequestedGradeViewDto,
+  ) {
+    const { actualScore, status, studentAssignmentId } = body;
+    const prepareData: Prisma.studentRequestedReviewsUncheckedUpdateInput = {
+      actualScore,
+      status,
+    };
+    const requestedGradeView =
+      await this.assignmentsService.updateRequestedGradeView(
+        +studentRequestedReviewId,
+        prepareData,
+      );
+    // update status of student assignment
+    await this.assignmentsService.updateStudentAssignment(
+      +studentAssignmentId,
+      {
+        status: ASSIGNMENT_STATUS.DONE_REQUESTED_REVIEW,
+        score: actualScore,
       },
     );
     return {

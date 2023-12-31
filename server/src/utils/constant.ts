@@ -14,6 +14,7 @@ export enum ASSIGNMENT_STATUS {
   LATE = 'LATE', // nộp muộn
   GRADED = 'GRADED', // đã chấm điểm
   REQUESTED_REVIEW = 'REQUESTED_REVIEW', // phúc khảo
+  DONE_REQUESTED_REVIEW = 'DONE_REQUESTED_REVIEW', // đã phúc khảo
 }
 
 export enum REQUESTED_REVIEW_STATUS {

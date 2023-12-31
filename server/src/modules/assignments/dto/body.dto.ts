@@ -97,3 +97,17 @@ export class RequestedGradeViewDto {
   @IsNotEmpty()
   comment: string;
 }
+
+export class UpdateRequestedGradeViewDto {
+  @ApiProperty({ required: false, example: 10 })
+  @IsNotEmpty()
+  actualScore: number;
+
+  @ApiProperty({ required: false, example: 'ACCEPT' })
+  @IsNotEmpty()
+  status: string;
+
+  @ApiProperty({ required: false, example: 10 })
+  @IsNotEmpty()
+  studentAssignmentId: number;
+}

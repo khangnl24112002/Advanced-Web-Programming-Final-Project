@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { compact, map } from 'lodash';
 import { PrismaService } from 'src/prisma.service';
+import { REQUESTED_REVIEW_STATUS } from 'src/utils';
 
 @Injectable()
 export class AssignmentsService {
@@ -94,6 +95,28 @@ export class AssignmentsService {
     data: Prisma.studentRequestedReviewsUncheckedCreateInput,
   ) {
     return this.primsaService.studentRequestedReviews.create({
+      data,
+    });
+  }
+
+  async getRequestedGradeView(id: number) {
+    return this.primsaService.studentRequestedReviews.findMany({
+      where: {
+        assignmentId: id,
+        status: REQUESTED_REVIEW_STATUS.OPENED,
+      },
+      include: {
+        students: true,
+      },
+    });
+  }
+
+  async updateRequestedGradeView(
+    id: number,
+    data: Prisma.studentRequestedReviewsUncheckedUpdateInput,
+  ) {
+    return this.primsaService.studentRequestedReviews.update({
+      where: { id },
       data,
     });
   }
