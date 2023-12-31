@@ -34,8 +34,11 @@ export class AssignmentsService {
     });
   }
 
-  async getAllAssignments() {
+  async getAllAssignments(classId: number) {
     return this.primsaService.assignments.findMany({
+      where: {
+        classId,
+      },
       include: {
         classes: true,
         grades: true,

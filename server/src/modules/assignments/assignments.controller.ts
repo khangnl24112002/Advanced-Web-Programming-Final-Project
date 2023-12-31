@@ -66,9 +66,10 @@ export class AssignmentsController {
     };
   }
 
-  @Get()
-  async getAllAssignments() {
-    const assignments = await this.assignmentsService.getAllAssignments();
+  @Get(':classId')
+  async getAllAssignments(@Param('classId') classId: number) {
+    const assignments =
+      await this.assignmentsService.getAllAssignments(classId);
     return {
       status: true,
       data: assignments,
