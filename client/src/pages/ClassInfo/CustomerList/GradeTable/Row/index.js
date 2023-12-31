@@ -14,6 +14,7 @@ const Row = ({
     activeId,
     setActiveId,
     onChoose,
+    gradeComposition,
 }) => {
     const handleClick = (id) => {
         setActiveTable(true);
@@ -53,24 +54,18 @@ const Row = ({
                     <div className={styles.email}>20120196</div>
                 </div>
 
-                <div className={styles.col}>
-                    {/* <div className={styles.lifetime}> */}
-                    <div>10</div>
-                    {/* <Balance
-                            className={styles.balance}
-                            value={item.balance}
-                        /> */}
-                    {/* </div> */}
-                </div>
-                <div className={styles.col}>
-                    {/* <div className={styles.lifetime}> */}
-                    <div>10</div>
-                    {/* <Balance
-                            className={styles.balance}
-                            value={item.balance}
-                        /> */}
-                    {/* </div> */}
-                </div>
+                {gradeComposition &&
+                    gradeComposition.map((grade) => (
+                        <div className={styles.col}>
+                            {/* <div className={styles.lifetime}> */}
+                            <div>10</div>
+                            {/* <Balance
+                                className={styles.balance}
+                                value={item.balance}
+                            /> */}
+                            {/* </div> */}
+                        </div>
+                    ))}
                 {user.role === "teacher" && (
                     <div className={styles.col}>
                         <div className={styles.editbutton}>Edit</div>

@@ -15,6 +15,9 @@
     display: table-row
     +t
         display: none
+    .col
+        div
+            text-align: center
     &.active
         .col
             &:not(:first-child):not(:nth-child(2))
@@ -47,6 +50,7 @@
     &:last-child
         &:after
             right: 12px
+   
     
 .foot
     margin-top: 20px
@@ -55,3 +59,15 @@
         .loader
             transform: scale(.8)
             margin: 0 18px 0 8px
+
+.flex
+    display: flex
+    justify-content: center
+    align-items: center
+    gap: 6px
+
+.dropdownBox
+    border: none
+
+.dropdownHead
+    border: none
