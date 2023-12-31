@@ -79,18 +79,9 @@ export const classServices = {
       return error.response.data;
     }
   },
-  getClassDetail: async (token, classId) => {
+  getClassDetail: async (classId) => {
     try {
-      const response = await axiosInstance.get(
-        `/classes/${classId}`,
-
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + token,
-          },
-        }
-      );
+      const response = await axiosInstance.get(`/classes/${classId}`);
 
       return response.data;
     } catch (error) {
