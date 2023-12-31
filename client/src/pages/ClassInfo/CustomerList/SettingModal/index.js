@@ -20,6 +20,7 @@ const SettingModal = ({
   urlClass,
   keyInvite,
   gradeComposition,
+  classInfo,
 }) => {
   const {
     control: controlScore,
@@ -27,14 +28,17 @@ const SettingModal = ({
     handleSubmit: handleSubmitScore,
   } = useForm();
 
-  const { control: controlClassInfo, handleSubmit: handleSubmitClassInfo } =
-    useForm({
-      defaultValues: {
-        name: "fff",
-        maximumStudents: "zzz",
-        description: "aaa",
-      },
-    });
+  const {
+    control: controlClassInfo,
+    setValue: setValueClassInfo,
+    handleSubmit: handleSubmitClassInfo,
+  } = useForm({
+    defaultValues: {
+      name: "fff",
+      maximumStudents: "zzz",
+      description: "aaa",
+    },
+  });
   const {
     fields: fieldsScore,
     append: appendScore,
@@ -72,8 +76,12 @@ const SettingModal = ({
   }, [visible]);
 
   useEffect(() => {
+    // set old value for grade composition
     setValueScore("grades", gradeComposition);
-  }, [gradeComposition]);
+    setValueClassInfo("description", classInfo.description);
+    setValueClassInfo("name", classInfo.name);
+    setValueClassInfo("maximumStudents", classInfo.maximumStudents);
+  }, [gradeComposition, classInfo]);
 
   // Handle submit score compositions
   const onSubmitScore = async (data) => {
@@ -109,11 +117,24 @@ const SettingModal = ({
 
   // Handle submit class info
   const onSubmitClassInfo = (classInfo) => {
-    const requestData = { ...classInfo, classId };
-    // call API to send data to server
+    // Change maximumStudent to int
+    const requestData = {
+      ...classInfo,
+      maximumStudents: parseInt(classInfo.maximumStudents),
+    };
     console.log(requestData);
+    // Call API to update
+    const response = {
+      status: true,
+    };
+    if (response.status) {
+      return successToast("Cập nhật thành công!", 3000);
+    } else {
+      return errorToast("Cập nhật thất bại!");
+    }
   };
 
+  // Function to handle download class student list
   const handleDownloadClassList = async () => {
     const response = await classServices.downloadClassList(classId);
     if (response.status) {
@@ -122,6 +143,7 @@ const SettingModal = ({
       return errorToast("Lấy danh sách thất bại");
     }
   };
+
   return createPortal(
     visible && (
       <div id="modal-product" className={styles.modal}>
