@@ -22,6 +22,34 @@ export class CreateAssignmentDTO {
   @Transform(({ value }) => new Date(value).toISOString())
   dueDate: string;
 }
+export class UpdateAssignmentDTO {
+  @ApiProperty({ required: true, example: 'Minh' })
+  @IsNotEmpty()
+  classId: number;
+
+  @ApiProperty({ required: true, example: 'Minh' })
+  @IsNotEmpty()
+  name: string;
+
+  @ApiProperty({ required: true, example: '1' })
+  gradeId: number;
+
+  @ApiProperty({ required: true, example: 'description' })
+  @IsOptional()
+  description?: string;
+
+  @ApiProperty({ required: true, example: '2021-10-10' })
+  @Transform(({ value }) => new Date(value).toISOString())
+  dueDate?: string;
+
+  @ApiProperty({ required: true, example: 'COMPLETE' })
+  @IsOptional()
+  status?: string;
+
+  @ApiProperty({ required: true, example: 'true' })
+  @IsOptional()
+  isDisable?: boolean;
+}
 
 class CreateGrade {
   @ApiProperty({ required: true, example: 'CKI' })

@@ -41,6 +41,7 @@
     "class-validator": "^0.14.0",
     "cloudinary": "^1.41.1",
     "cookie-parser": "^1.4.6",
+    "firebase": "^10.7.1",
     "hbs": "^4.2.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
