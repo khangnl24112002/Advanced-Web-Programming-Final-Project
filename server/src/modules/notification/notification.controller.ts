@@ -6,7 +6,7 @@ import { JwtAuthGuard } from 'src/guards/jwt.auth.guard';
 
 @Controller('notification')
 @ApiTags('Notification')
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
@@ -28,7 +28,6 @@ export class NotificationController {
       newData: {
         ...payload,
         id,
-        sendingTime: new Date().toISOString(),
       },
     });
     return saveNewNotiToUser;

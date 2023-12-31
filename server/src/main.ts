@@ -48,7 +48,7 @@ async function bootstrap() {
         schema: 'Bearer',
         bearerFormat: 'Token',
       } as SecuritySchemeObject,
-      'Bearer'
+      'Bearer',
     )
     .build();
   app.useStaticAssets(join(__dirname, '..', 'public'));
