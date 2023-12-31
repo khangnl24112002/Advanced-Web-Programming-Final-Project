@@ -43,7 +43,7 @@ import { customAlphabet } from 'nanoid';
 import { CreateGradeDto, UpdateGradeDto } from '../assignments/dto/body.dto';
 import * as xlsx from 'xlsx';
 import { CloudinaryService } from '../files/cloudinary.service';
-import { includes, map, toNumber } from 'lodash';
+import { includes, isEmpty, map, toNumber } from 'lodash';
 import { NotificationService } from '../notification/notification.service';
 
 @Controller('classes')
@@ -484,9 +484,18 @@ export class ClassesController {
   @Get(':id/export-grade-board')
   async exportGrade(@Param('id') id: number) {
     const grades = await this.classesService.getGrades(+id);
+    if (isEmpty(grades)) {
+      return {
+        status: false,
+        message: 'Lớp học chưa có bài tập nào',
+      };
+    }
     let workbook = xlsx.utils.book_new();
     map(grades, (studentAssignment) => {
       const { assignments } = studentAssignment;
+      if (isEmpty(assignments)) {
+        return null;
+      }
       const { studentAssignments } = assignments;
       const refactoredStudentsData = map(studentAssignments, (student) => {
         const { students } = student;
@@ -525,6 +534,9 @@ export class ClassesController {
     const isStudent = !includes(map(refactorTeachers, 'id'), userId);
     map(grades, (studentAssignment) => {
       const { assignments, status } = studentAssignment;
+      if (isEmpty(assignments)) {
+        return null;
+      }
       const { studentAssignments } = assignments;
       const refactoredStudentsData = map(studentAssignments, (student) => {
         const { students } = student;

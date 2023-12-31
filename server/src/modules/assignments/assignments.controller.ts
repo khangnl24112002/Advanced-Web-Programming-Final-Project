@@ -92,8 +92,17 @@ export class AssignmentsController {
   @Get(':id/download-score')
   async downloadScoreForAssignment(@Param('id') id: number) {
     const grade = await this.assignmentsService.getAssignment(+id);
+    if (!grade) {
+      throw new HttpException(
+        {
+          status: false,
+          message: 'Không tìm thấy bài tập',
+        },
+        404,
+      );
+    }
     const { studentAssignments } = grade;
-    const refactoredData = studentAssignments.map((studentAssignment) => {
+    const refactoredData = map(studentAssignments, (studentAssignment) => {
       const { students } = studentAssignment;
       return {
         'Student Id': students?.uniqueId,
