@@ -21,6 +21,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { AuthService } from '../auth/auth.service';
+import { find } from 'lodash';
 
 @Controller('assignments')
 @ApiTags('Assignments')
@@ -146,9 +147,22 @@ export class AssignmentsController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     const excelData = await readFileExcel(file.path);
+    const students = await Promise.all(
+      excelData.map(async (data: any) => {
+        const { StudentId } = data;
+        const student = await this.authService.getUserByUniqueId(StudentId);
+        return {
+          studentId: student.id,
+          score: data.Grade,
+          assignmentId: +id,
+        };
+      }),
+    );
+    const assignments =
+      await this.assignmentsService.markScoreForAssignment(students);
     return {
       status: true,
-      data: excelData,
+      data: assignments,
       message: 'Chấm điểm thành công',
     };
   }
