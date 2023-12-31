@@ -57,6 +57,7 @@ const CustomerList = () => {
                         " " +
                         responseData.teachers[key].lastName,
                     email: responseData.teachers[key].email,
+                    id: responseData.teachers[key].id,
                     role: "Giáo viên",
                 });
             }
@@ -70,6 +71,7 @@ const CustomerList = () => {
                         " " +
                         responseData.students[key].lastName,
                     email: responseData.students[key].email,
+                    id: responseData.students[key].id,
                     role: "Học sinh",
                 });
             }
@@ -97,6 +99,7 @@ const CustomerList = () => {
                         gradeCompositionData.push({
                             name: grade.name,
                             percentage: grade.percentage,
+                            id: grade.id,
                         });
                     });
                     setGradeComposition(gradeCompositionData);
@@ -104,7 +107,6 @@ const CustomerList = () => {
                 }
             };
             getClassGradeComposition();
-            console.log(gradeComposition);
             setIsLoading(false);
         };
 
@@ -198,6 +200,14 @@ const CustomerList = () => {
                 </div>
             </>
         );
+    };
+    const handleDownloadGradeBoard = async () => {
+        const response = await classServices.exportGradeBoard(classId);
+        if (response.status) {
+            window.open(response.data);
+        } else {
+            return errorToast("Lấy bảng điểm thất bại");
+        }
     };
     // Modal để show xác nhận rời khỏi lớp
     const handleOutGroup = () => {
@@ -316,6 +326,7 @@ const CustomerList = () => {
                         role={user.role}
                         addStudent={handleAddingStudent}
                         outGroup={handleOutGroup}
+                        downloadGradeBoard={handleDownloadGradeBoard}
                     />
                     <Modal
                         outerClassName={styles.outer}
