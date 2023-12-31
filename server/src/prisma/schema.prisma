@@ -37,6 +37,7 @@ model users {
   assignmentsScoreHistories          assignmentsScoreHistories[]
   studentRequestedReviews            studentRequestedReviews[]
   studentRequestedReviewConversation studentRequestedReviewConversation[]
+  assignments                        assignments[]
 }
 
 model roles {
@@ -81,6 +82,7 @@ model assignments {
   classId                   Int?                        @map(name: "class_id")
   name                      String?
   gradeId                   Int?                        @unique @map(name: "grade_id")
+  teacherId                 String?                     @map(name: "creator_id")
   description               String?                     @db.Text
   status                    String?                     @default("OPEN")
   metadata                  String?                     @db.Text
@@ -92,6 +94,7 @@ model assignments {
   updatedAt                 DateTime                    @default(now()) @updatedAt @map(name: "updated_at")
   classes                   classes?                    @relation(fields: [classId], references: [id])
   grades                    grades?                     @relation(fields: [gradeId], references: [id])
+  teacher                   users?                      @relation(fields: [teacherId], references: [id])
   studentAssignments        studentAssignments[]
   assignmentsScoreHistories assignmentsScoreHistories[]
   studentRequestedReviews   studentRequestedReviews[]

@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
   Param,
   Post,
   Put,
@@ -32,6 +33,7 @@ import { map } from 'lodash';
 import { Prisma } from '@prisma/client';
 import { CurrentUser } from 'src/decorators/users.decorator';
 import { JwtAuthGuard } from 'src/guards/jwt.auth.guard';
+import { NotificationService } from '../notification/notification.service';
 
 @Controller('assignments')
 @ApiTags('Assignments')
@@ -41,11 +43,18 @@ export class AssignmentsController {
     private readonly assignmentsService: AssignmentsService,
     private readonly cloudinaryService: CloudinaryService,
     private readonly authService: AuthService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   @Post()
-  async createAssignment(@Body() body: CreateAssignmentDTO) {
-    const assignments = await this.assignmentsService.createAssignment(body);
+  async createAssignment(
+    @Body() body: CreateAssignmentDTO,
+    @CurrentUser('id') teacherId: string,
+  ) {
+    const assignments = await this.assignmentsService.createAssignment({
+      ...body,
+      teacherId,
+    });
     return {
       status: true,
       data: assignments,
@@ -264,13 +273,88 @@ export class AssignmentsController {
     };
   }
 
-  @Post('requested-grade-view/:studentRequestedReviewId/conversation')
+  @Post(':id/requested-grade-view/:studentRequestedReviewId/conversation')
   async createConversation(
     @Param('studentRequestedReviewId') studentRequestedReviewId: number,
     @Body() body: any,
     @CurrentUser('id') userId: string,
+    @Param('id') id: number,
   ) {
     const { message } = body;
+    const assignment = await this.assignmentsService.getAssignment(+id);
+    if (!assignment) {
+      throw new HttpException(
+        {
+          status: false,
+          message: 'Không tìm thấy bài tập',
+        },
+        404,
+      );
+    }
+    const requestedGradeViewDetail =
+      await this.assignmentsService.getRequestGradeViewDetail(
+        +studentRequestedReviewId,
+      );
+    if (!requestedGradeViewDetail) {
+      throw new HttpException(
+        {
+          status: false,
+          message: 'Không tìm thấy phúc khảo',
+        },
+        404,
+      );
+    }
+    const { students } = requestedGradeViewDetail;
+    const { teacher } = assignment;
+    if (students.id === userId) {
+      const userId = teacher.id;
+      const notiLength =
+        await this.notificationService.readNotiLengthFromDB(userId);
+      const id = notiLength ? notiLength + 1 : 0;
+      const payload = {
+        content: `Sinh viên ${
+          students?.firstName + '' + students?.lastName
+        } vừa phản hồi trong cuộc hội thoại phúc khảo bài tập ${
+          assignment.name
+        }`,
+        createdAt: new Date().toISOString(),
+        isRead: false,
+        title: 'Bạn vừa nhận được thông báo trong đoạn hội thoại',
+        type: 'review',
+      };
+      await this.notificationService.saveNewNotiToUser({
+        userId,
+        currentNotiLength: notiLength || 0,
+        newData: {
+          ...payload,
+          id,
+        },
+      });
+    } else {
+      const userId = students.id;
+      const notiLength =
+        await this.notificationService.readNotiLengthFromDB(userId);
+      const id = notiLength ? notiLength + 1 : 0;
+      const payload = {
+        content: `Giáo viên ${
+          teacher?.firstName + '' + teacher?.lastName
+        } vừa phản hồi trong cuộc hội thoại phúc khảo bài tập ${
+          assignment.name
+        }`,
+        createdAt: new Date().toISOString(),
+        isRead: false,
+        title: 'Bạn vừa nhận được thông báo trong đoạn hội thoại',
+        type: 'review',
+      };
+      await this.notificationService.saveNewNotiToUser({
+        userId,
+        currentNotiLength: notiLength || 0,
+        newData: {
+          ...payload,
+          id,
+        },
+      });
+    }
     const requestedGradeView = await this.assignmentsService.createConversation(
       +studentRequestedReviewId,
       {

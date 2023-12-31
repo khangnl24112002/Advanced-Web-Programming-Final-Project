@@ -43,6 +43,14 @@ export class AssignmentsService {
         classes: true,
         grades: true,
         studentAssignments: true,
+        teacher: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatar: true,
+          },
+        },
       },
       orderBy: {
         createdAt: 'desc',
@@ -90,6 +98,14 @@ export class AssignmentsService {
             students: true,
           },
         },
+        teacher: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatar: true,
+          },
+        },
       },
     });
   }
@@ -106,7 +122,17 @@ export class AssignmentsService {
     return this.primsaService.studentRequestedReviews.findMany({
       where: {
         assignmentId: id,
-        status: REQUESTED_REVIEW_STATUS.OPENED,
+      },
+      include: {
+        students: true,
+      },
+    });
+  }
+
+  async getRequestGradeViewDetail(id: number) {
+    return this.primsaService.studentRequestedReviews.findUnique({
+      where: {
+        id,
       },
       include: {
         students: true,
