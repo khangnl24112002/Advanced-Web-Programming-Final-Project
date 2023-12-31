@@ -11,12 +11,16 @@ import {
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AssignmentsService } from './assignments.service';
 import { CreateAssignmentDTO, MarkScoreStudentDto } from './dto/body.dto';
-import { ASSIGNMENT_STATUS, createBufferFromExcelFile } from 'src/utils';
+import {
+  ASSIGNMENT_STATUS,
+  createBufferFromExcelFile,
+  readFileExcel,
+} from 'src/utils';
 import { CloudinaryService } from '../files/cloudinary.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import * as xlxs from 'xlsx';
+import { AuthService } from '../auth/auth.service';
 
 @Controller('assignments')
 @ApiTags('Assignments')
@@ -24,6 +28,7 @@ export class AssignmentsController {
   constructor(
     private readonly assignmentsService: AssignmentsService,
     private readonly cloudinaryService: CloudinaryService,
+    private readonly authService: AuthService,
   ) {}
 
   @Post()
@@ -140,7 +145,7 @@ export class AssignmentsController {
     @Param('id') id: number,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const excelData = xlxs.readFile(file.path);
+    const excelData = await readFileExcel(file.path);
     return {
       status: true,
       data: excelData,

@@ -11,7 +11,7 @@ export class AuthService {
     // eslint-disable-next-line prettier/prettier
     private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
   async generateAccessToken(payload): Promise<string> {
     return this.jwtService.signAsync(payload, {
       secret: process.env.SECRET_KEY,
@@ -28,11 +28,19 @@ export class AuthService {
     return user;
   }
 
- 
-
   async signUpByEmail(createUserDTO: any) {
-    const { firstName, lastName, email, password, role, emailVerified, avatar} = createUserDTO;
-    const roleId: number = ROLES[role?.toUpperCase() || 'USER'] as unknown as number
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      role,
+      emailVerified,
+      avatar,
+    } = createUserDTO;
+    const roleId: number = ROLES[
+      role?.toUpperCase() || 'USER'
+    ] as unknown as number;
     const encryptedPassword = await hashPassword(password);
     let user: any = await this.prismaService.users.findFirst({
       where: {
@@ -40,10 +48,13 @@ export class AuthService {
       },
     });
     if (user?.emailVerified) {
-      throw new HttpException({
-        status: false,
-        message: "Tài khoản đã tồn tại"
-      }, HttpStatus.BAD_REQUEST)
+      throw new HttpException(
+        {
+          status: false,
+          message: 'Tài khoản đã tồn tại',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
     if (user && !user.emailVerified) {
       user = await this.prismaService.users.update({
@@ -54,10 +65,10 @@ export class AuthService {
           firstName,
           lastName,
           encryptedPassword,
-          roleId
-        }
-      })
-    } else if (!user){
+          roleId,
+        },
+      });
+    } else if (!user) {
       user = await this.prismaService.users.create({
         data: {
           firstName,
@@ -66,7 +77,9 @@ export class AuthService {
           encryptedPassword,
           roleId,
           emailVerified: emailVerified || false,
-          avatar: avatar || 'https://www.kindpng.com/picc/m/303-3032000_blue-class-dojo-monsters-hd-png-download.png'
+          avatar:
+            avatar ||
+            'https://www.kindpng.com/picc/m/303-3032000_blue-class-dojo-monsters-hd-png-download.png',
         },
       });
     }
@@ -93,26 +106,31 @@ export class AuthService {
         emailVerified: true,
       },
       include: {
-        role: true
-      }
+        role: true,
+      },
     });
     if (!ex_user) {
-      throw new HttpException({
-        status: false,
-        data: null,
-        message: "Tài khoản không tồn tại"
-      }, HttpStatus.BAD_REQUEST)
+      throw new HttpException(
+        {
+          status: false,
+          data: null,
+          message: 'Tài khoản không tồn tại',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const { encryptedPassword } = ex_user;
     const isValidPassword = await comparePassword(password, encryptedPassword);
     if (!isValidPassword) {
-      throw new HttpException({
-        status: false,
-        daa: null,
-        message: 'Mật khẩu bạn đã nhập không chính xác.',
-      }, HttpStatus.BAD_REQUEST)
-
+      throw new HttpException(
+        {
+          status: false,
+          daa: null,
+          message: 'Mật khẩu bạn đã nhập không chính xác.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
     const access_token = await this.generateAccessToken({
       email: email,
@@ -150,8 +168,8 @@ export class AuthService {
         email,
       },
       include: {
-        role: true
-      }
+        role: true,
+      },
     });
     return user;
   }
@@ -186,6 +204,15 @@ export class AuthService {
       },
       data: {
         encryptedPassword,
+      },
+    });
+    return user;
+  }
+
+  async getUserByUniqueId(uniqueId: string) {
+    const user = await this.prismaService.users.findUnique({
+      where: {
+        uniqueId,
       },
     });
     return user;

@@ -25,5 +25,6 @@ import { SendgridService } from '../mail/mail.service';
     FacebookStrategy,
     SendgridService,
   ],
+  exports: [AuthService],
 })
 export class AuthModule {}
