@@ -35,6 +35,7 @@ model users {
   classTeachers             classTeachers[]
   studentAssignments        studentAssignments[]
   assignmentsScoreHistories assignmentsScoreHistories[]
+  studentRequestedReviews   studentRequestedReviews[]
 }
 
 model roles {
@@ -88,6 +89,7 @@ model assignments {
   grades                    grades?                     @relation(fields: [gradeId], references: [id])
   studentAssignments        studentAssignments[]
   assignmentsScoreHistories assignmentsScoreHistories[]
+  studentRequestedReviews   studentRequestedReviews[]
 
   @@map("assignments")
 }
@@ -104,8 +106,26 @@ model studentAssignments {
   students                     users?                         @relation(fields: [studentId], references: [id])
   assignments                  assignments?                   @relation(fields: [assignmentId], references: [id])
   studentAssignmentSubmissions studentAssignmentSubmissions[]
+  studentRequestedReviews      studentRequestedReviews[]
 
   @@map("student_assignments")
+}
+
+model studentRequestedReviews {
+  id                  Int                 @id @default(autoincrement())
+  studentAssignmentId Int?                @map(name: "student_assignment_id")
+  metadata            String?             @db.Text
+  expectedScore       Float?              @map(name: "expected_score")
+  comment             String?
+  assignmentId        Int?                @map(name: "assignment_id")
+  studentId           String?             @map(name: "student_id")
+  createdAt           DateTime            @default(now()) @map(name: "created_at")
+  updatedAt           DateTime            @default(now()) @updatedAt @map(name: "updated_at")
+  studentAssignments  studentAssignments? @relation(fields: [studentAssignmentId], references: [id])
+  students            users?              @relation(fields: [studentId], references: [id])
+  assignments         assignments?        @relation(fields: [assignmentId], references: [id])
+
+  @@map("student_requested_reviews")
 }
 
 model assignmentsScoreHistories {
