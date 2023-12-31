@@ -7,3 +7,11 @@ export enum ROLES {
 export enum MAIL_TEMPLATE_ID {
   REGISTER = 'd-db6bbb0802d64247a96775213bf23c48',
 }
+
+export enum ASSIGNMENT_STATUS {
+  NOT_SUBMITTED = 'NOT_SUBMITTED', // chưa nộp
+  SUBMITTED = 'SUBMITTED', // đã nộp
+  LATE = 'LATE', // nộp muộn
+  GRADED = 'GRADED', // đã chấm điểm
+  RE_MARK = 'RE_MARK', // phúc khảo
+}

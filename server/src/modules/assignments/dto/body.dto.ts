@@ -50,3 +50,32 @@ export class CreateGradeDto {
   })
   grades: CreateGrade[];
 }
+
+class MarkScoreStudent {
+  @ApiProperty({ required: true, example: '1711060777' })
+  @IsNotEmpty()
+  studentId: string;
+
+  @ApiProperty({ required: true, example: 10 })
+  @IsNotEmpty()
+  score: number;
+}
+
+export class MarkScoreStudentDto {
+  @ApiProperty({
+    required: true,
+    example: [
+      {
+        studentId: '1711060777',
+        score: 10,
+      },
+      {
+        studentId: '1711060777',
+        score: 10,
+      },
+    ],
+    type: [MarkScoreStudent],
+  })
+  @IsNotEmpty()
+  scores: MarkScoreStudent[];
+}

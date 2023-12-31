@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AssignmentsService } from './assignments.service';
-import { CreateAssignmentDTO } from './dto/body.dto';
+import { CreateAssignmentDTO, MarkScoreStudentDto } from './dto/body.dto';
 import * as xlsx from 'xlsx';
-import { createBufferFromExcelFile } from 'src/utils';
+import { ASSIGNMENT_STATUS, createBufferFromExcelFile } from 'src/utils';
 import { CloudinaryService } from '../files/cloudinary.service';
 
 @Controller('assignments')
@@ -71,6 +71,26 @@ export class AssignmentsController {
       status: true,
       data: uploadedFile.url,
       message: 'Tải file Grade thành công',
+    };
+  }
+
+  @Post(':id/mark-score')
+  async markScoreForAssignment(
+    @Param('id') id: number,
+    @Body() body: MarkScoreStudentDto,
+  ) {
+    const { scores } = body;
+    const refactoredScores = scores.map((score) => ({
+      ...score,
+      assignmentId: +id,
+      status: ASSIGNMENT_STATUS.GRADED,
+    }));
+    const assignments =
+      await this.assignmentsService.markScoreForAssignment(refactoredScores);
+    return {
+      status: true,
+      data: assignments,
+      message: 'Chấm điểm thành công',
     };
   }
 }
