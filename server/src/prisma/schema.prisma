@@ -115,6 +115,7 @@ model studentRequestedReviews {
   id                  Int                 @id @default(autoincrement())
   studentAssignmentId Int?                @map(name: "student_assignment_id")
   metadata            String?             @db.Text
+  status              String?
   expectedScore       Float?              @map(name: "expected_score")
   comment             String?
   assignmentId        Int?                @map(name: "assignment_id")

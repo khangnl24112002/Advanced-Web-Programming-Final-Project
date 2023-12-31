@@ -1,10 +1,22 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AssignmentsService } from './assignments.service';
 import { CreateAssignmentDTO, MarkScoreStudentDto } from './dto/body.dto';
-import * as xlsx from 'xlsx';
 import { ASSIGNMENT_STATUS, createBufferFromExcelFile } from 'src/utils';
 import { CloudinaryService } from '../files/cloudinary.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import * as xlxs from 'xlsx';
 
 @Controller('assignments')
 @ApiTags('Assignments')
@@ -52,17 +64,17 @@ export class AssignmentsController {
 
   @Get(':id/download-score')
   async downloadScoreForAssignment(@Param('id') id: number) {
-    const mockData = [
-      {
-        studentId: '1711060777',
-        Grade: 10,
-      },
-      {
-        studentId: '1711060777',
-        Grade: 10,
-      },
-    ];
-    const buffer = createBufferFromExcelFile(mockData, 'Grade');
+    const grade = await this.assignmentsService.getAssignment(+id);
+    const { studentAssignments, grades } = grade;
+    const refactoredData = studentAssignments.map((studentAssignment) => {
+      const { students } = studentAssignment;
+      return {
+        'Student Id': students?.uniqueId,
+        'Full Name': students.firstName + ' ' + students.lastName,
+        Grade: studentAssignment.score,
+      };
+    });
+    const buffer = createBufferFromExcelFile(refactoredData, 'Grade');
     const uploadedFile = await this.cloudinaryService.uploadFile({
       buffer,
       filename: `Grade_${new Date().toISOString()}.xlsx`,
@@ -80,7 +92,7 @@ export class AssignmentsController {
     @Body() body: MarkScoreStudentDto,
   ) {
     const { scores } = body;
-    const refactoredScores = scores.map((score) => ({
+    const refactoredScores = scores?.map((score) => ({
       ...score,
       assignmentId: +id,
       status: ASSIGNMENT_STATUS.GRADED,
@@ -90,6 +102,48 @@ export class AssignmentsController {
     return {
       status: true,
       data: assignments,
+      message: 'Chấm điểm thành công',
+    };
+  }
+
+  @Post(':id/mark-score-excel')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: {
+        fileSize: 1024 * 1024 * 10,
+      },
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          return cb(null, `${randomName}${extname(file.originalname)}`);
+        },
+      }),
+    }),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async markScoreForAssignmentExcel(
+    @Param('id') id: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const excelData = xlxs.readFile(file.path);
+    return {
+      status: true,
+      data: excelData,
       message: 'Chấm điểm thành công',
     };
   }

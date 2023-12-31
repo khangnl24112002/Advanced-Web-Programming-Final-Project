@@ -18,7 +18,7 @@ import { JwtAuthGuard } from 'src/guards/jwt.auth.guard';
 @ApiBearerAuth('Bearer')
 export class CloudinaryController {
   // eslint-disable-next-line prettier/prettier
-  constructor(private readonly cloudinaryService: CloudinaryService) { }
+  constructor(private readonly cloudinaryService: CloudinaryService) {}
 
   @Post('upload')
   @ApiConsumes('multipart/form-data')
@@ -36,7 +36,7 @@ export class CloudinaryController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadImage(@UploadedFile('file') file: Express.Multer.File) {
     try {
-      const fileUploaded = await this.cloudinaryService.uploadFile(file);
+      const fileUploaded = await this.cloudinaryService.uploadFile({ file });
       return {
         status: true,
         message: 'Upload file thành công',

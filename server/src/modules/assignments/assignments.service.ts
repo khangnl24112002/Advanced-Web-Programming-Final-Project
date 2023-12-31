@@ -42,4 +42,19 @@ export class AssignmentsService {
       data,
     });
   }
+
+  async getAssignment(id: number) {
+    return this.primsaService.assignments.findUnique({
+      where: { id },
+      include: {
+        classes: true,
+        grades: true,
+        studentAssignments: {
+          include: {
+            students: true,
+          },
+        },
+      },
+    });
+  }
 }
