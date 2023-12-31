@@ -17,3 +17,13 @@ export const readFileExcel = async (path: string) => {
   await removeDirectory('./uploads');
   return excelData;
 };
+
+export const appendDataToExcelFile = (
+  data: any,
+  workbook: xlsx.WorkBook,
+  sheetName: string,
+) => {
+  const worksheet = xlsx.utils.json_to_sheet(data);
+  xlsx.utils.book_append_sheet(workbook, worksheet, sheetName);
+  return workbook;
+};

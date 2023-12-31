@@ -8,12 +8,12 @@ import { CreateGradeDto } from '../assignments/dto/body.dto';
 export class ClassesService {
   constructor(
     // eslint-disable-next-line prettier/prettier
-    private readonly prismaService: PrismaService
-  ) { }
+    private readonly prismaService: PrismaService,
+  ) {}
   async create(createClassDto) {
     return this.prismaService.classes.create({
       data: createClassDto,
-    })
+    });
   }
 
   async checkTeacherInClass(classId: number, teacherId: string) {
@@ -21,18 +21,22 @@ export class ClassesService {
       where: {
         classId,
         teacherId,
-      }
-    })
+      },
+    });
   }
 
-  async addTeacherToClass(classId: number, teacherId: string, isCreator: boolean = false) {
+  async addTeacherToClass(
+    classId: number,
+    teacherId: string,
+    isCreator: boolean = false,
+  ) {
     return this.prismaService.classTeachers.create({
       data: {
         classId,
         teacherId,
-        isCreator
-      }
-    })
+        isCreator,
+      },
+    });
   }
 
   async findAll(userId: string) {
@@ -42,8 +46,8 @@ export class ClassesService {
           some: {
             studentId: userId,
             isDisabled: false,
-          }
-        }
+          },
+        },
       },
       include: {
         classTeachers: {
@@ -55,22 +59,20 @@ export class ClassesService {
                 lastName: true,
                 email: true,
                 avatar: true,
-
-              }
-            }
-          }
-
-        }
-      }
-    })
+              },
+            },
+          },
+        },
+      },
+    });
     return map(exClasses, (exClass) => {
-      const teachers = map(exClass.classTeachers, 'teachers')
+      const teachers = map(exClass.classTeachers, 'teachers');
       return {
         ...exClass,
         teachers,
         classTeachers: undefined,
-      }
-    })
+      };
+    });
   }
 
   async findOne(name: string) {
@@ -79,7 +81,7 @@ export class ClassesService {
         name: name,
         isDisabled: false,
       },
-    })
+    });
   }
   async findClassById(id: number) {
     const exClass = await this.prismaService.classes.findUnique({
@@ -97,13 +99,12 @@ export class ClassesService {
                 lastName: true,
                 email: true,
                 avatar: true,
-
-              }
-            }
+              },
+            },
           },
           where: {
             isDisabled: false,
-          }
+          },
         },
         classTeachers: {
           where: {
@@ -117,22 +118,21 @@ export class ClassesService {
                 lastName: true,
                 email: true,
                 avatar: true,
-
-              }
-            }
-          }
-        }
-      }
-    })
-    const students = map(exClass.classStudents, 'students')
-    const teachers = map(exClass.classTeachers, 'teachers')
+              },
+            },
+          },
+        },
+      },
+    });
+    const students = map(exClass.classStudents, 'students');
+    const teachers = map(exClass.classTeachers, 'teachers');
     return {
       ...exClass,
       students,
       teachers,
       classStudents: undefined,
       classTeachers: undefined,
-    }
+    };
   }
 
   async updateClass(id: number, updateClassDto) {
@@ -141,7 +141,7 @@ export class ClassesService {
         id,
       },
       data: updateClassDto,
-    })
+    });
   }
   async getAllClassesOfTeacher(teacherId: string) {
     const exClasses = await this.prismaService.classes.findMany({
@@ -150,8 +150,8 @@ export class ClassesService {
           some: {
             teacherId,
             isDisabled: false,
-          }
-        }
+          },
+        },
       },
       include: {
         classTeachers: {
@@ -164,9 +164,9 @@ export class ClassesService {
                 avatar: true,
 
                 email: true,
-              }
-            }
-          }
+              },
+            },
+          },
         },
         classStudents: {
           select: {
@@ -177,13 +177,12 @@ export class ClassesService {
                 lastName: true,
                 email: true,
                 avatar: true,
-
-              }
-            }
-          }
-        }
-      }
-    })
+              },
+            },
+          },
+        },
+      },
+    });
     return map(exClasses, (exClass) => {
       const teachers = map(exClass.classTeachers, 'teachers');
       const students = map(exClass.classStudents, 'students');
@@ -193,8 +192,8 @@ export class ClassesService {
         students,
         classTeachers: undefined,
         classStudents: undefined,
-      }
-    })
+      };
+    });
   }
 
   async getStudentsOfClass(classId: number) {
@@ -215,11 +214,11 @@ export class ClassesService {
           where: {
             isDisabled: false,
             emailVerified: true,
-          }
+          },
         },
-      }
-    })
-    return map(students, 'students')
+      },
+    });
+    return map(students, 'students');
   }
 
   async inviteStudentToClass(classId: number, studentId: string) {
@@ -227,8 +226,8 @@ export class ClassesService {
       data: {
         classId,
         studentId,
-      }
-    })
+      },
+    });
   }
 
   async inviteTeacherToClass(classId: number, teacherId: string) {
@@ -236,11 +235,15 @@ export class ClassesService {
       data: {
         classId,
         teacherId,
-      }
-    })
+      },
+    });
   }
 
-  async findStudentOrTeacherInClass(classId: number, userId: string, roleId: number) {
+  async findStudentOrTeacherInClass(
+    classId: number,
+    userId: string,
+    roleId: number,
+  ) {
     if (roleId === ROLES.TEACHER) {
       const teacher = await this.prismaService.classTeachers.findFirst({
         where: {
@@ -263,67 +266,88 @@ export class ClassesService {
     return this.prismaService.classLinkInvitations.create({
       data: {
         classId,
-        expiredAt
-      }
-    })
+        expiredAt,
+      },
+    });
   }
 
   async findInvitationById(id: string) {
     return this.prismaService.classLinkInvitations.findUnique({
       where: {
         id,
-      }
-    })
+      },
+    });
   }
 
   async findInvitationByClassId(classId: number) {
     return this.prismaService.classLinkInvitations.findFirst({
       where: {
         classId,
-      }
-    })
+      },
+    });
   }
 
   async deleteInvitations(classId: number) {
     return this.prismaService.classLinkInvitations.deleteMany({
       where: {
         classId,
-      }
-    })
+      },
+    });
   }
 
   async deleteInvitationById(id: string) {
     return this.prismaService.classLinkInvitations.delete({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
   }
 
   async deleteGrades(classId: number) {
     return this.prismaService.grades.deleteMany({
       where: {
         classId,
-      }
-    })
+      },
+    });
   }
 
   async createGrade(classId: number, createGradeDto: CreateGradeDto) {
-    return Promise.all(createGradeDto.grades.map(async (grade) => {
-      return this.prismaService.grades.create({
-        data: {
-          classId,
-          name: grade.name,
-          percentage: grade.percentage,
-        }
-      })
-    }))
+    return Promise.all(
+      createGradeDto.grades.map(async (grade) => {
+        return this.prismaService.grades.create({
+          data: {
+            classId,
+            name: grade.name,
+            percentage: grade.percentage,
+          },
+        });
+      }),
+    );
   }
   async getGrades(classId: number) {
     return this.prismaService.grades.findMany({
       where: {
         classId,
-      }
-    })
+      },
+      include: {
+        assignments: {
+          include: {
+            studentAssignments: {
+              select: {
+                score: true,
+                studentId: true,
+                students: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                    uniqueId: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
   }
 }

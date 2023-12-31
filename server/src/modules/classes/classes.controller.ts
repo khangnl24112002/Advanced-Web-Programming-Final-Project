@@ -1,19 +1,49 @@
-import { Controller, Get, Post, Body, Param, InternalServerErrorException, BadRequestException, UseGuards, HttpException, HttpStatus, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  InternalServerErrorException,
+  BadRequestException,
+  UseGuards,
+  HttpException,
+  HttpStatus,
+  Put,
+} from '@nestjs/common';
 import { ClassesService } from './classes.service';
 import { CreateClassDto } from './dto/create-class.dto';
 import { CurrentUser } from 'src/decorators/users.decorator';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { CreateClassResponse, GetStudentClassResponse, GetStudentInClassResponse, GetTeacherClassResponse, InviteGroupStudentResponse, InviteStudentResponse } from './dto/response';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import {
+  CreateClassResponse,
+  GetStudentClassResponse,
+  GetStudentInClassResponse,
+  GetTeacherClassResponse,
+  InviteGroupStudentResponse,
+  InviteStudentResponse,
+} from './dto/response';
 import { JwtAuthGuard } from 'src/guards/jwt.auth.guard';
 import { AuthService } from '../auth/auth.service';
-import { MAIL_TEMPLATE_ID, ROLES } from 'src/utils';
-import * as moment from "moment";
+import {
+  MAIL_TEMPLATE_ID,
+  ROLES,
+  appendDataToExcelFile,
+  createBufferFromExcelFile,
+} from 'src/utils';
+import * as moment from 'moment';
 import { SendgridService } from '../mail/mail.service';
 import { JwtService } from '@nestjs/jwt';
 import { customAlphabet } from 'nanoid';
 import { CreateGradeDto } from '../assignments/dto/body.dto';
-import * as xlsx from 'xlsx'
+import * as xlsx from 'xlsx';
 import { CloudinaryService } from '../files/cloudinary.service';
+import { map } from 'lodash';
 
 @Controller('classes')
 @ApiTags('Classes')
@@ -21,82 +51,100 @@ import { CloudinaryService } from '../files/cloudinary.service';
 @UseGuards(JwtAuthGuard)
 export class ClassesController {
   // eslint-disable-next-line prettier/prettier
-  constructor(private readonly jwtService: JwtService,
+  constructor(
+    private readonly jwtService: JwtService,
     private readonly classesService: ClassesService,
     private readonly authService: AuthService,
     private readonly mailService: SendgridService,
-    private readonly cloudinaryService: CloudinaryService) { }
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   @Post()
   @ApiCreatedResponse({ type: CreateClassResponse })
-  async create(@Body() createClassDto: CreateClassDto, @CurrentUser('id') teacherId: string) {
+  async create(
+    @Body() createClassDto: CreateClassDto,
+    @CurrentUser('id') teacherId: string,
+  ) {
     const exClass = await this.classesService.findOne(createClassDto.name);
-    const uniqueCode =
-      customAlphabet(
-        '1234567890abcdefghiklmnouwpqz',
-        10
-      )(8)
-        .toUpperCase();
+    const uniqueCode = customAlphabet(
+      '1234567890abcdefghiklmnouwpqz',
+      10,
+    )(8).toUpperCase();
     if (exClass) {
       throw new BadRequestException({
         status: false,
-        message: "Lớp học đã tồn tại"
-      })
+        message: 'Lớp học đã tồn tại',
+      });
     }
-    const classCreated = await this.classesService.create({ ...createClassDto, uniqueCode });
+    const classCreated = await this.classesService.create({
+      ...createClassDto,
+      uniqueCode,
+    });
     const isCreator = true;
-    await this.classesService.addTeacherToClass(classCreated.id, teacherId, isCreator);
-    const classResponse = await this.classesService.findClassById(classCreated.id);
+    await this.classesService.addTeacherToClass(
+      classCreated.id,
+      teacherId,
+      isCreator,
+    );
+    const classResponse = await this.classesService.findClassById(
+      classCreated.id,
+    );
     return {
       status: true,
       data: classResponse,
-      message: "Tạo lớp học thành công"
-    }
+      message: 'Tạo lớp học thành công',
+    };
   }
-
 
   @Put(':id')
   @ApiOkResponse({ type: CreateClassResponse })
-  async update(@Param('id') id: number, @Body() createClassDto: CreateClassDto) {
+  async update(
+    @Param('id') id: number,
+    @Body() createClassDto: CreateClassDto,
+  ) {
     const exClass = await this.classesService.findClassById(+id);
     if (!exClass) {
       throw new BadRequestException({
         status: false,
-        message: "Lớp học không tồn tại"
-      })
+        message: 'Lớp học không tồn tại',
+      });
     }
     const { maximumStudents: currentStudent } = exClass;
     if (currentStudent > createClassDto.maximumStudents) {
       throw new BadRequestException({
         status: false,
-        message: "Số lượng học sinh không được nhỏ hơn số lượng hiện tại"
-      })
+        message: 'Số lượng học sinh không được nhỏ hơn số lượng hiện tại',
+      });
     }
-    const classUpdated = await this.classesService.updateClass(+id, createClassDto);
-    const classResponse = await this.classesService.findClassById(classUpdated.id);
+    const classUpdated = await this.classesService.updateClass(
+      +id,
+      createClassDto,
+    );
+    const classResponse = await this.classesService.findClassById(
+      classUpdated.id,
+    );
     return {
       status: true,
       data: classResponse,
-      message: "Cập nhật lớp học thành công"
-    }
+      message: 'Cập nhật lớp học thành công',
+    };
   }
 
   @Get('student')
   @ApiOkResponse({ type: GetStudentClassResponse })
   async findAll(@CurrentUser('id') userId: string) {
-
     try {
       const classes = await this.classesService.findAll(userId);
 
       return {
         status: true,
         data: classes,
-        message: "Lấy danh sách lớp học thành công"
-      }
+        message: 'Lấy danh sách lớp học thành công',
+      };
     } catch (error) {
       throw new InternalServerErrorException({
         status: false,
-        message: "Lỗi hệ thống"
+        message: 'Lỗi hệ thống',
       });
     }
   }
@@ -105,16 +153,17 @@ export class ClassesController {
   @ApiOkResponse({ type: GetTeacherClassResponse })
   async getAllClassesOfTeacher(@CurrentUser('id') teacherId: string) {
     try {
-      const classes = await this.classesService.getAllClassesOfTeacher(teacherId);
+      const classes =
+        await this.classesService.getAllClassesOfTeacher(teacherId);
       return {
         status: true,
         data: classes,
-        message: "Lấy danh sách lớp học thành công"
-      }
+        message: 'Lấy danh sách lớp học thành công',
+      };
     } catch (error) {
       throw new InternalServerErrorException({
         status: false,
-        message: "Lỗi hệ thống"
+        message: 'Lỗi hệ thống',
       });
     }
   }
@@ -126,15 +175,14 @@ export class ClassesController {
     if (!classResponse) {
       throw new BadRequestException({
         status: false,
-        message: "Lớp học không tồn tại"
-      })
+        message: 'Lớp học không tồn tại',
+      });
     }
     return {
       status: true,
       data: classResponse,
-      message: "Lấy thông tin lớp học thành công"
-    }
-
+      message: 'Lấy thông tin lớp học thành công',
+    };
   }
 
   @Get(':id/students')
@@ -145,28 +193,35 @@ export class ClassesController {
       return {
         status: true,
         data: students,
-        message: "Lấy danh sách học sinh thành công"
-      }
+        message: 'Lấy danh sách học sinh thành công',
+      };
     } catch (error) {
       throw new InternalServerErrorException({
         status: false,
-        message: "Lỗi hệ thống"
+        message: 'Lỗi hệ thống',
       });
     }
   }
 
   @Get(':id/invite/:email')
   @ApiOkResponse({ type: InviteStudentResponse })
-  async inviteStudentToClass(@Param('email') email: string, @Param('id') id: number) {
+  async inviteStudentToClass(
+    @Param('email') email: string,
+    @Param('id') id: number,
+  ) {
     const user = await this.authService.findUserVerifyEmail(email);
     if (!user) {
       throw new BadRequestException({
         status: false,
-        message: "Email không tồn tại"
-      })
+        message: 'Email không tồn tại',
+      });
     }
     const frontendUrl = process.env.FRONTEND_URL;
-    const token = await this.authService.generateAccessToken({ id: user.id, email: user.email, classId: id });
+    const token = await this.authService.generateAccessToken({
+      id: user.id,
+      email: user.email,
+      classId: id,
+    });
     const dynamic_template_data = {
       link: `${frontendUrl}/invite?token=${token}`,
     };
@@ -175,14 +230,13 @@ export class ClassesController {
       MAIL_TEMPLATE_ID.REGISTER as string,
       dynamic_template_data,
     );
-    await this.mailService.send(msg)
+    await this.mailService.send(msg);
     return {
       status: true,
-      message: "Mời thành công",
-      data: null
-    }
+      message: 'Mời thành công',
+      data: null,
+    };
   }
-
 
   @Get('accept-invite/:token')
   async acceptInvite(@Param('token') token: string) {
@@ -215,16 +269,20 @@ export class ClassesController {
     if (!user) {
       throw new BadRequestException({
         status: false,
-        message: "Tài khoản không tồn tại"
-      })
+        message: 'Tài khoản không tồn tại',
+      });
     }
     const roleId = user.roleId;
-    const exUser = await this.classesService.findStudentOrTeacherInClass(decoded.classId, user?.id, roleId);
+    const exUser = await this.classesService.findStudentOrTeacherInClass(
+      decoded.classId,
+      user?.id,
+      roleId,
+    );
     if (exUser) {
       throw new BadRequestException({
         status: false,
-        message: "Bạn đã tham gia lớp học này"
-      })
+        message: 'Bạn đã tham gia lớp học này',
+      });
     }
     if (roleId === ROLES.STUDENT) {
       await this.classesService.inviteStudentToClass(decoded.classId, user?.id);
@@ -233,9 +291,9 @@ export class ClassesController {
     }
     return {
       status: true,
-      message: "Tham gia lớp thành công",
-      data: null
-    }
+      message: 'Tham gia lớp thành công',
+      data: null,
+    };
   }
 
   @Get(':id/group-invite')
@@ -248,90 +306,104 @@ export class ClassesController {
       if (moment().isAfter(expiredAt)) {
         await this.classesService.deleteInvitations(exInvitation.classId);
         const expiredAt = moment().add(30, 'days').toDate().toISOString();
-        const invitationsLink = await this.classesService.inviteGroupUserToClass(+id, expiredAt);
+        const invitationsLink =
+          await this.classesService.inviteGroupUserToClass(+id, expiredAt);
 
         const link = `${frontendUrl}/group-invite?invitation=${invitationsLink.id}`;
         return {
           status: true,
-          message: "Mời thành công",
-          data: link
-        }
+          message: 'Mời thành công',
+          data: link,
+        };
       }
       const link = `${frontendUrl}/group-invite?invitation=${exInvitation.id}`;
       return {
         status: true,
-        message: "Mời thành công",
-        data: link
-      }
+        message: 'Mời thành công',
+        data: link,
+      };
     }
     const expiredAt = moment().add(30, 'days').toDate().toISOString();
-    const invitationsLink = await this.classesService.inviteGroupUserToClass(+id, expiredAt);
+    const invitationsLink = await this.classesService.inviteGroupUserToClass(
+      +id,
+      expiredAt,
+    );
     const link = `${frontendUrl}/group-invite?invitation=${invitationsLink.id}`;
     return {
       status: true,
-      message: "Mời thành công",
-      data: link
-    }
+      message: 'Mời thành công',
+      data: link,
+    };
   }
 
   @Get('accept-group-invite/:invitationId/:userId')
   @ApiOkResponse({ type: InviteStudentResponse })
-  async acceptGroupInvite(@Param('invitationId') invitationId: string, @Param('userId') userId: string) {
-    const invitation = await this.classesService.findInvitationById(invitationId);
+  async acceptGroupInvite(
+    @Param('invitationId') invitationId: string,
+    @Param('userId') userId: string,
+  ) {
+    const invitation =
+      await this.classesService.findInvitationById(invitationId);
     if (!invitation) {
       throw new BadRequestException({
         status: false,
-        message: "Mã mời không tồn tại"
-      })
+        message: 'Mã mời không tồn tại',
+      });
     }
     const expiredAt = invitation.expiredAt;
     if (moment().isAfter(expiredAt)) {
       throw new BadRequestException({
         status: false,
-        message: "Mã mời đã hết hạn"
-      })
+        message: 'Mã mời đã hết hạn',
+      });
     }
     const user = await this.authService.findUserVerifyByUserId(userId);
     if (!user) {
       throw new BadRequestException({
         status: false,
-        message: "Tài khoản không tồn tại"
-      })
+        message: 'Tài khoản không tồn tại',
+      });
     }
     const roleId = user.roleId;
-    const exUser = await this.classesService.findStudentOrTeacherInClass(invitation.classId, user?.id, roleId);
+    const exUser = await this.classesService.findStudentOrTeacherInClass(
+      invitation.classId,
+      user?.id,
+      roleId,
+    );
     if (exUser) {
       throw new BadRequestException({
         status: false,
-        message: "Bạn đã tham gia lớp học này"
-      })
+        message: 'Bạn đã tham gia lớp học này',
+      });
     }
     if (roleId === ROLES.STUDENT) {
-      await this.classesService.inviteStudentToClass(invitation.classId, user?.id);
+      await this.classesService.inviteStudentToClass(
+        invitation.classId,
+        user?.id,
+      );
     } else {
-      await this.classesService.inviteTeacherToClass(invitation.classId, user?.id);
+      await this.classesService.inviteTeacherToClass(
+        invitation.classId,
+        user?.id,
+      );
     }
     return {
       status: true,
-      message: "Tham gia lớp thành công",
-      data: null
-    }
+      message: 'Tham gia lớp thành công',
+      data: null,
+    };
   }
 
-
   @Post(':id/grades')
-  async createGrade(
-    @Param('id') id: number,
-    @Body() body: CreateGradeDto,
-  ) {
+  async createGrade(@Param('id') id: number, @Body() body: CreateGradeDto) {
     // delete old grade
     await this.classesService.deleteGrades(+id);
     const grades = await this.classesService.createGrade(+id, body);
     return {
       status: true,
       data: grades,
-      message: "Tạo bài tập thành công"
-    }
+      message: 'Tạo bài tập thành công',
+    };
   }
 
   @Get(':id/grades')
@@ -340,19 +412,19 @@ export class ClassesController {
     return {
       status: true,
       data: grades,
-      message: "Lấy danh sách bài tập thành công"
-    }
+      message: 'Lấy danh sách bài tập thành công',
+    };
   }
 
-  @Get(":id/export-student-list")
+  @Get(':id/export-student-list')
   async exportStudentList(@Param('id') id: number) {
     const students = await this.classesService.getStudentsOfClass(+id);
     const refactorStudents = students?.map((student) => {
       return {
-        "StudentId": student?.uniqueId || Math.floor(Math.random() * 1000000000),
-        "Fullname": `${student.firstName} ${student.lastName}`
-      }
-    })
+        StudentId: student?.uniqueId || Math.floor(Math.random() * 1000000000),
+        Fullname: `${student.firstName} ${student.lastName}`,
+      };
+    });
     const workbook = xlsx.utils.book_new();
     const worksheet = xlsx.utils.json_to_sheet(refactorStudents);
     xlsx.utils.book_append_sheet(workbook, worksheet, 'Students');
@@ -365,7 +437,40 @@ export class ClassesController {
     return {
       status: true,
       data: UploadedFile.url,
-      message: "Lấy danh sách học sinh thành công"
-    }
+      message: 'Lấy danh sách học sinh thành công',
+    };
+  }
+
+  @Get(':id/export-grade-board')
+  async exportGrade(@Param('id') id: number) {
+    const grades = await this.classesService.getGrades(+id);
+    let workbook = xlsx.utils.book_new();
+    map(grades, (studentAssignment) => {
+      const { assignments } = studentAssignment;
+      const { studentAssignments } = assignments;
+      const refactoredStudentsData = map(studentAssignments, (student) => {
+        const { students } = student;
+        return {
+          'Full Name': students.firstName + ' ' + students.lastName,
+          'Student Id': students?.uniqueId,
+          Grade: student.score,
+        };
+      });
+      workbook = appendDataToExcelFile(
+        refactoredStudentsData,
+        workbook,
+        studentAssignment.name,
+      );
+    });
+    const buffer = xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+    const uploadedFile = await this.cloudinaryService.uploadFile({
+      buffer,
+      filename: `Grade_${new Date().toISOString()}.xlsx`,
+    });
+    return {
+      status: true,
+      data: uploadedFile.url,
+      message: 'Tải file Grade thành công',
+    };
   }
 }
