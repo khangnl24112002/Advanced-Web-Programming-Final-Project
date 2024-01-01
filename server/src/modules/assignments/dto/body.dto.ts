@@ -3,13 +3,17 @@ import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateAssignmentDTO {
-  @ApiProperty({ required: true, example: 'Minh' })
+  @ApiProperty({ required: true, example: 1 })
   @IsNotEmpty()
   classId: number;
 
   @ApiProperty({ required: true, example: 'Minh' })
   @IsNotEmpty()
   name: string;
+
+  @ApiProperty({ required: true, example: 'https://test' })
+  @IsNotEmpty()
+  metadata: string;
 
   @ApiProperty({ required: true, example: '1' })
   gradeId: number;
