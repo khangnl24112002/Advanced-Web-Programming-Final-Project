@@ -20,6 +20,9 @@ import Classes from "./pages/ClassesDashboard/Classes";
 import { useAuth } from "./hooks/useAuth";
 import GroupInvite from "./pages/GroupInvite/GroupInvite";
 import EmailInvite from "./pages/EmailInvite/EmailInvite";
+import AssignmentTeacher from "./pages/AssignmentTeacher/AssignmentTeacher";
+import AssignmentStudent from "./pages/AssignmentStudent/AssignmentStudent";
+
 function App() {
   const { user, token } = useAuth();
   return (
@@ -46,7 +49,15 @@ function App() {
           <Route path="settings" element={<Settings />} />
           <Route path="classes" element={<ClassesDashboard />}>
             <Route index element={<Classes />} />
-            <Route path=":classId" element={<ClassInfo />} />
+            <Route exact path=":classId" element={<ClassInfo />} />
+            <Route
+              path=":classId/assignment/:assignmentId/teacher"
+              element={<AssignmentTeacher />}
+            />
+            <Route
+              path=":classId/assignment/:assignmentId/student"
+              element={<AssignmentStudent />}
+            />
           </Route>
           <Route path="profile" element={<Profile />} />
           <Route path="group-invite" element={<GroupInvite />} />
