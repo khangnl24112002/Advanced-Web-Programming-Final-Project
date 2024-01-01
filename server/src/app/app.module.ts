@@ -4,6 +4,7 @@ import { AssignmentsModule } from 'src/modules/assignments/assignments.module';
 import { AuthModule } from 'src/modules/auth/auth.module';
 import { ClassesModule } from 'src/modules/classes/classes.module';
 import { CloudinaryModule } from 'src/modules/files/cloudinary.module';
+import { NotificationModule } from 'src/modules/notification/notification.module';
 import { WebSocketModule } from 'src/modules/socket/websocket.module';
 import { UserModule } from 'src/modules/user/user.module';
 
@@ -18,7 +19,7 @@ import { UserModule } from 'src/modules/user/user.module';
     ClassesModule,
     AssignmentsModule,
     CloudinaryModule,
+    NotificationModule,
   ],
 })
-// eslint-disable-next-line prettier/prettier
-export class AppModule { }
+export class AppModule {}

@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma.service';
 import { CloudinaryService } from '../files/cloudinary.service';
 import { AuthService } from '../auth/auth.service';
 import { JwtModule } from '@nestjs/jwt';
+import { NotificationService } from '../notification/notification.service';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { JwtModule } from '@nestjs/jwt';
     PrismaService,
     CloudinaryService,
     AuthService,
+    NotificationService,
   ],
   controllers: [AssignmentsController],
 })

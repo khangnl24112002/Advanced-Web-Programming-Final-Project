@@ -4,7 +4,7 @@ import styles from "./Panel.module.sass";
 import Icon from "../../../../components/Icon";
 import { useAuth } from "../../../../hooks/useAuth";
 
-const Panel = ({ addStudent, outGroup, role }) => {
+const Panel = ({ addStudent, outGroup, role, downloadGradeBoard }) => {
     const { user } = useAuth();
     return (
         <div className={cn("panel", styles.panel)}>
@@ -25,7 +25,10 @@ const Panel = ({ addStudent, outGroup, role }) => {
                     </button>
                 ) : null}
 
-                <button className={cn("button-stroke", styles.button)}>
+                <button
+                    className={cn("button-stroke", styles.button)}
+                    onClick={downloadGradeBoard}
+                >
                     Xuất bảng điểm
                 </button>
                 {user.role === "teacher" && (

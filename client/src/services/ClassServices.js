@@ -118,4 +118,25 @@ export const classServices = {
       return error.response.data;
     }
   },
+  updateAssignmentGrade: async (assignmentId, body) => {
+    try {
+      const response = await axiosInstance.post(
+        `/assignments/${assignmentId}/mark-score`,
+        body
+      );
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  },
+  exportGradeBoard: async (classId) => {
+    try {
+      const response = await axiosInstance.get(
+        `/classes/${classId}/export-grade-board`
+      );
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  },
 };

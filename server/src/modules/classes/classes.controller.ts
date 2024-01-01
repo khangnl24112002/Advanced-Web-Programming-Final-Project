@@ -40,23 +40,24 @@ import * as moment from 'moment';
 import { SendgridService } from '../mail/mail.service';
 import { JwtService } from '@nestjs/jwt';
 import { customAlphabet } from 'nanoid';
-import { CreateGradeDto } from '../assignments/dto/body.dto';
+import { CreateGradeDto, UpdateGradeDto } from '../assignments/dto/body.dto';
 import * as xlsx from 'xlsx';
 import { CloudinaryService } from '../files/cloudinary.service';
-import { map } from 'lodash';
+import { includes, isEmpty, map, toNumber } from 'lodash';
+import { NotificationService } from '../notification/notification.service';
 
 @Controller('classes')
 @ApiTags('Classes')
 @ApiBearerAuth('Bearer')
 @UseGuards(JwtAuthGuard)
 export class ClassesController {
-  // eslint-disable-next-line prettier/prettier
   constructor(
     private readonly jwtService: JwtService,
     private readonly classesService: ClassesService,
     private readonly authService: AuthService,
     private readonly mailService: SendgridService,
     private readonly cloudinaryService: CloudinaryService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   @Post()
@@ -416,6 +417,45 @@ export class ClassesController {
     };
   }
 
+  @Put(':id/grades/:gradeId')
+  async updateGrade(
+    @Param('gradeId') gradeId: number,
+    @Param('id') id: number,
+    @Body() body: UpdateGradeDto,
+  ) {
+    const grades = await this.classesService.updateGrade(+gradeId, body);
+    const students = await this.classesService.getStudentsOfClass(+id);
+    const exClass = await this.classesService.findClassById(+id);
+    await Promise.all(
+      map(students, async (student) => {
+        const userId = student?.id;
+        const notiLength =
+          await this.notificationService.readNotiLengthFromDB(userId);
+        const id = notiLength ? notiLength + 1 : 0;
+        const payload = {
+          content: `Giáo viên lóp ${exClass.name} vừa cập nhật điểm số bài tập`,
+          createdAt: new Date().toISOString(),
+          isRead: false,
+          title: 'Bạn vừa được cập nhật điểm số bài tập',
+          type: 'finish_grade_composition',
+        };
+        return this.notificationService.saveNewNotiToUser({
+          userId,
+          currentNotiLength: notiLength || 0,
+          newData: {
+            ...payload,
+            id,
+          },
+        });
+      }),
+    );
+    return {
+      status: true,
+      data: grades,
+      message: 'Cập nhật bài tập thành công',
+    };
+  }
+
   @Get(':id/export-student-list')
   async exportStudentList(@Param('id') id: number) {
     const students = await this.classesService.getStudentsOfClass(+id);
@@ -444,9 +484,18 @@ export class ClassesController {
   @Get(':id/export-grade-board')
   async exportGrade(@Param('id') id: number) {
     const grades = await this.classesService.getGrades(+id);
+    if (isEmpty(grades)) {
+      return {
+        status: false,
+        message: 'Lớp học chưa có bài tập nào',
+      };
+    }
     let workbook = xlsx.utils.book_new();
     map(grades, (studentAssignment) => {
       const { assignments } = studentAssignment;
+      if (isEmpty(assignments)) {
+        return null;
+      }
       const { studentAssignments } = assignments;
       const refactoredStudentsData = map(studentAssignments, (student) => {
         const { students } = student;
@@ -471,6 +520,43 @@ export class ClassesController {
       status: true,
       data: uploadedFile.url,
       message: 'Tải file Grade thành công',
+    };
+  }
+
+  @Get(':id/grade-board')
+  async getGradeBoard(
+    @Param('id') id: number,
+    @CurrentUser('id') userId: string,
+  ) {
+    const grades = await this.classesService.getGrades(+id);
+    const teachers = await this.classesService.getTeachersOfClass(+id);
+    const refactorTeachers = map(teachers, ({ teachers }) => teachers);
+    const isStudent = !includes(map(refactorTeachers, 'id'), userId);
+    map(grades, (studentAssignment) => {
+      const { assignments, status } = studentAssignment;
+      if (isEmpty(assignments)) {
+        return null;
+      }
+      const { studentAssignments } = assignments;
+      const refactoredStudentsData = map(studentAssignments, (student) => {
+        const { students } = student;
+        const isViewedByStudent =
+          status === 'COMPLETE' && isStudent && students.id === userId;
+        return {
+          fullName: students.firstName + ' ' + students.lastName,
+          studentId: students?.uniqueId,
+          Grade: !isStudent || isViewedByStudent ? student.score : null,
+        };
+      });
+      return {
+        name: studentAssignment.name,
+        scores: refactoredStudentsData,
+      };
+    });
+    return {
+      status: true,
+      data: grades,
+      message: 'Lấy danh sách bảng điểm thành công',
     };
   }
 }

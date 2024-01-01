@@ -112,38 +112,6 @@ const CustomerList = () => {
   const handleSubmit = (e) => {
     alert();
   };
-
-  const [openModal, setOpenModal] = useState(false);
-  const [content, setContent] = useState(null);
-
-  const handleInviteMember = async () => {
-    // Sử dụng current để truy cập đến phần tử DOM
-    const email = inputRef.current.value;
-    if (validateData(email) === 1) {
-      // 2. Gọi API để kiểm tra xem email có tồn tại hay không
-      const response = await classServices.checkEmailExist(classId, email);
-      if (response.status) {
-        return successToast("Đã gửi lời mời!", 2000);
-      } else {
-        return errorToast("Tài khoản này chưa tham gia vào ứng dụng!");
-      }
-    }
-  };
-
-  const validateData = (email) => {
-    let result = 1;
-    if (email === "") {
-      return errorToast("Email không được để trống");
-    }
-    if (EMAIL_REGEX.test(email) === false) {
-      return errorToast("Email không hợp lệ");
-    }
-    return result;
-  };
-
-  // Xử lí việc rời khỏi lớp học
-  const handleOutClass = () => {};
-
   // Modal để thêm học sinh
   const handleAddingStudent = () => {
     setOpenModal(true);
@@ -191,6 +159,14 @@ const CustomerList = () => {
       </>
     );
   };
+  const handleDownloadGradeBoard = async () => {
+    const response = await classServices.exportGradeBoard(classId);
+    if (response.status) {
+      window.open(response.data);
+    } else {
+      return errorToast("Lấy bảng điểm thất bại");
+    }
+  };
   // Modal để show xác nhận rời khỏi lớp
   const handleOutGroup = () => {
     setOpenModal(true);
@@ -219,6 +195,37 @@ const CustomerList = () => {
       </>
     );
   };
+
+  const [openModal, setOpenModal] = useState(false);
+  const [content, setContent] = useState(null);
+
+  const handleInviteMember = async () => {
+    // Sử dụng current để truy cập đến phần tử DOM
+    const email = inputRef.current.value;
+    if (validateData(email) === 1) {
+      // 2. Gọi API để kiểm tra xem email có tồn tại hay không
+      const response = await classServices.checkEmailExist(classId, email);
+      if (response.status) {
+        return successToast("Đã gửi lời mời!", 2000);
+      } else {
+        return errorToast("Tài khoản này chưa tham gia vào ứng dụng!");
+      }
+    }
+  };
+
+  const validateData = (email) => {
+    let result = 1;
+    if (email === "") {
+      return errorToast("Email không được để trống");
+    }
+    if (EMAIL_REGEX.test(email) === false) {
+      return errorToast("Email không hợp lệ");
+    }
+    return result;
+  };
+
+  // Xử lí việc rời khỏi lớp học
+  const handleOutClass = () => {};
 
   return (
     <>
