@@ -66,22 +66,22 @@ model classes {
 }
 
 model grades {
-  id          Int           @id @default(autoincrement())
+  id          Int          @id @default(autoincrement())
   name        String?
   percentage  Int?
-  status      String?       @default("OPEN")
-  classId     Int?          @map(name: "class_id")
-  createdAt   DateTime      @default(now()) @map(name: "created_at")
-  updatedAt   DateTime      @default(now()) @updatedAt @map(name: "updated_at")
-  classes     classes?      @relation(fields: [classId], references: [id])
-  assignments assignments[]
+  status      String?      @default("OPEN")
+  classId     Int?         @map(name: "class_id")
+  createdAt   DateTime     @default(now()) @map(name: "created_at")
+  updatedAt   DateTime     @default(now()) @updatedAt @map(name: "updated_at")
+  classes     classes?     @relation(fields: [classId], references: [id])
+  assignments assignments?
 }
 
 model assignments {
   id                        Int                         @id @default(autoincrement())
   classId                   Int?                        @map(name: "class_id")
   name                      String?
-  gradeId                   Int?                        @map(name: "grade_id")
+  gradeId                   Int?                        @unique @map(name: "grade_id")
   teacherId                 String?                     @map(name: "creator_id")
   description               String?                     @db.Text
   status                    String?                     @default("OPEN")
