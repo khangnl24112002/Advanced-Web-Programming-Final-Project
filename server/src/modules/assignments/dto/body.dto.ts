@@ -12,7 +12,7 @@ export class CreateAssignmentDTO {
   name: string;
 
   @ApiProperty({ required: true, example: 'https://test' })
-  @IsNotEmpty()
+  @IsOptional()
   metadata: string;
 
   @ApiProperty({ required: true, example: '1' })
@@ -24,6 +24,7 @@ export class CreateAssignmentDTO {
 
   @ApiProperty({ required: true, example: '2021-10-10' })
   @Transform(({ value }) => new Date(value).toISOString())
+  @IsOptional()
   dueDate: string;
 }
 export class UpdateAssignmentDTO {
