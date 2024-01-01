@@ -5,7 +5,12 @@ import Card from "./Card";
 import { errorToast } from "../../../../utils/toast";
 import { classServices } from "../../../../services/ClassServices";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../../hooks/useAuth";
+import CreateAssignmentModal from "./CreateAssignmentModal";
+import { assignmentServices } from "../../../../services/AssignmentServices";
+import * as dayjs from "dayjs";
 const ClassInfoDashboard = ({ classId }) => {
+  const { user } = useAuth();
   const [assignments, setAssignments] = useState([
     {
       id: 1,
@@ -17,6 +22,8 @@ const ClassInfoDashboard = ({ classId }) => {
     },
   ]);
   const [classInfo, setClassInfo] = useState({});
+  const [openCreateAssignmentModal, setOpenCreateAssignmentModal] =
+    useState(false);
   const navigate = useNavigate();
   useEffect(() => {
     // Call API to get all assignment here
@@ -32,13 +39,41 @@ const ClassInfoDashboard = ({ classId }) => {
       }
     };
     getClassInfo();
-  }, []);
+
+    // Call API to get assignment List
+    const getAssignmentList = async () => {
+      const response = await assignmentServices.getAssignmentList(classId);
+      if (response.status) {
+        setAssignments(response.data);
+      } else {
+        return errorToast(
+          "Không thể lấy được danh sách bài tập. Vui lòng thử lại sau."
+        );
+      }
+    };
+    getAssignmentList();
+  }, [classId]);
   const goToAssignment = (id) => {
-    console.log(id);
-    navigate(`assignment/${id}`, { replace: true });
+    if (user.role === "teacher")
+      navigate(`assignment/${id}/teacher`, { replace: true });
+    else if (user.role === "student") {
+      navigate(`assignment/${id}/student`, { replace: true });
+    }
+  };
+  const handleCreateAssignment = () => {
+    setOpenCreateAssignmentModal(true);
   };
   return (
     <div>
+      {/**Button create new assignment for teacher */}
+      {user.role === "teacher" && (
+        <button
+          className={cn("button", styles.button)}
+          onClick={handleCreateAssignment}
+        >
+          Tạo bài tập mới
+        </button>
+      )}
       {assignments &&
         assignments.map((assignment, index) => {
           return (
@@ -50,17 +85,35 @@ const ClassInfoDashboard = ({ classId }) => {
             >
               <Card
                 className={cn(styles.card)}
-                title={`Giáo viên Nguyễn Nhật Khang đã tạo bài tập mới`}
+                title={`Giáo viên ${assignment.teacher.lastName} ${assignment.teacher.firstName} đã tạo bài tập mới: ${assignment.name}`}
                 classTitle={cn("title-green", styles.title)}
               >
                 <div className={styles.description}>
-                  <div className={styles.field}>Thời gian: 10 phút</div>
-                  <div>Hạn nộp: 20/03/2024</div>
+                  <div className={styles.field}>
+                    Mô tả: {assignment.description}
+                  </div>
+                  <div>
+                    Ngày tạo:
+                    {" " + dayjs(assignment.createdAt).format("DD/MM/YYYY")}
+                  </div>
+                  <div>
+                    Hạn nộp:
+                    {assignment.dueDate !== null
+                      ? " " + dayjs(assignment.dueDate).format("DD/MM/YYYY") // '25/01/2019'
+                      : " Không có thời hạn"}
+                  </div>
                 </div>
               </Card>
             </div>
           );
         })}
+      <CreateAssignmentModal
+        classId={classId}
+        visible={openCreateAssignmentModal}
+        onClose={() => {
+          setOpenCreateAssignmentModal(false);
+        }}
+      />
     </div>
   );
 };
