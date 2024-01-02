@@ -4,6 +4,7 @@ import FormInput from "../../components/FormInput/FormInput";
 import Button from "../../components/Button/Button";
 import { Form } from "react-bootstrap";
 import Alert from "react-bootstrap/Alert";
+import { successToast } from "../../utils/toast";
 
 import { userServices } from "../../services/UserServices";
 
@@ -20,11 +21,13 @@ const EditProfileForm = ({
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        uniqueId: user.uniqueId ? user.uniqueId : "",
     };
     const initalErrors = {
         email: "",
         firstName: "",
         lastName: "",
+        uniqueId: "",
     };
 
     const [userAccount, setUserAccount] = useState(initalState);
@@ -42,6 +45,7 @@ const EditProfileForm = ({
                 userAccount,
                 token
             );
+            console.log(userAccount);
             if (response.status === true) {
                 setUserAccount(response.data);
                 setSuccess(true);
@@ -50,10 +54,12 @@ const EditProfileForm = ({
                     ...userStorage,
                     firstName: userAccount.firstName,
                     lastName: userAccount.lastName,
+                    uniqueId: userAccount.uniqueId,
                 });
                 localStorage.setItem("user", updatedUser);
                 editProfile(userAccount);
-                setSubmitResult(response.message);
+                // setSubmitResult(response.message);
+                successToast(response.message);
                 setTimeout(() => {
                     toggleEdit(false);
                     window.location.reload();
@@ -86,6 +92,13 @@ const EditProfileForm = ({
             setErrors((prevState) => ({
                 ...prevState,
                 lastName: "Họ không được để trống",
+            }));
+            result = 0;
+        }
+        if (userAccount.uniqueId === "") {
+            setErrors((prevState) => ({
+                ...prevState,
+                uniqueId: "Mã số không được để trống",
             }));
             result = 0;
         }
@@ -169,6 +182,18 @@ const EditProfileForm = ({
                                 disabled={!isEditing}
                             />
                         </div>
+                        {user.role === "student" && (
+                            <FormInput
+                                type="uniqueId"
+                                name="uniqueId"
+                                title="Mã số"
+                                placeholder="Nhập mã số"
+                                value={user.uniqueId ? user.uniqueId : ""}
+                                onChange={handleChange}
+                                error={errors.uniqueId}
+                                disabled={!isEditing}
+                            />
+                        )}
                         {/* <div className="hiddenElement">
                             <FormInput
                                 type="id"
@@ -177,7 +202,7 @@ const EditProfileForm = ({
                                 onChange={handleChange}
                             />
                         </div> */}
-                        {submitResult !== "" && isEditing ? (
+                        {/* {submitResult !== "" && isEditing ? (
                             <Alert
                                 className="my-3"
                                 variant={
@@ -186,7 +211,7 @@ const EditProfileForm = ({
                             >
                                 {submitResult}
                             </Alert>
-                        ) : null}
+                        ) : null} */}
                         {isEditing && (
                             <div className="d-grid">
                                 <Button type="submit" name="Xác nhận" />

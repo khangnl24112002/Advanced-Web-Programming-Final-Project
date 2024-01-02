@@ -82,6 +82,7 @@ const SignIn = () => {
                     firstName: Response.user.firstName,
                     lastName: Response.user.lastName,
                     role: response.data.user.role,
+                    uniqueId: response.data.user.uniqueId,
                 },
                 token: Response.token,
             };
