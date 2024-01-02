@@ -47,6 +47,16 @@ export class AssignmentsController {
     private readonly notificationService: NotificationService,
   ) {}
 
+  @Get(':id')
+  async getAssignment(@Param('id') id: number) {
+    const assignment = await this.assignmentsService.getAssignment(+id);
+    return {
+      status: true,
+      data: assignment,
+      message: 'Lấy bài tập thành công',
+    };
+  }
+
   @Post()
   async createAssignment(
     @Body() body: CreateAssignmentDTO,

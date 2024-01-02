@@ -146,6 +146,7 @@ export class AuthService {
           firstName: ex_user.firstName,
           lastName: ex_user.lastName,
           role: ex_user.role.name,
+          uniqueId: ex_user.uniqueId || null,
         },
       },
       message: 'Đăng nhập thành công',
