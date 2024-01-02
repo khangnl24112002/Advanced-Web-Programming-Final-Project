@@ -139,6 +139,7 @@ export class AssignmentsController {
   async createStudentAssignment(
     @Body() body: StudentAssigmentDto,
     @Param('id') id: number,
+    @CurrentUser('id') studentId: string,
   ) {
     const assignment = await this.assignmentsService.getAssignment(+id);
     if (!assignment) {
@@ -153,7 +154,7 @@ export class AssignmentsController {
     const status = moment().isBefore(assignment.dueDate)
       ? ASSIGNMENT_STATUS.SUBMITTED
       : ASSIGNMENT_STATUS.LATE;
-    const { studentId, metadata } = body;
+    const { metadata } = body;
     const studentAssignment =
       await this.assignmentsService.createStudentAssignment({
         studentId,
