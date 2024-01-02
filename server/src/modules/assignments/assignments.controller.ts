@@ -22,6 +22,7 @@ import {
 import {
   ASSIGNMENT_STATUS,
   REQUESTED_REVIEW_STATUS,
+  ROLES,
   createBufferFromExcelFile,
   readFileExcel,
 } from 'src/utils';
@@ -50,11 +51,36 @@ export class AssignmentsController {
   ) {}
 
   @Get(':id')
-  async getAssignment(@Param('id') id: number) {
+  async getAssignment(@Param('id') id: number, @CurrentUser() user: any) {
     const assignment = await this.assignmentsService.getAssignment(+id);
+    if (!assignment) {
+      throw new HttpException(
+        {
+          status: false,
+          message: 'Không tìm thấy bài tập',
+        },
+        404,
+      );
+    }
+    const { id: userId, roleId } = user;
+    if (roleId === ROLES.TEACHER) {
+      return {
+        status: true,
+        data: assignment,
+        message: 'Lấy bài tập thành công',
+      };
+    }
+    const { studentAssignments, ...rest } = assignment;
+    const studentAssignment = studentAssignments.find(
+      (studentAssignment) => studentAssignment.studentId === userId,
+    );
+
     return {
       status: true,
-      data: assignment,
+      data: {
+        ...rest,
+        studentAssignments: [studentAssignment],
+      },
       message: 'Lấy bài tập thành công',
     };
   }
