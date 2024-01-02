@@ -16,6 +16,7 @@ import {
   CreateAssignmentDTO,
   MarkScoreStudentDto,
   RequestedGradeViewDto,
+  StudentAssigmentDto,
   UpdateRequestedGradeViewDto,
 } from './dto/body.dto';
 import {
@@ -34,6 +35,7 @@ import { Prisma } from '@prisma/client';
 import { CurrentUser } from 'src/decorators/users.decorator';
 import { JwtAuthGuard } from 'src/guards/jwt.auth.guard';
 import { NotificationService } from '../notification/notification.service';
+import * as moment from 'moment';
 
 @Controller('assignments')
 @ApiTags('Assignments')
@@ -129,6 +131,39 @@ export class AssignmentsController {
     return {
       status: true,
       data: uploadedFile.url,
+      message: 'Tải file Grade thành công',
+    };
+  }
+
+  @Post('id:/student-assignment')
+  async createStudentAssignment(
+    @Body() body: StudentAssigmentDto,
+    @Param('id') id: number,
+  ) {
+    const assignment = await this.assignmentsService.getAssignment(+id);
+    if (!assignment) {
+      throw new HttpException(
+        {
+          status: false,
+          message: 'Không tìm thấy bài tập',
+        },
+        404,
+      );
+    }
+    const status = moment().isBefore(assignment.dueDate)
+      ? ASSIGNMENT_STATUS.SUBMITTED
+      : ASSIGNMENT_STATUS.LATE;
+    const { studentId, metadata } = body;
+    const studentAssignment =
+      await this.assignmentsService.createStudentAssignment({
+        studentId,
+        assignmentId: +id,
+        metadata,
+        status,
+      });
+    return {
+      status: true,
+      data: studentAssignment,
       message: 'Tải file Grade thành công',
     };
   }
