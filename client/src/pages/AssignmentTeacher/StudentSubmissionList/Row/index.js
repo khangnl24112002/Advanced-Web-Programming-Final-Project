@@ -26,6 +26,7 @@ const Row = ({ item, value, onChange, up }) => {
       <MarkAssignmentModal
         onClose={() => setVisibleModalProduct(false)}
         visible={visibleModalProduct}
+        assignmentDetail={item}
       />
     </>
   );
