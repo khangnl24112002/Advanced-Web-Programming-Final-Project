@@ -9,23 +9,17 @@ import { useAuth } from "../../../../hooks/useAuth";
 import CreateAssignmentModal from "./CreateAssignmentModal";
 import { assignmentServices } from "../../../../services/AssignmentServices";
 import * as dayjs from "dayjs";
+import LoadingSpinner from "../../../../components/LoadingSpinner/LoadingSpinner";
 const ClassInfoDashboard = ({ classId }) => {
   const { user } = useAuth();
-  const [assignments, setAssignments] = useState([
-    {
-      id: 1,
-      name: "Assignment 1",
-    },
-    {
-      id: 2,
-      name: "Assignment 2",
-    },
-  ]);
+  const [assignments, setAssignments] = useState([]);
   const [classInfo, setClassInfo] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
   const [openCreateAssignmentModal, setOpenCreateAssignmentModal] =
     useState(false);
   const navigate = useNavigate();
   useEffect(() => {
+    setIsLoading(true);
     // Call API to get all assignment here
     // Call API to get class info here
     const getClassInfo = async () => {
@@ -44,6 +38,7 @@ const ClassInfoDashboard = ({ classId }) => {
     const getAssignmentList = async () => {
       const response = await assignmentServices.getAssignmentList(classId);
       if (response.status) {
+        console.log(response.data);
         setAssignments(response.data);
       } else {
         return errorToast(
@@ -52,6 +47,7 @@ const ClassInfoDashboard = ({ classId }) => {
       }
     };
     getAssignmentList();
+    setIsLoading(false);
   }, [classId]);
   const goToAssignment = (id) => {
     if (user.role === "teacher")
@@ -65,8 +61,9 @@ const ClassInfoDashboard = ({ classId }) => {
   };
   return (
     <div>
+      {isLoading && <LoadingSpinner />}
       {/**Button create new assignment for teacher */}
-      {user.role === "teacher" && (
+      {!isLoading && user.role === "teacher" && (
         <button
           className={cn("button", styles.button)}
           onClick={handleCreateAssignment}
@@ -74,7 +71,13 @@ const ClassInfoDashboard = ({ classId }) => {
           Tạo bài tập mới
         </button>
       )}
-      {assignments &&
+      {!isLoading && !assignments?.length && (
+        <div className={styles.description}>
+          Hiện tại chưa có bài tập nào trong lớp học.
+        </div>
+      )}
+      {!isLoading &&
+        assignments &&
         assignments.map((assignment, index) => {
           return (
             <div

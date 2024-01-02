@@ -67,7 +67,6 @@ const Classes = () => {
   useEffect(() => {
     setIsLoading(true);
     const getClassList = async () => {
-      console.log(user.role);
       if (user.role === "teacher") {
         const response = await classServices.getTeacherClass(token);
         if (response.status) {
