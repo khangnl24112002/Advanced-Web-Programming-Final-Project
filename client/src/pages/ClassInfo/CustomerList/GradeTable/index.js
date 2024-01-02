@@ -16,7 +16,7 @@ import { customers } from "../../../../mocks/customers";
 
 const gradeOptions = ["Xuất", "Nhập"];
 
-const Table = ({
+const GradeTable = ({
     className,
     activeTable,
     setActiveTable,
@@ -126,8 +126,18 @@ const Table = ({
         }
     };
 
-    const handleClickAssignmentOptions = (option) => {
-        console.log(option);
+    const handleClickAssignmentOptions = async (option, assignmentId) => {
+        if (option === "Xuất") {
+            const response = await classServices.downloadScoreFromAssignment(
+                assignmentId
+            );
+            if (response.status) {
+                successToast("Lấy thành công", 2000);
+                window.open(response.data);
+            } else {
+                return errorToast("Xuất thất bại, vui lòng thử lại sau");
+            }
+        }
     };
     return (
         <>
@@ -166,7 +176,8 @@ const Table = ({
                                                 options={gradeOptions}
                                                 chooseOption={(option) => {
                                                     handleClickAssignmentOptions(
-                                                        option
+                                                        option,
+                                                        grade.id
                                                     );
                                                 }}
                                                 small
@@ -208,4 +219,4 @@ const Table = ({
     );
 };
 
-export default Table;
+export default GradeTable;
