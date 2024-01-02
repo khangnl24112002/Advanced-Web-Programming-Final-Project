@@ -4,7 +4,15 @@ export const assignmentServices = {
   // API get assignment list
   getAssignmentList: async (classId) => {
     try {
-      const response = await axiosInstance.get(`/assignments/${classId}`);
+      const response = await axiosInstance.get(`/assignments/${classId}/all`);
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  },
+  getAssignmentById: async (assignmentId) => {
+    try {
+      const response = await axiosInstance.get(`/assignments/${assignmentId}`);
       return response.data;
     } catch (error) {
       return error.response.data;
