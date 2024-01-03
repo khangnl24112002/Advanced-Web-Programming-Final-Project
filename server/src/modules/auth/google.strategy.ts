@@ -39,14 +39,20 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         emailVerified: true,
         avatar: user.picture,
       });
-      existUser = {...response.user, role: "user"};
+      existUser = { ...response.user, role: 'user' };
     }
-    const access_token = await this.authService.generateAccessToken({ id: existUser.id, email: existUser.email });
+    const access_token = await this.authService.generateAccessToken({
+      id: existUser.id,
+      email: existUser.email,
+    });
     done(null, {
       ...user,
       id: existUser.id,
       accessToken: access_token,
-      ...(existUser?.role?.name ||  existUser?.role ? { role: existUser?.role.name ||  existUser?.role} : {})
+      ...(existUser?.role?.name || existUser?.role
+        ? { role: existUser?.role.name || existUser?.role }
+        : {}),
+      roleId: existUser?.roleId || 2,
     });
   }
 }
