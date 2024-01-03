@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-facebook';
 import { AuthService } from './auth.service';
@@ -42,6 +42,17 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
         avatar: user.picture,
       });
       existUser = { ...response.user, role: 'user' };
+    }
+    const { isBan } = existUser;
+    if (isBan) {
+      throw new HttpException(
+        {
+          status: false,
+          daa: null,
+          message: 'Tài khoản của bạn đã bị khóa.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
     const token = await this.authService.generateAccessToken({
       id: existUser.id,

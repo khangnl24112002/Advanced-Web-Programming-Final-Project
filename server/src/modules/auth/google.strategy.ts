@@ -1,6 +1,6 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
 @Injectable()
@@ -45,6 +45,17 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       id: existUser.id,
       email: existUser.email,
     });
+    const { isBan } = existUser;
+    if (isBan) {
+      throw new HttpException(
+        {
+          status: false,
+          daa: null,
+          message: 'Tài khoản của bạn đã bị khóa.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     done(null, {
       ...user,
       id: existUser.id,

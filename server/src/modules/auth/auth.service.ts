@@ -132,6 +132,17 @@ export class AuthService {
         HttpStatus.BAD_REQUEST,
       );
     }
+    const { isBan } = ex_user;
+    if (isBan) {
+      throw new HttpException(
+        {
+          status: false,
+          daa: null,
+          message: 'Tài khoản của bạn đã bị khóa.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     const access_token = await this.generateAccessToken({
       email: email,
       id: ex_user.id,
