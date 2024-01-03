@@ -29,9 +29,13 @@ export class CreateAssignmentDTO {
 }
 
 export class StudentAssigmentDto {
-  @ApiProperty({ required: true, example: 'https://link' })
+  @ApiProperty({ required: false, example: 'https://link' })
   @IsOptional()
   metadata: string;
+
+  @ApiProperty({ required: false, example: 'https://link' })
+  @IsOptional()
+  description: string;
 }
 
 export class UpdateAssignmentDTO {

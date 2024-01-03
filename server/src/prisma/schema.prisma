@@ -108,6 +108,7 @@ model studentAssignments {
   assignmentId                 Int?                           @map(name: "assignment_id")
   status                       String?
   score                        Float?
+  description                  String?                        @db.Text
   metadata                     String?                        @db.Text
   createdAt                    DateTime                       @default(now()) @map(name: "created_at")
   updatedAt                    DateTime                       @default(now()) @updatedAt @map(name: "updated_at")

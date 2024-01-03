@@ -161,10 +161,10 @@ export class AssignmentsController {
     };
   }
 
-  @Post('id:/student-assignment')
+  @Post(':id/student-assignment')
   async createStudentAssignment(
     @Body() body: StudentAssigmentDto,
-    @Param('id') id: number,
+    @Param('id') id: string,
     @CurrentUser('id') studentId: string,
   ) {
     const assignment = await this.assignmentsService.getAssignment(+id);
@@ -177,16 +177,18 @@ export class AssignmentsController {
         404,
       );
     }
-    const status = moment().isBefore(assignment.dueDate)
-      ? ASSIGNMENT_STATUS.SUBMITTED
-      : ASSIGNMENT_STATUS.LATE;
-    const { metadata } = body;
+    const status =
+      !assignment.dueDate || moment().isBefore(assignment.dueDate)
+        ? ASSIGNMENT_STATUS.SUBMITTED
+        : ASSIGNMENT_STATUS.LATE;
+    const { metadata, description } = body;
     const studentAssignment =
       await this.assignmentsService.createStudentAssignment({
         studentId,
         assignmentId: +id,
         metadata,
         status,
+        description,
       });
     return {
       status: true,
