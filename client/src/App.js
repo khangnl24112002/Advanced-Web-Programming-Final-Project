@@ -24,7 +24,8 @@ import AssignmentTeacher from "./pages/AssignmentTeacher/AssignmentTeacher";
 import AssignmentStudent from "./pages/AssignmentStudent/AssignmentStudent";
 
 function App() {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
+  console.log(user);
   return (
     <div className="App">
       <Routes>
@@ -46,7 +47,7 @@ function App() {
           }
         >
           <Route path="home" index element={<Home />} />
-          <Route path="settings" element={<Settings />} />
+
           <Route path="classes" element={<ClassesDashboard />}>
             <Route index element={<Classes />} />
             <Route exact path=":classId" element={<ClassInfo />} />
@@ -59,6 +60,7 @@ function App() {
               element={<AssignmentStudent />}
             />
           </Route>
+
           <Route path="profile" element={<Profile />} />
           <Route path="group-invite" element={<GroupInvite />} />
           <Route path="invite" element={<EmailInvite />} />

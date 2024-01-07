@@ -6,8 +6,9 @@ import Icon from "../Icon";
 import Theme from "../Theme";
 import Dropdown from "./Dropdown";
 import Image from "../Image";
+import { useAuth } from "../../hooks/useAuth";
 
-const navigation = [
+let navigation = [
   {
     title: "Home",
     icon: "home",
@@ -33,7 +34,11 @@ const navigation = [
 
 const Sidebar = ({ className, onClose }) => {
   const [visible, setVisible] = useState(false);
-
+  const { user } = useAuth();
+  const { role } = user;
+  if (role !== "admin") {
+    navigation = navigation.filter((x) => x.title === "Classes");
+  }
   return (
     <>
       <div

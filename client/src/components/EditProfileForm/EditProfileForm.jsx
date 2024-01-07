@@ -16,6 +16,7 @@ const EditProfileForm = ({
     editProfile,
     toggleEdit,
     token,
+    isShow = true
 }) => {
     const initalState = {
         email: user.email,
@@ -95,18 +96,13 @@ const EditProfileForm = ({
             }));
             result = 0;
         }
-        if (userAccount.uniqueId === "") {
-            setErrors((prevState) => ({
-                ...prevState,
-                uniqueId: "Mã số không được để trống",
-            }));
-            result = 0;
-        }
         return result;
     };
 
     return (
-        <main className={styles.editScreen}>
+        
+        (isShow && (
+            <main className={styles.editScreen}>
             <div className={styles.editContainer}>
                 <div
                     style={
@@ -221,6 +217,7 @@ const EditProfileForm = ({
                 </Form>
             </div>
         </main>
+        ))
     );
 };
 
