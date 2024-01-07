@@ -14,7 +14,7 @@ export const readFileExcel = async (path: string) => {
   const sheetNameList = workbook.SheetNames;
   const excelData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetNameList[0]]);
   // detele file after read
-  await removeDirectory('./uploads');
+
   return excelData;
 };
 
