@@ -12,7 +12,15 @@ import { set } from "react-hook-form";
 import { userServices } from "../../services/UserServices";
 import { errorToast, successToast } from "../../utils/toast";
 
-const UserCard = ({ studentId, email, firstName, lastName, image, status }) => {
+const UserCard = ({
+  uniqueId,
+  email,
+  firstName,
+  lastName,
+  image,
+  status,
+  role,
+}) => {
   const [visibleModal, setVisibleModal] = useState(false);
   const { token } = useAuth();
   const user = {
@@ -20,6 +28,7 @@ const UserCard = ({ studentId, email, firstName, lastName, image, status }) => {
     lastName,
     email,
     image,
+    uniqueId,
   };
   const [userProfile, setUserProfile] = useState(user);
   const [isEditing, setIsEditing] = useState(false);
@@ -71,7 +80,7 @@ const UserCard = ({ studentId, email, firstName, lastName, image, status }) => {
           />
           <Card.Title>{firstName + " " + lastName}</Card.Title>
           <Card.Text>{email}</Card.Text>
-          {studentId && <Card.Text>Mã sinh viên: {studentId}</Card.Text>}
+          {uniqueId && <Card.Text>Mã sinh viên: {uniqueId}</Card.Text>}
           <Card.Text>
             Trạng thái hoạt động:{" "}
             <span
@@ -100,6 +109,7 @@ const UserCard = ({ studentId, email, firstName, lastName, image, status }) => {
           }}
           toggleEdit={(value) => setIsEditing(value)}
           isShow={true}
+          isShowInputStudentId={role === "student"}
         />
       </Modal>
     </>

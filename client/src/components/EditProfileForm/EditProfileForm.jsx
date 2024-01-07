@@ -16,7 +16,8 @@ const EditProfileForm = ({
     editProfile,
     toggleEdit,
     token,
-    isShow = true
+    isShow = true,
+    isShowInputStudentId = false
 }) => {
     const initalState = {
         email: user.email,
@@ -178,7 +179,7 @@ const EditProfileForm = ({
                                 disabled={!isEditing}
                             />
                         </div>
-                        {user.role === "student" && (
+                        {(user.role === "student" || isShowInputStudentId) && (
                             <FormInput
                                 type="uniqueId"
                                 name="uniqueId"
