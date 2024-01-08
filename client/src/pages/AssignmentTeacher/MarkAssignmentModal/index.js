@@ -59,16 +59,16 @@ const MarkAssignmentModal = ({ visible, onClose, assignmentDetail }) => {
                   <div>Nội dung đã làm</div>
                   <LargeInput
                     className={styles.field}
-                    value="Em dell bk làm đâu"
+                    value={assignmentDetail.metadata}
                     disabled
                   />
                   <div>File đính kèm</div>
                   <a
-                    href="https://example.com"
+                    href={assignmentDetail.description}
                     target="_blank"
                     rel="noreferrer"
                   >
-                    https://asdasfdsadfs.com
+                    {assignmentDetail.description}
                   </a>
                 </div>
               </div>

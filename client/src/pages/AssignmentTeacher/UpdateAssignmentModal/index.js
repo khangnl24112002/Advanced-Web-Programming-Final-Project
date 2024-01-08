@@ -12,7 +12,12 @@ import Dropdown from "../../../components/Dropdown";
 import { assignmentServices } from "../../../services/AssignmentServices";
 import { classServices } from "../../../services/ClassServices";
 import { errorToast, successToast } from "../../../utils/toast";
-const UpdateAssignmentModal = ({ visible, onClose, classId }) => {
+const UpdateAssignmentModal = ({
+  visible,
+  onClose,
+  classId,
+  assignmentInfo,
+}) => {
   const {
     control: controlAssignmentInfo,
     setValue: setValueAssignmentInfo,
@@ -50,11 +55,11 @@ const UpdateAssignmentModal = ({ visible, onClose, classId }) => {
   }, [visible]);
 
   useEffect(() => {
-    setValueAssignmentInfo("name", "XYZ");
-    setValueAssignmentInfo("gradeId", "");
-    setValueAssignmentInfo("dueDate", "2022/11/24");
-    setValueAssignmentInfo("description", "24/11/2002");
-    setValueAssignmentInfo("metadata", "zzzz");
+    setValueAssignmentInfo("name", assignmentInfo.name);
+    setValueAssignmentInfo("gradeId", assignmentInfo.gradeId);
+    setValueAssignmentInfo("dueDate", assignmentInfo.dueDate);
+    setValueAssignmentInfo("description", assignmentInfo.description);
+    setValueAssignmentInfo("metadata", assignmentInfo.metadata);
     setValueAssignmentInfo("classId", classId);
     // Get grades
     const getGradeCompositon = async () => {
@@ -63,8 +68,7 @@ const UpdateAssignmentModal = ({ visible, onClose, classId }) => {
         setGradeTypesList(response.data);
         const gradeCompositionNameList = [];
         response.data.map((gradeComposition, index) => {
-          if (!gradeComposition?.assignments)
-            gradeCompositionNameList.push(gradeComposition.name);
+          gradeCompositionNameList.push(gradeComposition.name);
         });
         setGradeTypesNameList(gradeCompositionNameList);
       } else {
@@ -109,9 +113,12 @@ const UpdateAssignmentModal = ({ visible, onClose, classId }) => {
       requestObject.metadata = fileUrl;
     }
     // Call API to update assignment info
-    const response = await assignmentServices.createAssignment(requestObject);
+    const response = await assignmentServices.updateAssignment(
+      requestObject,
+      assignmentInfo.id
+    );
     if (response.status) {
-      successToast("Tạo bài tập mới thành công!", 2000);
+      successToast("Cập nhật bài tập thành công!", 2000);
       const newGradeTypesNameList = gradeTypesNameList.filter(
         (item, index) => item !== gradeTypeChoose.name
       );
@@ -119,7 +126,7 @@ const UpdateAssignmentModal = ({ visible, onClose, classId }) => {
       resetForm();
       window.location.reload();
     } else {
-      return errorToast("Tạo bài tập mới thất bại");
+      return errorToast("Cập nhật thất bại");
     }
   };
 
@@ -235,7 +242,7 @@ const UpdateAssignmentModal = ({ visible, onClose, classId }) => {
                   }}
                   type="submit"
                 >
-                  Tạo bài tập
+                  Cập nhật
                 </button>
               </div>
             </form>

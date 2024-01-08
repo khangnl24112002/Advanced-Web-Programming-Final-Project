@@ -8,6 +8,7 @@ import { errorToast, successToast } from "../../utils/toast";
 import { helper } from "../../utils/helper";
 import { classServices } from "../../services/ClassServices";
 import { useNavigate } from "react-router-dom";
+import LargeInput from "../../components/LargeInput";
 
 // Giao diện màn hình tạo lớp học cho giáo viên
 const CreateClass = ({ className }) => {
@@ -84,7 +85,7 @@ const CreateClass = ({ className }) => {
             required
             onChange={handleChange}
           />
-          <TextInput
+          <LargeInput
             className={styles.field}
             label="Mô tả lớp học"
             name="description"

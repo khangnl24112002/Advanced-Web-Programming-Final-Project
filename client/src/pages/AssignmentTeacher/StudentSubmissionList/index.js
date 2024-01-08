@@ -3,7 +3,6 @@ import styles from "./StudentSubmissionList.module.sass";
 // import cn from "classnames";
 // import Checkbox from "../../../../components/Checkbox";
 import Row from "./Row";
-
 const StudentSubmissionList = ({ items }) => {
   // const [chooseAll, setСhooseAll] = useState(false);
 
@@ -24,6 +23,7 @@ const StudentSubmissionList = ({ items }) => {
           <div className={styles.col}></div>
           <div className={styles.col}>Họ và tên</div>
           <div className={styles.col}>MSSV</div>
+          <div className={styles.col}>Email</div>
           <div className={styles.col}>Thời gian nộp</div>
         </div>
         {items.map((x, index) => (

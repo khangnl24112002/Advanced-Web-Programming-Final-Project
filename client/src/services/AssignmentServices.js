@@ -27,6 +27,27 @@ export const assignmentServices = {
       return error.response.data;
     }
   },
+  updateAssignment: async (assignmentData, assignmentId) => {
+    try {
+      const response = await axiosInstance.put(
+        `/assignments/${assignmentId}`,
+        assignmentData
+      );
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  },
+  deleteAssignment: async (assignmentId) => {
+    try {
+      const response = await axiosInstance.delete(
+        `/assignments/${assignmentId}`
+      );
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  },
   uploadFile: async (fileUrl) => {
     try {
       const file = new FormData();
