@@ -62,4 +62,15 @@ export const assignmentServices = {
       return error.response.data;
     }
   },
+  markScoreForStudent: async (assignmentId, data) => {
+    try {
+      const response = await axiosInstance.post(
+        `/assignments/${assignmentId}/mark-score`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  },
 };

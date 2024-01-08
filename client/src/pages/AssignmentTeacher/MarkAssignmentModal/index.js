@@ -7,6 +7,10 @@ import Icon from "../../../components/Icon";
 import Card from "../../../components/Card";
 import LargeInput from "../../../components/LargeInput";
 import TextInput from "../../../components/TextInput";
+import { useForm, Controller } from "react-hook-form";
+import { errorToast, successToast } from "../../../utils/toast";
+import { assignmentServices } from "../../../services/AssignmentServices";
+
 const MarkAssignmentModal = ({ visible, onClose, assignmentDetail }) => {
   const escFunction = useCallback(
     (e) => {
@@ -33,6 +37,33 @@ const MarkAssignmentModal = ({ visible, onClose, assignmentDetail }) => {
     }
   }, [visible]);
 
+  const { control, setValue, handleSubmit, reset } = useForm();
+
+  const onSubmit = async (data) => {
+    const score = parseFloat(data.score);
+    if (score < 0 || score > 10) {
+      return errorToast("Số điểm không hợp lệ!");
+    } else {
+      const requestObject = {
+        scores: [
+          {
+            studentId: assignmentDetail.students.id,
+            score: score,
+          },
+        ],
+      };
+      const response = await assignmentServices.markScoreForStudent(
+        assignmentDetail.id,
+        requestObject
+      );
+      if (response.status) {
+        onClose();
+        return successToast("Chấm điểm thành công");
+      } else {
+        return errorToast("Chấm điểm thất bại!");
+      }
+    }
+  };
   return createPortal(
     visible && (
       <div id="modal-product" className={styles.modal}>
@@ -83,18 +114,30 @@ const MarkAssignmentModal = ({ visible, onClose, assignmentDetail }) => {
                   <div className={cn("title-green", styles.title)}>
                     Chấm điểm
                   </div>
-                  <TextInput
-                    className={styles.field}
-                    label="Số điểm muốn chấm"
-                    type="number"
-                  />
-                  <button
-                    className={cn("button", styles.button)}
-                    style={{}}
-                    type="butotn"
-                  >
-                    Chấm điểm
-                  </button>
+                  <form onSubmit={handleSubmit(onSubmit)}>
+                    <Controller
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput
+                          className={styles.field}
+                          label="Số điểm muốn chấm"
+                          type="number"
+                          required
+                          onChange={onChange}
+                          onBlur={onBlur}
+                          value={value}
+                        />
+                      )}
+                      name="score"
+                      control={control}
+                    />
+                    <button
+                      className={cn("button", styles.button)}
+                      style={{}}
+                      type="submit"
+                    >
+                      Chấm điểm
+                    </button>
+                  </form>
                 </div>
               </div>
             </div>
