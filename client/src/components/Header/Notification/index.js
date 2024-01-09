@@ -8,18 +8,22 @@ import Actions from "../../Actions";
 import Item from "./Item";
 
 // data
-import { notifications } from "../../../mocks/notifications";
-
-const actions = [
+const notifications = [
   {
-    title: "Mark as read",
-    icon: "check",
-    action: () => console.log("Mark as read"),
+    content: "This is a notification content",
+    createdAt: "2023-12-31T11:09:53.417Z",
+    id: 0,
+    isRead: true,
+    title: "This is notification title",
+    type: "notification",
   },
   {
-    title: "Delete notifications",
-    icon: "trash",
-    action: () => console.log("Delete notifications"),
+    content: "This is a notification content",
+    createdAt: "2023-12-31T11:09:53.417Z",
+    id: 1,
+    isRead: false,
+    title: "This is notification title",
+    type: "notification",
   },
 ];
 
@@ -41,13 +45,13 @@ const Notification = ({ className }) => {
         </button>
         <div className={styles.body}>
           <div className={styles.top}>
-            <div className={styles.title}>Notification</div>
-            <Actions
+            <div className={styles.title}>Thông báo</div>
+            {/* <Actions
               className={styles.actions}
               classActionsHead={styles.actionsHead}
               items={actions}
               small
-            />
+            /> */}
           </div>
           <div className={styles.list}>
             {notifications.map((x, index) => (
@@ -64,7 +68,7 @@ const Notification = ({ className }) => {
             to="/notifications"
             onClick={() => setVisible(false)}
           >
-            See all notifications
+            Xem toàn bộ thông báo
           </Link>
         </div>
       </div>
