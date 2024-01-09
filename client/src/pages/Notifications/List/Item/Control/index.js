@@ -1,36 +1,20 @@
 import React, { useState } from "react";
 import styles from "./Control.module.sass";
 import cn from "classnames";
-import Answer from "../../../../../components/Answer";
 
-const Control = ({ className, valueAnswer, setValueAnswer }) => {
-  const [visible, setVisible] = useState(false);
-  const [like, setLike] = useState(false);
-
+const Control = ({ className, handleReadNotification, isRead }) => {
   return (
     <>
-      <div
-        className={cn(styles.control, className, { [styles.hidden]: visible })}
-      >
-        <button
-          className={cn(styles.button, styles.favorite, {
-            [styles.active]: like,
-          })}
-          onClick={() => setLike(!like)}
-        >
-          Like<span>d</span>
-        </button>
-        <button className={styles.button} onClick={() => setVisible(true)}>
-          Reply
-        </button>
-      </div>
-      <Answer
-        className={cn(styles.answer, { [styles.show]: visible })}
-        avatar="/images/content/avatar.jpg"
-        onClose={() => setVisible(false)}
-        currentValue={valueAnswer}
-        setCurrentValue={setValueAnswer}
-      />
+      {isRead === false ? (
+        <div className={cn(styles.control, className)}>
+          <button
+            className={cn(styles.button, styles.favorite)}
+            onClick={handleReadNotification}
+          >
+            Đánh dấu là đã xem
+          </button>
+        </div>
+      ) : null}
     </>
   );
 };

@@ -3,18 +3,11 @@ import cn from "classnames";
 import styles from "./Item.module.sass";
 import Control from "./Control";
 import dayjs from "dayjs";
-const Item = ({ className, item }) => {
+const Item = ({ className, item, handleReadNotification }) => {
   const [visible, setVisible] = useState(false);
-  const [currentValue, setCurrentValue] = useState("");
 
   return (
     <div className={cn(styles.item, { [styles.new]: !item.isRead }, className)}>
-      {/* <div className={styles.avatar}>
-        <img src="" alt="Avatar" />
-        <div className={styles.icon} style={{ backgroundColor: item.color }}>
-          <img src={item.icon} alt="Status" />
-        </div>
-      </div> */}
       <div className={styles.details}>
         <div className={styles.line}>
           <div className={styles.subtitle}>{item.title}</div>
@@ -32,8 +25,8 @@ const Item = ({ className, item }) => {
           className={styles.control}
           value={visible}
           setValue={setVisible}
-          valueAnswer={currentValue}
-          setValueAnswer={setCurrentValue}
+          handleReadNotification={handleReadNotification}
+          isRead={item.isRead}
         />
       </div>
     </div>

@@ -13,21 +13,26 @@ const navigation = [
     icon: "home",
     url: "/home",
   },
+  // {
+  //   title: "Người dùng",
+  //   slug: "users",
+  //   icon: "diamond",
+  //   dropdown: [
+  //     {
+  //       title: "Stats",
+  //       url: "/stats",
+  //     },
+  //   ],
+  // },
   {
-    title: "Users",
-    slug: "users",
-    icon: "diamond",
-    dropdown: [
-      {
-        title: "Stats",
-        url: "/stats",
-      },
-    ],
-  },
-  {
-    title: "Classes",
+    title: "Lớp học",
     icon: "board",
     url: "/classes",
+  },
+  {
+    title: "Thông báo",
+    icon: "notification",
+    url: "/notifications",
   },
 ];
 

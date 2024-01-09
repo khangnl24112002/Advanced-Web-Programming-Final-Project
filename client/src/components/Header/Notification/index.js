@@ -1,33 +1,36 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import cn from "classnames";
 import OutsideClickHandler from "react-outside-click-handler";
 import styles from "./Notification.module.sass";
 import Icon from "../../Icon";
-import Actions from "../../Actions";
 import Item from "./Item";
-
-// data
-const notifications = [
-  {
-    content: "This is a notification content",
-    createdAt: "2023-12-31T11:09:53.417Z",
-    id: 0,
-    isRead: true,
-    title: "This is notification title",
-    type: "notification",
-  },
-  {
-    content: "This is a notification content",
-    createdAt: "2023-12-31T11:09:53.417Z",
-    id: 1,
-    isRead: false,
-    title: "This is notification title",
-    type: "notification",
-  },
-];
+import { ref, onValue } from "firebase/database";
+import { database } from "../../../configs/firebase";
+import { useAuth } from "../../../hooks/useAuth";
 
 const Notification = ({ className }) => {
+  // Quản lý lấy thông báo
+
+  const { user } = useAuth();
+  const [notifications, setNotifications] = useState([]);
+  const [existNotRead, setExistNotRead] = useState(false);
+
+  useEffect(() => {
+    const starCountRef = ref(database, "notifications/" + user.id);
+    onValue(starCountRef, (snapshot) => {
+      const data = snapshot.val();
+      setNotifications(data);
+      for (let i = 0; i < notifications.length; i++) {
+        if (notifications[i].isRead === false) {
+          setExistNotRead(true);
+          return;
+        }
+        setExistNotRead(false);
+      }
+    });
+  }, []);
+
   const [visible, setVisible] = useState(false);
 
   return (
@@ -38,7 +41,9 @@ const Notification = ({ className }) => {
         })}
       >
         <button
-          className={cn(styles.head, styles.active)}
+          className={
+            existNotRead ? cn(styles.head, styles.active) : cn(styles.head)
+          }
           onClick={() => setVisible(!visible)}
         >
           <Icon name="notification" size="24" />
@@ -54,14 +59,18 @@ const Notification = ({ className }) => {
             /> */}
           </div>
           <div className={styles.list}>
-            {notifications.map((x, index) => (
-              <Item
-                className={cn(styles.item, className)}
-                item={x}
-                key={index}
-                onClose={() => setVisible(false)}
-              />
-            ))}
+            {notifications.map((x, index) => {
+              if (index < 5) {
+                return (
+                  <Item
+                    className={cn(styles.item, className)}
+                    item={x}
+                    key={index}
+                    onClose={() => setVisible(false)}
+                  />
+                );
+              }
+            })}
           </div>
           <Link
             className={cn("button", styles.button)}
