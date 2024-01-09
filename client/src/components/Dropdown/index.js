@@ -15,12 +15,18 @@ const Dropdown = ({
   tooltip,
   small,
   upBody,
+  sortValue,
 }) => {
   const [visible, setVisible] = useState(false);
 
   const handleClick = (value) => {
     setValue(value);
     setVisible(false);
+    if (value === "Tăng dần") {
+      sortValue(true);
+    } else {
+      sortValue(false);
+    }
   };
 
   return (
