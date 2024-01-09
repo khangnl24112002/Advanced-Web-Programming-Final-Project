@@ -61,7 +61,7 @@ const Notification = ({ className }) => {
           </div>
           <Link
             className={cn("button", styles.button)}
-            to="/notification"
+            to="/notifications"
             onClick={() => setVisible(false)}
           >
             See all notifications

@@ -22,7 +22,7 @@ import GroupInvite from "./pages/GroupInvite/GroupInvite";
 import EmailInvite from "./pages/EmailInvite/EmailInvite";
 import AssignmentTeacher from "./pages/AssignmentTeacher/AssignmentTeacher";
 import AssignmentStudent from "./pages/AssignmentStudent/AssignmentStudent";
-
+import Notifications from "./pages/Notifications";
 function App() {
   const { user, token } = useAuth();
   return (
@@ -47,6 +47,7 @@ function App() {
         >
           <Route path="home" index element={<Home />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="notifications" element={<Notifications />} />
           <Route path="classes" element={<ClassesDashboard />}>
             <Route index element={<Classes />} />
             <Route exact path=":classId" element={<ClassInfo />} />
