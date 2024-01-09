@@ -6,9 +6,8 @@ import ModalProduct from "../../../../components/ModalProduct/index.js";
 import MarkAssignmentModal from "../../MarkAssignmentModal/index.js";
 import * as dayjs from "dayjs";
 
-const Row = ({ item, value, onChange, up }) => {
+const Row = ({ item, value, onChange, up, reviews }) => {
   const [visibleModalProduct, setVisibleModalProduct] = useState(false);
-
   return (
     <>
       <div className={styles.row} onClick={() => setVisibleModalProduct(true)}>
@@ -32,6 +31,7 @@ const Row = ({ item, value, onChange, up }) => {
         onClose={() => setVisibleModalProduct(false)}
         visible={visibleModalProduct}
         assignmentDetail={item}
+        reviews={reviews}
       />
     </>
   );

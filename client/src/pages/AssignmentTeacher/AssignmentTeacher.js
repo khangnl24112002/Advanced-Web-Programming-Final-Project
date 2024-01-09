@@ -17,6 +17,7 @@ const AssignmentTeacher = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [assignmentData, setAssignmentData] = useState("");
+  const [assignmentReviews, setAssignmentReviews] = useState([]);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [content, setContent] = useState("");
   const navigate = useNavigate();
@@ -35,15 +36,31 @@ const AssignmentTeacher = () => {
     getAssignmentData();
     setIsLoading(false);
   }, [assignmentId]);
-  const handleDeleteAssignment = async()=>{
+
+  // Lấy toàn bộ danh sách học sinh phúc khảo
+  useEffect(() => {
+    setIsLoading(true);
+    const getAssignmentReviews = async () => {
+      const assignmentReviewsResponse =
+        await assignmentServices.getAssignmentReviews(assignmentId);
+      if (assignmentReviewsResponse.status) {
+        setAssignmentReviews(assignmentReviewsResponse.data);
+      } else {
+        return errorToast("Không thể lấy được dữ liệu. Vui lòng thử lại sau.");
+      }
+    };
+    getAssignmentReviews();
+    setIsLoading(false);
+  }, []);
+
+  const handleDeleteAssignment = async () => {
     const response = await assignmentServices.deleteAssignment(assignmentId);
-    if (response.status){
-      return successToast("Xóa bài tập thành công!",2000)
-    }
-    else {
+    if (response.status) {
+      return successToast("Xóa bài tập thành công!", 2000);
+    } else {
       return errorToast("Xóa bài tập thất bại, vui lòng thử lại sau.");
     }
-  }
+  };
   const handleUpdateAssignment = () => {
     setOpenModal(true);
   };
@@ -64,7 +81,12 @@ const AssignmentTeacher = () => {
           >
             <span>Quay lại</span>
           </button>
-          <button onClick={()=>{handleDeleteAssignment()}} className={cn("button", styles.button)}>
+          <button
+            onClick={() => {
+              handleDeleteAssignment();
+            }}
+            className={cn("button", styles.button)}
+          >
             <span>Xóa bài tập</span>
           </button>
         </div>
@@ -150,6 +172,7 @@ const AssignmentTeacher = () => {
                 <div className={styles.wrapper}>
                   <StudentSubmissionList
                     items={assignmentData.studentAssignments}
+                    reviews={assignmentReviews}
                   />
                 </div>
               </div>

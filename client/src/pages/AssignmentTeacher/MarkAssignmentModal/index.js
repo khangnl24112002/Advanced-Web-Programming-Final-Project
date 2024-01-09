@@ -11,7 +11,12 @@ import { useForm, Controller } from "react-hook-form";
 import { errorToast, successToast } from "../../../utils/toast";
 import { assignmentServices } from "../../../services/AssignmentServices";
 
-const MarkAssignmentModal = ({ visible, onClose, assignmentDetail }) => {
+const MarkAssignmentModal = ({
+  visible,
+  onClose,
+  assignmentDetail,
+  reviews,
+}) => {
   const escFunction = useCallback(
     (e) => {
       if (e.keyCode === 27) {
@@ -38,7 +43,8 @@ const MarkAssignmentModal = ({ visible, onClose, assignmentDetail }) => {
   }, [visible]);
 
   const { control, setValue, handleSubmit, reset } = useForm();
-
+  const { control: reviewControl, handleSubmit: handleSubmitReview } =
+    useForm();
   const onSubmit = async (data) => {
     const score = parseFloat(data.score);
     if (score < 0 || score > 10) {
@@ -64,6 +70,9 @@ const MarkAssignmentModal = ({ visible, onClose, assignmentDetail }) => {
       }
     }
   };
+  const onSubmitReview = (data) => {
+    console.log(data);
+  };
   return createPortal(
     visible && (
       <div id="modal-product" className={styles.modal}>
@@ -76,7 +85,7 @@ const MarkAssignmentModal = ({ visible, onClose, assignmentDetail }) => {
         <div className={styles.outer}>
           <Card className={cn(styles.card)}>
             <div style={{ display: "flex", gap: "40px" }}>
-              <div style={{ flex: 4 }} className={cn(styles.head)}>
+              <div style={{ flex: 2 }} className={cn(styles.head)}>
                 <div
                   style={{
                     display: "flex",
@@ -136,6 +145,53 @@ const MarkAssignmentModal = ({ visible, onClose, assignmentDetail }) => {
                       type="submit"
                     >
                       Chấm điểm
+                    </button>
+                  </form>
+                </div>
+              </div>
+              <div style={{ flex: 1 }} className={cn(styles.head)}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "20px",
+                  }}
+                >
+                  <div className={cn("title-green", styles.title)}>
+                    Phúc khảo
+                  </div>
+                  <div className={styles.messagebox}>
+                    <div className={styles.another_message}>
+                      <div className={styles.name}>khagnnl2412@gmail.com</div>
+                      <div className={styles.content}>Phúc khảo giúp em</div>
+                    </div>
+                    <div className={styles.your_message}>
+                      <div className={styles.name}>Bạn</div>
+                      <div className={styles.content}>Phúc cc</div>
+                    </div>
+                  </div>
+                  <form onSubmit={handleSubmitReview(onSubmitReview)}>
+                    <Controller
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput
+                          className={styles.field}
+                          label="Nội dung phản hồi"
+                          type="text"
+                          required
+                          onChange={onChange}
+                          onBlur={onBlur}
+                          value={value}
+                        />
+                      )}
+                      name="reviewContent"
+                      control={reviewControl}
+                    />
+                    <button
+                      className={cn("button", styles.button)}
+                      style={{}}
+                      type="submit"
+                    >
+                      Gửi
                     </button>
                   </form>
                 </div>

@@ -10,6 +10,16 @@ export const assignmentServices = {
       return error.response.data;
     }
   },
+  getAssignmentReviews: async (assignmentId) => {
+    try {
+      const response = await axiosInstance.get(
+        `/assignments/${assignmentId}/requested-grade-view`
+      );
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  },
   getAssignmentById: async (assignmentId) => {
     try {
       const response = await axiosInstance.get(`/assignments/${assignmentId}`);
