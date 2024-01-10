@@ -160,7 +160,7 @@ export class UpdateRequestedGradeViewDto {
   @IsNotEmpty()
   actualScore: number;
 
-  @ApiProperty({ required: false, example: 'ACCEPT' })
+  @ApiProperty({ required: false, example: 'ACCEPT | DENIED' })
   @IsNotEmpty()
   status: string;
 

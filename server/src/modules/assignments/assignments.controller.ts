@@ -365,12 +365,24 @@ export class AssignmentsController {
   async updateRequestedGradeView(
     @Param('studentRequestedReviewId') studentRequestedReviewId: number,
     @Body() body: UpdateRequestedGradeViewDto,
+    @CurrentUser() teacher: any,
   ) {
     const { actualScore, status, studentAssignmentId } = body;
     const prepareData: Prisma.studentRequestedReviewsUncheckedUpdateInput = {
       actualScore,
       status,
     };
+    const studentAssignment =
+      await this.assignmentsService.getStudentAssignment(studentAssignmentId);
+    if (!studentAssignment) {
+      throw new HttpException(
+        {
+          status: false,
+          message: 'Không tìm thấy bài tập của học sinh',
+        },
+        404,
+      );
+    }
     const requestedGradeView =
       await this.assignmentsService.updateRequestedGradeView(
         +studentRequestedReviewId,
@@ -380,10 +392,36 @@ export class AssignmentsController {
     await this.assignmentsService.updateStudentAssignment(
       +studentAssignmentId,
       {
-        status: ASSIGNMENT_STATUS.DONE_REQUESTED_REVIEW,
+        status:
+          status === 'ACCEPT'
+            ? ASSIGNMENT_STATUS.ACCEPT_REQUESTED_REVIEW
+            : ASSIGNMENT_STATUS.DENIED_REQUESTED_REVIEW,
         score: actualScore,
       },
     );
+    // CREATE NOTIFICATION FOR STUDENT
+    const { students, assignments } = studentAssignment;
+    const userId = students.id;
+    const notiLength =
+      await this.notificationService.readNotiLengthFromDB(userId);
+    const id = notiLength ? notiLength + 1 : 0;
+    const payload = {
+      content: `Giáo viên ${
+        teacher?.firstName + ' ' + teacher?.lastName
+      } vừa phản hồi phúc khảo bài tập ${assignments?.name}`,
+      createdAt: new Date().toISOString(),
+      isRead: false,
+      title: 'Bạn vừa nhận được thông báo trong đoạn hội thoại',
+      type: 'review',
+    };
+    await this.notificationService.saveNewNotiToUser({
+      userId,
+      currentNotiLength: notiLength || 0,
+      newData: {
+        ...payload,
+        id,
+      },
+    });
     return {
       status: true,
       data: requestedGradeView,
