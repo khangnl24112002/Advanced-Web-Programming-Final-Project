@@ -14,6 +14,7 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AssignmentsService } from './assignments.service';
 import {
   CreateAssignmentDTO,
+  CreateConversationDto,
   MarkScoreStudentDto,
   RequestedGradeViewDto,
   StudentAssigmentDto,
@@ -392,7 +393,7 @@ export class AssignmentsController {
   @Post(':id/requested-grade-view/:studentRequestedReviewId/conversation')
   async createConversation(
     @Param('studentRequestedReviewId') studentRequestedReviewId: number,
-    @Body() body: any,
+    @Body() body: CreateConversationDto,
     @CurrentUser('id') userId: string,
     @Param('id') id: number,
   ) {
