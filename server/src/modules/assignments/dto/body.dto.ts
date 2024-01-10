@@ -27,6 +27,17 @@ export class CreateAssignmentDTO {
   @IsOptional()
   dueDate: string;
 }
+
+export class StudentAssigmentDto {
+  @ApiProperty({ required: false, example: 'https://link' })
+  @IsOptional()
+  metadata: string;
+
+  @ApiProperty({ required: false, example: 'https://link' })
+  @IsOptional()
+  description: string;
+}
+
 export class UpdateAssignmentDTO {
   @ApiProperty({ required: true, example: 'Minh' })
   @IsNotEmpty()

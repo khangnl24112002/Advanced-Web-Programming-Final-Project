@@ -110,6 +110,14 @@ export class AssignmentsService {
     });
   }
 
+  async createStudentAssignment(
+    data: Prisma.studentAssignmentsUncheckedCreateInput,
+  ) {
+    return this.primsaService.studentAssignments.create({
+      data,
+    });
+  }
+
   async createRequestedGradeView(
     data: Prisma.studentRequestedReviewsUncheckedCreateInput,
   ) {

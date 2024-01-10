@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-facebook';
 import { AuthService } from './auth.service';
@@ -22,12 +22,12 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
     profile: Profile,
     done: (err: any, user: any, info?: any) => void,
   ): Promise<any> {
-    const { name, emails, id} = profile;
+    const { name, emails, id } = profile;
     const user = {
       email: emails[0].value,
       firstName: name.givenName,
       lastName: name.familyName,
-      picture: `https://graph.facebook.com/${id}/picture?type=large`
+      picture: `https://graph.facebook.com/${id}/picture?type=large`,
     };
     const provider = 'facebook';
     let existUser: any = await this.authService.findUserByEmail(user.email);
@@ -41,17 +41,31 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
         emailVerified: true,
         avatar: user.picture,
       });
-      existUser = {...response.user, role: "user"};
+      existUser = { ...response.user, role: 'user' };
+    }
+    const { isBan } = existUser;
+    if (isBan) {
+      throw new HttpException(
+        {
+          status: false,
+          daa: null,
+          message: 'Tài khoản của bạn đã bị khóa.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
     const token = await this.authService.generateAccessToken({
       id: existUser.id,
       email: existUser.email,
-    })
+    });
     done(null, {
-        ...user,
-        id: existUser.id,
-        accessToken: token,
-        ...(existUser?.role?.name ||  existUser?.role ? { role: existUser?.role.name ||  existUser?.role} : {})
+      ...user,
+      id: existUser.id,
+      accessToken: token,
+      ...(existUser?.role?.name || existUser?.role
+        ? { role: existUser?.role.name || existUser?.role }
+        : {}),
+      roleId: existUser?.roleId || 2,
     });
   }
 }

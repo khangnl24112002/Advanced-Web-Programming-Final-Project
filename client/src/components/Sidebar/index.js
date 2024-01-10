@@ -6,13 +6,14 @@ import Icon from "../Icon";
 import Theme from "../Theme";
 import Dropdown from "./Dropdown";
 import Image from "../Image";
+import { useAuth } from "../../hooks/useAuth";
 
-const navigation = [
-  {
-    title: "Home",
-    icon: "home",
-    url: "/home",
-  },
+let userNavigation = [
+  // {
+  //   title: "Home",
+  //   icon: "home",
+  //   url: "/home",
+  // },
   // {
   //   title: "Người dùng",
   //   slug: "users",
@@ -36,9 +37,34 @@ const navigation = [
   },
 ];
 
+let adminNavigation = [
+  {
+    title: "Quản lý",
+    slug: "users",
+    icon: "leaderboard",
+    dropdown: [
+      {
+        title: "Quản lý người dùng",
+        url: "manage/users",
+      },
+      {
+        title: "Quản lý lớp học",
+        url: "manage/classes",
+      },
+    ],
+  },
+];
+
 const Sidebar = ({ className, onClose }) => {
   const [visible, setVisible] = useState(false);
-
+  const { user } = useAuth();
+  const { role } = user;
+  let navigation;
+  if (role === "admin") {
+    navigation = adminNavigation;
+  } else {
+    navigation = userNavigation;
+  }
   return (
     <>
       <div

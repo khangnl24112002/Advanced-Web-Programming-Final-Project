@@ -22,10 +22,12 @@ const Dropdown = ({
   const handleClick = (value) => {
     setValue(value);
     setVisible(false);
-    if (value === "Tăng dần") {
-      sortValue(true);
-    } else {
-      sortValue(false);
+    if (sortValue) {
+      if (value === "Tăng dần") {
+        sortValue(true);
+      } else {
+        sortValue(false);
+      }
     }
   };
 

@@ -55,4 +55,21 @@ export const userServices = {
       return error?.response?.data;
     }
   },
+
+  updateStudentIdByFile: async (data) => {
+    try {
+      const response = await axiosInstance.post(
+        "/user/update-studentId-file",
+        data,
+        {
+          headers: {
+            "content-type": "multipart/form-data",
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  },
 };

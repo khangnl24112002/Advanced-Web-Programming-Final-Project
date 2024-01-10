@@ -1,17 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
+import { Roles } from 'src/decorators/roles.decorator';
+import { ROLES } from 'src/utils';
 
 @Injectable()
 export class UserService {
-
   constructor(
     // eslint-disable-next-line prettier/prettier
     private readonly prismaService: PrismaService,
   ) {}
 
   async findAll() {
-    const users = await this.prismaService.users.findMany();
+    const users = await this.prismaService.users.findMany({
+      include: {
+        role: true,
+      },
+    });
 
     return {
       status: true,
@@ -19,17 +24,19 @@ export class UserService {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        uniqueId: user.uniqueId,
+        role: user.role.name,
       })),
-      message: "Danh sách users"
-    }
+      message: 'Danh sách users',
+    };
   }
-  async update(email,updateUserDto: UpdateUserDto) {
+  async update(email, updateUserDto: any) {
     const user = await this.prismaService.users.update({
       where: {
-        email
+        email,
       },
-      data: updateUserDto
-    })
+      data: updateUserDto,
+    });
 
     return {
       status: true,
@@ -38,8 +45,8 @@ export class UserService {
         firstName: user.firstName,
         lastName: user.lastName,
       },
-      message: "Cập nhật thành công"
-    }
+      message: 'Cập nhật thành công',
+    };
   }
 
   remove(id: number) {

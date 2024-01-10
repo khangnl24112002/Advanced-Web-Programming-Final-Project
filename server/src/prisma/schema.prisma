@@ -25,6 +25,7 @@ model users {
   emailVerifiedAt                    DateTime?                            @map(name: "email_verified_at")
   emailVerified                      Boolean?                             @default(false) @map(name: "email_verified")
   status                             Boolean?
+  isBan                              Boolean?                             @default(false) @map("is_ban")
   isDisabled                         Boolean                              @default(false) @map(name: "is_disabled")
   isDeleted                          Boolean                              @default(false) @map(name: "is_deleted")
   deletedAt                          DateTime?                            @map(name: "deleted_at")
@@ -108,6 +109,7 @@ model studentAssignments {
   assignmentId                 Int?                           @map(name: "assignment_id")
   status                       String?
   score                        Float?
+  description                  String?                        @db.Text
   metadata                     String?                        @db.Text
   createdAt                    DateTime                       @default(now()) @map(name: "created_at")
   updatedAt                    DateTime                       @default(now()) @updatedAt @map(name: "updated_at")

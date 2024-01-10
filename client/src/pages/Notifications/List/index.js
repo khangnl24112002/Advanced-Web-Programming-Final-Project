@@ -57,14 +57,18 @@ const List = ({ className }) => {
     >
       <div className={styles.notifications}>
         <div className={styles.list}>
-          {notifications.map((x, index) => (
-            <Item
-              className={cn(styles.item, className)}
-              item={x}
-              key={index}
-              handleReadNotification={() => handleReadNotification(x.id)}
-            />
-          ))}
+          {notifications &&
+            notifications.map((x, index) => (
+              <Item
+                className={cn(styles.item, className)}
+                item={x}
+                key={index}
+                handleReadNotification={() => handleReadNotification(x.id)}
+              />
+            ))}
+          {!notifications && (
+            <div className={styles.text}>Bạn không có thông báo nào</div>
+          )}
         </div>
         {/* <div className={styles.foot}>
           <button className={cn("button-stroke button-small", styles.button)}>

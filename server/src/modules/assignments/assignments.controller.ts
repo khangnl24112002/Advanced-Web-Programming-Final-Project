@@ -16,11 +16,13 @@ import {
   CreateAssignmentDTO,
   MarkScoreStudentDto,
   RequestedGradeViewDto,
+  StudentAssigmentDto,
   UpdateRequestedGradeViewDto,
 } from './dto/body.dto';
 import {
   ASSIGNMENT_STATUS,
   REQUESTED_REVIEW_STATUS,
+  ROLES,
   createBufferFromExcelFile,
   readFileExcel,
 } from 'src/utils';
@@ -34,6 +36,7 @@ import { Prisma } from '@prisma/client';
 import { CurrentUser } from 'src/decorators/users.decorator';
 import { JwtAuthGuard } from 'src/guards/jwt.auth.guard';
 import { NotificationService } from '../notification/notification.service';
+import * as moment from 'moment';
 
 @Controller('assignments')
 @ApiTags('Assignments')
@@ -46,6 +49,41 @@ export class AssignmentsController {
     private readonly authService: AuthService,
     private readonly notificationService: NotificationService,
   ) {}
+
+  @Get(':id')
+  async getAssignment(@Param('id') id: number, @CurrentUser() user: any) {
+    const assignment = await this.assignmentsService.getAssignment(+id);
+    if (!assignment) {
+      throw new HttpException(
+        {
+          status: false,
+          message: 'Không tìm thấy bài tập',
+        },
+        404,
+      );
+    }
+    const { id: userId, roleId } = user;
+    if (roleId === ROLES.TEACHER) {
+      return {
+        status: true,
+        data: assignment,
+        message: 'Lấy bài tập thành công',
+      };
+    }
+    const { studentAssignments, ...rest } = assignment;
+    const studentAssignment = studentAssignments.find(
+      (studentAssignment) => studentAssignment.studentId === userId,
+    );
+
+    return {
+      status: true,
+      data: {
+        ...rest,
+        studentAssignments: [studentAssignment],
+      },
+      message: 'Lấy bài tập thành công',
+    };
+  }
 
   @Post()
   async createAssignment(
@@ -79,7 +117,7 @@ export class AssignmentsController {
     };
   }
 
-  @Get(':classId')
+  @Get(':classId/all')
   async getAllAssignments(@Param('classId') classId: number) {
     const assignments =
       await this.assignmentsService.getAllAssignments(classId);
@@ -119,6 +157,42 @@ export class AssignmentsController {
     return {
       status: true,
       data: uploadedFile.url,
+      message: 'Tải file Grade thành công',
+    };
+  }
+
+  @Post(':id/student-assignment')
+  async createStudentAssignment(
+    @Body() body: StudentAssigmentDto,
+    @Param('id') id: string,
+    @CurrentUser('id') studentId: string,
+  ) {
+    const assignment = await this.assignmentsService.getAssignment(+id);
+    if (!assignment) {
+      throw new HttpException(
+        {
+          status: false,
+          message: 'Không tìm thấy bài tập',
+        },
+        404,
+      );
+    }
+    const status =
+      !assignment.dueDate || moment().isBefore(assignment.dueDate)
+        ? ASSIGNMENT_STATUS.SUBMITTED
+        : ASSIGNMENT_STATUS.LATE;
+    const { metadata, description } = body;
+    const studentAssignment =
+      await this.assignmentsService.createStudentAssignment({
+        studentId,
+        assignmentId: +id,
+        metadata,
+        status,
+        description,
+      });
+    return {
+      status: true,
+      data: studentAssignment,
       message: 'Tải file Grade thành công',
     };
   }

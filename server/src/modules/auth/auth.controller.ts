@@ -21,26 +21,32 @@ import { SendgridService } from '../mail/mail.service';
 import { MAIL_TEMPLATE_ID, comparePassword } from 'src/utils';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { ResetPasswordDto, createNewPasswordDto } from './dto/reset-password.dto';
+import {
+  ResetPasswordDto,
+  createNewPasswordDto,
+} from './dto/reset-password.dto';
 import { Response } from 'express';
-
 
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
   // eslint-disable-next-line prettier/prettier
-  constructor(private readonly authService: AuthService, private readonly jwtService: JwtService, private readonly mailService: SendgridService, private readonly configService: ConfigService) { }
+  constructor(
+    private readonly authService: AuthService,
+    private readonly jwtService: JwtService,
+    private readonly mailService: SendgridService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Get('google')
   @UseGuards(GoogleOAuthGuard)
-  async googleAuth() { }
+  async googleAuth() {}
 
   @Post('register')
   @ApiCreatedResponse({
     type: RegisterResponse,
   })
   async register(@Body() body: RegisterDto) {
-
     const { token } = await this.authService.signUpByEmail(body);
     const dynamic_template_data = {
       link: `${process.env.BACKEND_URL}/auth/verify?token=${token}`,
@@ -54,7 +60,7 @@ export class AuthController {
     return {
       status: true,
       message: 'Gửi mail thành công',
-    }
+    };
   }
 
   @Post('login')
@@ -69,17 +75,21 @@ export class AuthController {
   @UseGuards(GoogleOAuthGuard)
   async googleAuthRedirect(@Request() req, @Res() res: Response) {
     const { user } = req;
-    return res.redirect(`${process.env.FRONTEND_URL}/auth/oauth-redirect?id=${user.id}&email=${user.email}&firstName=${user.firstName}&lastName=${user.lastName}&picture=${user.picture}&accessToken=${user.accessToken}&role=${user.role}`);
+    return res.redirect(
+      `${process.env.FRONTEND_URL}/auth/oauth-redirect?id=${user.id}&email=${user.email}&firstName=${user.firstName}&lastName=${user.lastName}&picture=${user.picture}&accessToken=${user.accessToken}&role=${user.roleId}&uniqueId=${user.uniqueId}`,
+    );
   }
 
-  @Get("facebook-redirect")
+  @Get('facebook-redirect')
   @UseGuards(FacebookAuthGuard)
   async facebookLogin(@Request() req, @Res() res: Response): Promise<any> {
     const { user } = req;
-    return res.redirect(`${process.env.FRONTEND_URL}/auth/oauth-redirect?id=${user.id}&email=${user.email}&firstName=${user.firstName}&lastName=${user.lastName}&picture=${user.picture}&accessToken=${user.accessToken}&role=${user.role}`);
+    return res.redirect(
+      `${process.env.FRONTEND_URL}/auth/oauth-redirect?id=${user.id}&email=${user.email}&firstName=${user.firstName}&lastName=${user.lastName}&picture=${user.picture}&accessToken=${user.accessToken}&role=${user.roleId}&uniqueId=${user.uniqueId}`,
+    );
   }
 
-  @Get("facebook")
+  @Get('facebook')
   @UseGuards(FacebookAuthGuard)
   async facebookLoginRedirect(): Promise<any> {
     return {
@@ -125,7 +135,10 @@ export class AuthController {
       );
     }
     const verifyUser = await this.authService.verifyUser(decoded.id);
-    return { name: verifyUser.firstName, link: `${process.env.FRONTEND_URL}/auth/sign-in` };
+    return {
+      name: verifyUser.firstName,
+      link: `${process.env.FRONTEND_URL}/auth/sign-in`,
+    };
   }
 
   @Get('forgot-password')
@@ -168,7 +181,7 @@ export class AuthController {
     return {
       status: true,
       message: 'Gửi mail thành công',
-    }
+    };
   }
 
   @Post('reset-password')
@@ -185,16 +198,24 @@ export class AuthController {
       );
     }
     const { encryptedPassword } = user;
-    const isValidPassword = await comparePassword(oldPassword, encryptedPassword);
+    const isValidPassword = await comparePassword(
+      oldPassword,
+      encryptedPassword,
+    );
     if (!isValidPassword) {
-      throw new HttpException({
-        status: false,
-        daa: null,
-        message: 'Mật khẩu bạn đã nhập không chính xác.',
-      }, HttpStatus.BAD_REQUEST)
-
+      throw new HttpException(
+        {
+          status: false,
+          daa: null,
+          message: 'Mật khẩu bạn đã nhập không chính xác.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
-    const updatePassword = await this.authService.updatePassword(user.id, newPassword);
+    const updatePassword = await this.authService.updatePassword(
+      user.id,
+      newPassword,
+    );
     if (!updatePassword) {
       throw new HttpException(
         {
@@ -207,11 +228,14 @@ export class AuthController {
     return {
       status: true,
       message: 'Cập nhật mật khẩu thành công',
-    }
+    };
   }
 
   @Post('create-new-password')
-  async createNewPassword(@Body() body: createNewPasswordDto, @Query('email') email: string) {
+  async createNewPassword(
+    @Body() body: createNewPasswordDto,
+    @Query('email') email: string,
+  ) {
     const { newPassword } = body;
     const user = await this.authService.findUserVerifyEmail(email);
     if (!user) {
@@ -223,7 +247,10 @@ export class AuthController {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const updatePassword = await this.authService.updatePassword(user.id, newPassword);
+    const updatePassword = await this.authService.updatePassword(
+      user.id,
+      newPassword,
+    );
     if (!updatePassword) {
       throw new HttpException(
         {
@@ -236,6 +263,6 @@ export class AuthController {
     return {
       status: true,
       message: 'Cập nhật mật khẩu thành công',
-    }
+    };
   }
 }

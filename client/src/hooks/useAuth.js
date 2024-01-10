@@ -12,7 +12,8 @@ export const AuthProvider = ({ children }) => {
   const login = async (data, token) => {
     setUser(data);
     setToken(token);
-    navigate("/home", { replace: true });
+    const defaultPath = data.role === "admin" ? "/manage/users" : "/classes";
+    navigate(defaultPath, { replace: true });
   };
   const logout = () => {
     setUser(null);

@@ -21,7 +21,7 @@ const Notification = ({ className }) => {
     onValue(starCountRef, (snapshot) => {
       const data = snapshot.val();
       setNotifications(data);
-      for (let i = 0; i < notifications.length; i++) {
+      for (let i = 0; i < notifications?.length; i++) {
         if (notifications[i].isRead === false) {
           setExistNotRead(true);
           return;
@@ -59,18 +59,24 @@ const Notification = ({ className }) => {
             /> */}
           </div>
           <div className={styles.list}>
-            {notifications.map((x, index) => {
-              if (index < 5) {
-                return (
-                  <Item
-                    className={cn(styles.item, className)}
-                    item={x}
-                    key={index}
-                    onClose={() => setVisible(false)}
-                  />
-                );
-              }
-            })}
+            {notifications ? (
+              notifications.map((x, index) => {
+                if (index < 5) {
+                  return (
+                    <Item
+                      className={cn(styles.item, className)}
+                      item={x}
+                      key={index}
+                      onClose={() => setVisible(false)}
+                    />
+                  );
+                }
+              })
+            ) : (
+              <div style={{ padding: "12px" }} className={styles.text}>
+                Bạn không có thông báo nào
+              </div>
+            )}
           </div>
           <Link
             className={cn("button", styles.button)}
