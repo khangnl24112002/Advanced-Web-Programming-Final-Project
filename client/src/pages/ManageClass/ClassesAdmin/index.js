@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import styles from "./Classes.module.sass";
+import styles from "./ClassesAdmin.module.sass";
 import cn from "classnames";
 import Card from "../../../components/Card";
 import Form from "../../../components/Form";
@@ -50,7 +50,7 @@ const indicatorsViewers = [
     },
 ];
 
-const Classes = () => {
+const ClassesAdmin = () => {
     // Lấy thông tin user
     const { user, token } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
@@ -67,17 +67,11 @@ const Classes = () => {
     useEffect(() => {
         setIsLoading(true);
         const getClassList = async () => {
-            if (user.role === "teacher") {
-                const response = await classServices.getTeacherClass(token);
-                if (response.status) {
-                    setClassList(response.data);
-                }
-            } else if (user.role === "student") {
-                const response = await classServices.getStudentClass(token);
-                if (response.status) {
-                    setClassList(response.data);
-                }
+            const response = await classServices.getAllClasses(token);
+            if (response.status) {
+                setClassList(response.data);
             }
+
             setIsLoading(false);
         };
         getClassList();
@@ -92,15 +86,15 @@ const Classes = () => {
             head={
                 <>
                     {/* <Form
-            className={styles.form}
-            value={search}
-            setValue={setSearch}
-            onSubmit={() => handleSubmit()}
-            placeholder="Tìm lớp"
-            type="text"
-            name="search"
-            icon="search"
-          /> */}
+                        className={styles.form}
+                        value={search}
+                        setValue={setSearch}
+                        onSubmit={() => handleSubmit()}
+                        placeholder="Tìm lớp"
+                        type="text"
+                        name="search"
+                        icon="search"
+                    /> */}
                     {/**Button dùng để tạo lớp học
                      * nếu role = 'teacher' (teacher thì mới có quyền tạo lớp)
                      */}
@@ -126,11 +120,11 @@ const Classes = () => {
             )}
             {!isLoading && classList.length <= 0 && (
                 <div className={styles.text} style={{ textAlign: "center" }}>
-                    Không tìm thấy lớp học bạn đã tham gia
+                    Không tìm thấy lớp nào
                 </div>
             )}
         </Card>
     );
 };
 
-export default Classes;
+export default ClassesAdmin;
