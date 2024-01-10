@@ -129,8 +129,8 @@ export class AssignmentsController {
     };
   }
 
-  @Get(':id/download-score')
-  async downloadScoreForAssignment(@Param('id') id: number) {
+  @Get(':assignmentId/download-score')
+  async downloadScoreForAssignment(@Param('assignmentId') id: number) {
     const grade = await this.assignmentsService.getAssignment(+id);
     if (!grade) {
       throw new HttpException(
@@ -162,10 +162,10 @@ export class AssignmentsController {
     };
   }
 
-  @Post(':id/student-assignment')
+  @Post(':assignmentId/student-assignment')
   async createStudentAssignment(
     @Body() body: StudentAssigmentDto,
-    @Param('id') id: string,
+    @Param('assignmentId') id: string,
     @CurrentUser('id') studentId: string,
   ) {
     const assignment = await this.assignmentsService.getAssignment(+id);
@@ -198,9 +198,9 @@ export class AssignmentsController {
     };
   }
 
-  @Post(':id/mark-score')
+  @Post(':assignmentId/mark-score')
   async markScoreForAssignment(
-    @Param('id') id: number,
+    @Param('assignmentId') id: number,
     @Body() body: MarkScoreStudentDto,
   ) {
     const { scores } = body;
@@ -274,7 +274,7 @@ export class AssignmentsController {
     };
   }
 
-  @Get(':id/requested-grade-view')
+  @Get(':assignmentId/requested-grade-view')
   async getRequestedGradeView(@Param('id') id: number) {
     const requestedReviews =
       await this.assignmentsService.getRequestedGradeView(+id);
@@ -299,9 +299,9 @@ export class AssignmentsController {
     };
   }
 
-  @Post(':id/requested-grade-view')
+  @Post(':assignmentId/requested-grade-view')
   async requestedGradeView(
-    @Param('id') id: number,
+    @Param('assignmentId') id: number,
     @Body() body: RequestedGradeViewDto,
     @CurrentUser() student: any,
   ) {
@@ -429,12 +429,14 @@ export class AssignmentsController {
     };
   }
 
-  @Post(':id/requested-grade-view/:studentRequestedReviewId/conversation')
+  @Post(
+    ':assignmentId/requested-grade-view/:studentRequestedReviewId/conversation',
+  )
   async createConversation(
     @Param('studentRequestedReviewId') studentRequestedReviewId: number,
     @Body() body: CreateConversationDto,
     @CurrentUser('id') userId: string,
-    @Param('id') id: number,
+    @Param('assignmentId') id: number,
   ) {
     const { message } = body;
     const assignment = await this.assignmentsService.getAssignment(+id);
