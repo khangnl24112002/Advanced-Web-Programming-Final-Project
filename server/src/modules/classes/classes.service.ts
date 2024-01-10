@@ -240,6 +240,14 @@ export class ClassesService {
     });
   }
 
+  async findClassByCodeId(uniqueCode: string) {
+    return this.prismaService.classes.findUnique({
+      where: {
+        uniqueCode,
+      },
+    });
+  }
+
   async findStudentOrTeacherInClass(
     classId: number,
     userId: string,

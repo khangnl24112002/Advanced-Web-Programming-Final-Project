@@ -559,4 +559,36 @@ export class ClassesController {
       message: 'Lấy danh sách bảng điểm thành công',
     };
   }
+
+  @Get('invite-by-class-code/:classCode')
+  async inviteStudentByClassCode(
+    @Param('classCode') classCode: string,
+    @Param('id') id: number,
+    @CurrentUser('id') userId: string,
+  ) {
+    const exClass = await this.classesService.findClassByCodeId(classCode);
+    if (!exClass) {
+      throw new BadRequestException({
+        status: false,
+        message: 'Mã lớp không tồn tại',
+      });
+    }
+    const exUser = await this.classesService.findStudentOrTeacherInClass(
+      +id,
+      userId,
+      ROLES.STUDENT,
+    );
+    if (exUser) {
+      throw new BadRequestException({
+        status: false,
+        message: 'Bạn đã tham gia lớp học này',
+      });
+    }
+    await this.classesService.inviteStudentToClass(+id, userId);
+    return {
+      status: true,
+      message: 'Tham gia lớp thành công',
+      data: null,
+    };
+  }
 }
