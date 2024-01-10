@@ -302,11 +302,23 @@ export class AssignmentsController {
   async requestedGradeView(
     @Param('id') id: number,
     @Body() body: RequestedGradeViewDto,
+    @CurrentUser() student: any,
   ) {
-    const { studentId, expectedScore, studentAssignmentId, comment } = body;
+    const assignment = await this.assignmentsService.getAssignment(+id);
+    if (!assignment) {
+      throw new HttpException(
+        {
+          status: false,
+          message: 'Không tìm thấy bài tập',
+        },
+        404,
+      );
+    }
+    const { teacherId } = assignment;
+    const { expectedScore, studentAssignmentId, comment } = body;
     const inputData: Prisma.studentRequestedReviewsUncheckedCreateInput = {
       assignmentId: +id,
-      studentId,
+      studentId: student.id,
       expectedScore,
       comment,
       status: REQUESTED_REVIEW_STATUS.OPENED,
@@ -320,6 +332,26 @@ export class AssignmentsController {
         status: ASSIGNMENT_STATUS.REQUESTED_REVIEW,
       },
     );
+    // CREATE NOTIFICATION FOR TEACHER
+    const notiLength =
+      await this.notificationService.readNotiLengthFromDB(teacherId);
+    const payload = {
+      content: `Sinh viên ${
+        student?.firstName + '' + student.lastName
+      } vừa tạo một phúc khảo cho bài tập ${assignment.name}`,
+      createdAt: new Date().toISOString(),
+      isRead: false,
+      title: 'Bạn vừa nhận được thông báo trong đoạn hội thoại',
+      type: 'review',
+    };
+    await this.notificationService.saveNewNotiToUser({
+      userId: teacherId,
+      currentNotiLength: notiLength || 0,
+      newData: {
+        ...payload,
+        id: notiLength ? notiLength + 1 : 0,
+      },
+    });
     return {
       status: true,
       data: requestedGradeView,
