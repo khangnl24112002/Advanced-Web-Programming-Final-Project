@@ -323,6 +323,7 @@ export class AssignmentsController {
       expectedScore,
       comment,
       status: REQUESTED_REVIEW_STATUS.OPENED,
+      studentAssignmentId,
     };
     const requestedGradeView =
       await this.assignmentsService.createRequestedGradeView(inputData);
