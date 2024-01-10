@@ -337,7 +337,7 @@ export class AssignmentsController {
       await this.notificationService.readNotiLengthFromDB(teacherId);
     const payload = {
       content: `Sinh viên ${
-        student?.firstName + '' + student.lastName
+        student?.lastName + ' ' + student?.firstName
       } vừa tạo một phúc khảo cho bài tập ${assignment.name}`,
       createdAt: new Date().toISOString(),
       isRead: false,
@@ -453,7 +453,7 @@ export class AssignmentsController {
       const id = notiLength ? notiLength + 1 : 0;
       const payload = {
         content: `Giáo viên ${
-          teacher?.firstName + '' + teacher?.lastName
+          teacher?.lastName + ' ' + teacher?.firstName
         } vừa phản hồi trong cuộc hội thoại phúc khảo bài tập ${
           assignment.name
         }`,
