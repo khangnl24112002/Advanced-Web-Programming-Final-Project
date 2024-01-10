@@ -275,7 +275,7 @@ export class AssignmentsController {
   }
 
   @Get(':assignmentId/requested-grade-view')
-  async getRequestedGradeView(@Param('id') id: number) {
+  async getRequestedGradeView(@Param('assignmentId') id: number) {
     const requestedReviews =
       await this.assignmentsService.getRequestedGradeView(+id);
     const refactoredData = map(requestedReviews, (studentAssignment) => {
