@@ -469,7 +469,7 @@ export class AssignmentsController {
       const id = notiLength ? notiLength + 1 : 0;
       const payload = {
         content: `Sinh viên ${
-          students?.firstName + '' + students?.lastName
+          students?.lastName + ' ' + students?.firstName
         } vừa phản hồi trong cuộc hội thoại phúc khảo bài tập ${
           assignment.name
         }`,
