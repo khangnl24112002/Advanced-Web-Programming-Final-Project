@@ -4,10 +4,11 @@ import UserCard from "../../components/UserCard/UserCard";
 
 import { userServices } from "../../services/UserServices";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
-
+import styles from "./Home.module.sass";
 import { useAuth } from "../../hooks/useAuth";
 import Button from "../../components/Button/Button";
 import cn from "classnames";
+import TextInput from "../../components/TextInput";
 
 let statusArr = ["Online", "Offline"];
 
@@ -55,18 +56,17 @@ const Home = () => {
 
   const handleUpload = async () => {
     if (file) {
-      console.log("Uploading file...");
+      console.log("Uploading file student:", file);
+      // const formData = new FormData();
+      // formData.append("file", file);
 
-      const formData = new FormData();
-      formData.append("file", file);
-
-      try {
-        // You can write the URL of your server or any other endpoint used for file upload
-        const response = await userServices.updateStudentIdByFile(formData);
-        console.log(response);
-      } catch (error) {
-        console.error(error);
-      }
+      // try {
+      //   // You can write the URL of your server or any other endpoint used for file upload
+      //   const response = await userServices.updateStudentIdByFile(formData);
+      //   console.log(response);
+      // } catch (error) {
+      //   console.error(error);
+      // }
     }
   };
   return (
@@ -74,18 +74,22 @@ const Home = () => {
       {isLoading && <LoadingSpinner />}
       {users && (
         <>
-          <div>
-            <label htmlFor="file" className="sr-only">
-              Upload Mã số sinh viên
+          <div style={{ padding: "24px 30px" }}>
+            <label htmlFor="file" className={styles.import_label}>
+              Upload mã số sinh viên
             </label>
-            <input id="file" type="file" onChange={handleFileChange} />
+            <TextInput id="file" type="file" onChange={handleFileChange} />
             {file && (
-              <button className={cn("button-stroke")} onClick={handleUpload}>
+              <button
+                style={{ marginTop: "20px" }}
+                className={cn("button-stroke")}
+                onClick={handleUpload}
+              >
                 <span>Upload</span>
               </button>
             )}
           </div>
-
+          <div className={styles.listUserTitle}>DANH SÁCH USER</div>
           <div className="userContainer">
             {users.map((user) => (
               <UserCard

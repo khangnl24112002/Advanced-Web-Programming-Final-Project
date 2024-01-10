@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styles from "./Header.module.sass";
-
+import Notification from "./Notification";
 import User from "./User";
 
 const Header = ({ onOpen }) => {
@@ -16,6 +16,7 @@ const Header = ({ onOpen }) => {
       <button className={styles.burger} onClick={() => handleClick()}></button>
 
       <div className={styles.control} onClick={() => setVisible(false)}>
+        <Notification className={styles.notification} />
         <User className={styles.user} />
       </div>
     </header>

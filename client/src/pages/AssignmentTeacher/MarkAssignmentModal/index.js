@@ -7,7 +7,16 @@ import Icon from "../../../components/Icon";
 import Card from "../../../components/Card";
 import LargeInput from "../../../components/LargeInput";
 import TextInput from "../../../components/TextInput";
-const MarkAssignmentModal = ({ visible, onClose, assignmentDetail }) => {
+import { useForm, Controller } from "react-hook-form";
+import { errorToast, successToast } from "../../../utils/toast";
+import { assignmentServices } from "../../../services/AssignmentServices";
+
+const MarkAssignmentModal = ({
+  visible,
+  onClose,
+  assignmentDetail,
+  reviews,
+}) => {
   const escFunction = useCallback(
     (e) => {
       if (e.keyCode === 27) {
@@ -33,6 +42,37 @@ const MarkAssignmentModal = ({ visible, onClose, assignmentDetail }) => {
     }
   }, [visible]);
 
+  const { control, setValue, handleSubmit, reset } = useForm();
+  const { control: reviewControl, handleSubmit: handleSubmitReview } =
+    useForm();
+  const onSubmit = async (data) => {
+    const score = parseFloat(data.score);
+    if (score < 0 || score > 10) {
+      return errorToast("Số điểm không hợp lệ!");
+    } else {
+      const requestObject = {
+        scores: [
+          {
+            studentId: assignmentDetail.students.id,
+            score: score,
+          },
+        ],
+      };
+      const response = await assignmentServices.markScoreForStudent(
+        assignmentDetail.id,
+        requestObject
+      );
+      if (response.status) {
+        onClose();
+        return successToast("Chấm điểm thành công");
+      } else {
+        return errorToast("Chấm điểm thất bại!");
+      }
+    }
+  };
+  const onSubmitReview = (data) => {
+    console.log(data);
+  };
   return createPortal(
     visible && (
       <div id="modal-product" className={styles.modal}>
@@ -45,7 +85,7 @@ const MarkAssignmentModal = ({ visible, onClose, assignmentDetail }) => {
         <div className={styles.outer}>
           <Card className={cn(styles.card)}>
             <div style={{ display: "flex", gap: "40px" }}>
-              <div style={{ flex: 4 }} className={cn(styles.head)}>
+              <div style={{ flex: 2 }} className={cn(styles.head)}>
                 <div
                   style={{
                     display: "flex",
@@ -59,16 +99,16 @@ const MarkAssignmentModal = ({ visible, onClose, assignmentDetail }) => {
                   <div>Nội dung đã làm</div>
                   <LargeInput
                     className={styles.field}
-                    value="Em dell bk làm đâu"
+                    value={assignmentDetail.metadata}
                     disabled
                   />
                   <div>File đính kèm</div>
                   <a
-                    href="https://example.com"
+                    href={assignmentDetail.description}
                     target="_blank"
                     rel="noreferrer"
                   >
-                    https://asdasfdsadfs.com
+                    {assignmentDetail.description}
                   </a>
                 </div>
               </div>
@@ -83,18 +123,77 @@ const MarkAssignmentModal = ({ visible, onClose, assignmentDetail }) => {
                   <div className={cn("title-green", styles.title)}>
                     Chấm điểm
                   </div>
-                  <TextInput
-                    className={styles.field}
-                    label="Số điểm muốn chấm"
-                    type="number"
-                  />
-                  <button
-                    className={cn("button", styles.button)}
-                    style={{}}
-                    type="butotn"
-                  >
-                    Chấm điểm
-                  </button>
+                  <form onSubmit={handleSubmit(onSubmit)}>
+                    <Controller
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput
+                          className={styles.field}
+                          label="Số điểm muốn chấm"
+                          type="number"
+                          required
+                          onChange={onChange}
+                          onBlur={onBlur}
+                          value={value}
+                        />
+                      )}
+                      name="score"
+                      control={control}
+                    />
+                    <button
+                      className={cn("button", styles.button)}
+                      style={{}}
+                      type="submit"
+                    >
+                      Chấm điểm
+                    </button>
+                  </form>
+                </div>
+              </div>
+              <div style={{ flex: 1 }} className={cn(styles.head)}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "20px",
+                  }}
+                >
+                  <div className={cn("title-green", styles.title)}>
+                    Phúc khảo
+                  </div>
+                  <div className={styles.messagebox}>
+                    <div className={styles.another_message}>
+                      <div className={styles.name}>khagnnl2412@gmail.com</div>
+                      <div className={styles.content}>Phúc khảo giúp em</div>
+                    </div>
+                    <div className={styles.your_message}>
+                      <div className={styles.name}>Bạn</div>
+                      <div className={styles.content}>Phúc cc</div>
+                    </div>
+                  </div>
+                  <form onSubmit={handleSubmitReview(onSubmitReview)}>
+                    <Controller
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput
+                          className={styles.field}
+                          label="Nội dung phản hồi"
+                          type="text"
+                          required
+                          onChange={onChange}
+                          onBlur={onBlur}
+                          value={value}
+                        />
+                      )}
+                      name="reviewContent"
+                      control={reviewControl}
+                    />
+                    <button
+                      className={cn("button", styles.button)}
+                      style={{}}
+                      type="submit"
+                    >
+                      Gửi
+                    </button>
+                  </form>
                 </div>
               </div>
             </div>

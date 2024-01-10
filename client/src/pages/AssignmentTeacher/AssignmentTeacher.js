@@ -8,12 +8,20 @@ import UpdateAssignmentModal from "./UpdateAssignmentModal";
 import StudentSubmissionList from "./StudentSubmissionList";
 import * as dayjs from "dayjs";
 import { assignmentServices } from "../../services/AssignmentServices";
-import { errorToast } from "../../utils/toast";
+import { errorToast, successToast } from "../../utils/toast";
+import { useNavigate } from "react-router-dom";
+import Modal from "./ConfirmDeleteModal";
+
 const AssignmentTeacher = () => {
   const { assignmentId, classId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [assignmentData, setAssignmentData] = useState("");
+  const [assignmentReviews, setAssignmentReviews] = useState([]);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [content, setContent] = useState("");
+  const navigate = useNavigate();
+
   useEffect(() => {
     setIsLoading(true);
     const getAssignmentData = async () => {
@@ -28,11 +36,62 @@ const AssignmentTeacher = () => {
     getAssignmentData();
     setIsLoading(false);
   }, [assignmentId]);
-  const handleUploadAssignment = () => {
+
+  // Lấy toàn bộ danh sách học sinh phúc khảo
+  useEffect(() => {
+    setIsLoading(true);
+    const getAssignmentReviews = async () => {
+      const assignmentReviewsResponse =
+        await assignmentServices.getAssignmentReviews(assignmentId);
+      if (assignmentReviewsResponse.status) {
+        setAssignmentReviews(assignmentReviewsResponse.data);
+      } else {
+        return errorToast("Không thể lấy được dữ liệu. Vui lòng thử lại sau.");
+      }
+    };
+    getAssignmentReviews();
+    setIsLoading(false);
+  }, []);
+
+  const handleDeleteAssignment = async () => {
+    const response = await assignmentServices.deleteAssignment(assignmentId);
+    if (response.status) {
+      return successToast("Xóa bài tập thành công!", 2000);
+    } else {
+      return errorToast("Xóa bài tập thất bại, vui lòng thử lại sau.");
+    }
+  };
+  const handleUpdateAssignment = () => {
     setOpenModal(true);
   };
-  const handleDeleteAssignment = async () => {
-    alert("Đã xóa bài tập");
+  const handleOpenDeleteModal = async () => {
+    setOpenDeleteModal(true);
+    setContent(
+      <>
+        <div className={cn("title-green", styles.modaltitle)}>
+          Xác nhận xóa bài tập đã tạo
+        </div>
+        <div className={styles.info}>Bạn thật sự muốn xóa bài tập này chứ?</div>
+        <div className={styles.foot}>
+          <button
+            onClick={() => {
+              setOpenModal(false);
+            }}
+            className={cn("button-stroke", styles.button)}
+          >
+            <span>Quay lại</span>
+          </button>
+          <button
+            onClick={() => {
+              handleDeleteAssignment();
+            }}
+            className={cn("button", styles.button)}
+          >
+            <span>Xóa bài tập</span>
+          </button>
+        </div>
+      </>
+    );
   };
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
@@ -75,13 +134,13 @@ const AssignmentTeacher = () => {
             >
               <button
                 className={cn("button", styles.button)}
-                onClick={handleUploadAssignment}
+                onClick={handleUpdateAssignment}
               >
                 Cập nhật bài tập
               </button>
               <button
                 className={cn("button", styles.button)}
-                onClick={handleDeleteAssignment}
+                onClick={handleOpenDeleteModal}
               >
                 Xóa bài tập
               </button>
@@ -89,10 +148,18 @@ const AssignmentTeacher = () => {
             <UpdateAssignmentModal
               visible={openModal}
               classId={classId}
+              assignmentInfo={assignmentData}
               onClose={() => {
                 setOpenModal(false);
               }}
             />
+            <Modal
+              outerClassName={styles.outer}
+              visible={openDeleteModal}
+              onClose={() => setOpenModal(false)}
+            >
+              {content}
+            </Modal>
           </Card>
           <Card
             className={styles.card}
@@ -105,6 +172,7 @@ const AssignmentTeacher = () => {
                 <div className={styles.wrapper}>
                   <StudentSubmissionList
                     items={assignmentData.studentAssignments}
+                    reviews={assignmentReviews}
                   />
                 </div>
               </div>
@@ -115,6 +183,15 @@ const AssignmentTeacher = () => {
               </div>
             )}
           </Card>
+          <button
+            style={{ alignSelf: "flex-end" }}
+            className={cn("button", styles.button)}
+            onClick={() => {
+              navigate(`/classes/${classId}`, { replace: true });
+            }}
+          >
+            Quay lại
+          </button>
         </>
       )}
     </div>

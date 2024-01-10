@@ -1,21 +1,13 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
 import cn from "classnames";
 import styles from "./Item.module.sass";
+import Control from "./Control";
 import dayjs from "dayjs";
-const Item = ({ className, item, onClose }) => {
+const Item = ({ className, item, handleReadNotification }) => {
+  const [visible, setVisible] = useState(false);
+
   return (
-    <Link
-      className={cn(styles.item, { [styles.new]: !item.isRead }, className)}
-      to={item.url}
-      onClick={onClose}
-    >
-      {/* <div className={styles.avatar}>
-        <img src={item.avatar} alt="Avatar" />
-        <div className={styles.icon} style={{ backgroundColor: item.color }}>
-          <img src={item.icon} alt="Status" />
-        </div>
-      </div> */}
+    <div className={cn(styles.item, { [styles.new]: !item.isRead }, className)}>
       <div className={styles.details}>
         <div className={styles.line}>
           <div className={styles.subtitle}>{item.title}</div>
@@ -28,8 +20,16 @@ const Item = ({ className, item, onClose }) => {
           className={styles.content}
           dangerouslySetInnerHTML={{ __html: item.content }}
         ></div>
+
+        <Control
+          className={styles.control}
+          value={visible}
+          setValue={setVisible}
+          handleReadNotification={handleReadNotification}
+          isRead={item.isRead}
+        />
       </div>
-    </Link>
+    </div>
   );
 };
 

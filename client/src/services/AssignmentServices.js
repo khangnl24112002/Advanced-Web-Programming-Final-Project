@@ -10,6 +10,16 @@ export const assignmentServices = {
       return error.response.data;
     }
   },
+  getAssignmentReviews: async (assignmentId) => {
+    try {
+      const response = await axiosInstance.get(
+        `/assignments/${assignmentId}/requested-grade-view`
+      );
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  },
   getAssignmentById: async (assignmentId) => {
     try {
       const response = await axiosInstance.get(`/assignments/${assignmentId}`);
@@ -27,6 +37,27 @@ export const assignmentServices = {
       return error.response.data;
     }
   },
+  updateAssignment: async (assignmentData, assignmentId) => {
+    try {
+      const response = await axiosInstance.put(
+        `/assignments/${assignmentId}`,
+        assignmentData
+      );
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  },
+  deleteAssignment: async (assignmentId) => {
+    try {
+      const response = await axiosInstance.delete(
+        `/assignments/${assignmentId}`
+      );
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  },
   uploadFile: async (fileUrl) => {
     try {
       const file = new FormData();
@@ -36,6 +67,17 @@ export const assignmentServices = {
           "content-type": "multipart/form-data",
         },
       });
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  },
+  markScoreForStudent: async (assignmentId, data) => {
+    try {
+      const response = await axiosInstance.post(
+        `/assignments/${assignmentId}/mark-score`,
+        data
+      );
       return response.data;
     } catch (error) {
       return error.response.data;

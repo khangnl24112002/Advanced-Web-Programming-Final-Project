@@ -1,29 +1,36 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import cn from "classnames";
 import OutsideClickHandler from "react-outside-click-handler";
 import styles from "./Notification.module.sass";
 import Icon from "../../Icon";
-import Actions from "../../Actions";
 import Item from "./Item";
-
-// data
-import { notifications } from "../../../mocks/notifications";
-
-const actions = [
-  {
-    title: "Mark as read",
-    icon: "check",
-    action: () => console.log("Mark as read"),
-  },
-  {
-    title: "Delete notifications",
-    icon: "trash",
-    action: () => console.log("Delete notifications"),
-  },
-];
+import { ref, onValue } from "firebase/database";
+import { database } from "../../../configs/firebase";
+import { useAuth } from "../../../hooks/useAuth";
 
 const Notification = ({ className }) => {
+  // Quản lý lấy thông báo
+
+  const { user } = useAuth();
+  const [notifications, setNotifications] = useState([]);
+  const [existNotRead, setExistNotRead] = useState(false);
+
+  useEffect(() => {
+    const starCountRef = ref(database, "notifications/" + user.id);
+    onValue(starCountRef, (snapshot) => {
+      const data = snapshot.val();
+      setNotifications(data);
+      for (let i = 0; i < notifications?.length; i++) {
+        if (notifications[i].isRead === false) {
+          setExistNotRead(true);
+          return;
+        }
+        setExistNotRead(false);
+      }
+    });
+  }, []);
+
   const [visible, setVisible] = useState(false);
 
   return (
@@ -34,37 +41,49 @@ const Notification = ({ className }) => {
         })}
       >
         <button
-          className={cn(styles.head, styles.active)}
+          className={
+            existNotRead ? cn(styles.head, styles.active) : cn(styles.head)
+          }
           onClick={() => setVisible(!visible)}
         >
           <Icon name="notification" size="24" />
         </button>
         <div className={styles.body}>
           <div className={styles.top}>
-            <div className={styles.title}>Notification</div>
-            <Actions
+            <div className={styles.title}>Thông báo</div>
+            {/* <Actions
               className={styles.actions}
               classActionsHead={styles.actionsHead}
               items={actions}
               small
-            />
+            /> */}
           </div>
           <div className={styles.list}>
-            {notifications.map((x, index) => (
-              <Item
-                className={cn(styles.item, className)}
-                item={x}
-                key={index}
-                onClose={() => setVisible(false)}
-              />
-            ))}
+            {notifications ? (
+              notifications.map((x, index) => {
+                if (index < 5) {
+                  return (
+                    <Item
+                      className={cn(styles.item, className)}
+                      item={x}
+                      key={index}
+                      onClose={() => setVisible(false)}
+                    />
+                  );
+                }
+              })
+            ) : (
+              <div style={{ padding: "12px" }} className={styles.text}>
+                Bạn không có thông báo nào
+              </div>
+            )}
           </div>
           <Link
             className={cn("button", styles.button)}
-            to="/notification"
+            to="/notifications"
             onClick={() => setVisible(false)}
           >
-            See all notifications
+            Xem toàn bộ thông báo
           </Link>
         </div>
       </div>

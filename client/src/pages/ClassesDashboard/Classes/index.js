@@ -122,7 +122,7 @@ const Classes = () => {
         </div>
       )}
       {!isLoading && classList.length <= 0 && (
-        <div style={{ textAlign: "center" }}>
+        <div className={styles.text} style={{ textAlign: "center" }}>
           Không tìm thấy lớp học bạn đã tham gia
         </div>
       )}

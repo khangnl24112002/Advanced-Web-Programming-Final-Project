@@ -11,7 +11,7 @@ import LandingPage from "./pages/Landing Page/LandingPage";
 import Home from "./pages/Home/Home";
 import ClassesDashboard from "./pages/ClassesDashboard/ClassesDashboard";
 import ClassInfo from "./pages/ClassInfo/ClassInfo";
-import Stats from "./pages/Stats/Stats";
+import Stats from "./pages/ManageClass/ManageClass";
 import "./styles/app.sass";
 import AuthLayout from "./layouts/Auth/AuthLayout";
 import OAuthRedirect from "./pages/OAuthRedirect/OAuthRedirect";
@@ -22,10 +22,10 @@ import GroupInvite from "./pages/GroupInvite/GroupInvite";
 import EmailInvite from "./pages/EmailInvite/EmailInvite";
 import AssignmentTeacher from "./pages/AssignmentTeacher/AssignmentTeacher";
 import AssignmentStudent from "./pages/AssignmentStudent/AssignmentStudent";
-
+import Notifications from "./pages/Notifications";
+import ManageClass from "./pages/ManageClass/ManageClass";
 function App() {
   const { user } = useAuth();
-  console.log(user);
   return (
     <div className="App">
       <Routes>
@@ -46,8 +46,8 @@ function App() {
             <ProtectedLayout isAllowed={!!user} redirectPath="/auth/sign-in" />
           }
         >
-          <Route path="home" index element={<Home />} />
-
+          <Route path="settings" element={<Settings />} />
+          <Route path="notifications" element={<Notifications />} />
           <Route path="classes" element={<ClassesDashboard />}>
             <Route index element={<Classes />} />
             <Route exact path=":classId" element={<ClassInfo />} />
@@ -70,12 +70,23 @@ function App() {
           element={
             <ProtectedLayout
               isAllowed={!!user && user.role === "teacher"}
-              redirectPath="/home"
+              redirectPath="/classes"
             />
           }
         >
           <Route path="classes/addClass" element={<CreateClass />} />
-          <Route path="stats" element={<Stats />} />
+        </Route>
+        {/**Only admin can access to these routes */}
+        <Route
+          element={
+            <ProtectedLayout
+              isAllowed={!!user && user.role === "admin"}
+              redirectPath="/classes"
+            />
+          }
+        >
+          <Route path="manage/users" index element={<Home />} />
+          <Route path="manage/classes" element={<ManageClass />} />
         </Route>
       </Routes>
     </div>

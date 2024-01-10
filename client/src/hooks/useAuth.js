@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (data, token) => {
     setUser(data);
     setToken(token);
-    const defaultPath = data.role === "admin" ? "/home" : "/classes";
+    const defaultPath = data.role === "admin" ? "/manage/users" : "/classes";
     navigate(defaultPath, { replace: true });
   };
   const logout = () => {

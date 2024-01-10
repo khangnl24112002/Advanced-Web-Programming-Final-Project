@@ -53,9 +53,12 @@ const UserCard = ({
   return (
     <>
       <Card className={styles.userCard}>
-        <Card.Header>
+        {/* <Card.Header>
           <Card.Title
-            style={{ display: "flex", justifyContent: "end" }}
+            style={{
+              display: "flex",
+              justifyContent: "end",
+            }}
             onClick={handleCLickBanUser}
           >
             <svg
@@ -63,24 +66,32 @@ const UserCard = ({
               width="16"
               height="16"
               fill="currentColor"
-              class="bi bi-ban"
+              className="bi bi-ban"
               color="red"
               viewBox="0 0 16 16"
             >
               <path d="M15 8a6.97 6.97 0 0 0-1.71-4.584l-9.874 9.875A7 7 0 0 0 15 8M2.71 12.584l9.874-9.875a7 7 0 0 0-9.874 9.874ZM16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0" />
             </svg>
           </Card.Title>
-        </Card.Header>
+        </Card.Header> */}
 
-        <Card.Body className={styles.cardBody} onClick={handleClick}>
+        <Card.Body className={styles.cardBody}>
           <Card.Img
-            style={{ height: "10rem", objectFit: "cover" }}
+            style={{
+              height: "10rem",
+              objectFit: "cover",
+              marginBottom: "10px",
+            }}
             variant="top"
             src={image}
           />
           <Card.Title>{firstName + " " + lastName}</Card.Title>
-          <Card.Text>{email}</Card.Text>
-          {uniqueId && <Card.Text>Mã sinh viên: {uniqueId}</Card.Text>}
+          <Card.Text>Email: {email}</Card.Text>
+          {uniqueId ? (
+            <Card.Text>Mã sinh viên: {uniqueId}</Card.Text>
+          ) : (
+            <Card.Text>Mã sinh viên: Chưa có thông tin</Card.Text>
+          )}
           <Card.Text>
             Trạng thái hoạt động:{" "}
             <span
@@ -92,6 +103,27 @@ const UserCard = ({
             >
               {status}
             </span>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                gap: "10px",
+                justifyContent: "space-between",
+              }}
+            >
+              <button
+                onClick={handleClick}
+                className={cn("button", styles.button)}
+              >
+                Xem TK
+              </button>
+              <button
+                onClick={handleCLickBanUser}
+                className={cn("button", styles.button)}
+              >
+                Khóa TK
+              </button>
+            </div>
           </Card.Text>
         </Card.Body>
       </Card>
