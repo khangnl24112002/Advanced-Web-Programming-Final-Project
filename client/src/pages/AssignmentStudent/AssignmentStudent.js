@@ -127,12 +127,20 @@ const AssignmentStudent = () => {
                         >
                             <button
                                 className={cn("button", styles.button)}
-                                // onClick={() => setVisibleModalProduct(true)}
                                 onClick={() => {
-                                    const studentData =
+                                    let studentData;
+
+                                    if (
                                         assignmentData.studentAssignments.find(
-                                            (item) => item.studentId === user.id
-                                        );
+                                            (item) => item !== null
+                                        )
+                                    ) {
+                                        studentData =
+                                            assignmentData.studentAssignments.find(
+                                                (item) =>
+                                                    item.studentId === user.id
+                                            );
+                                    }
                                     setStudentAssignment(studentData);
                                     if (!studentData) {
                                         setAlreadySubmit(false);

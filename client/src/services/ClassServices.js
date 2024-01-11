@@ -40,7 +40,7 @@ export const classServices = {
     // API lấy danh sách các lớp học cho admin
     getAllClasses: async (token) => {
         try {
-            const response = await axiosInstance.get("/classes", {
+            const response = await axiosInstance.get("/classes/admin", {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: "Bearer " + token,
@@ -168,7 +168,7 @@ export const classServices = {
     downloadScoreFromAssignment: async (assignmentId) => {
         try {
             const response = await axiosInstance.get(
-                `/assignment/${assignmentId}/download-score`
+                `/assignments/${assignmentId}/download-score`
             );
             return response.data;
         } catch (error) {
