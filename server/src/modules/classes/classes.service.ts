@@ -11,6 +11,35 @@ export class ClassesService {
     // eslint-disable-next-line prettier/prettier
     private readonly prismaService: PrismaService,
   ) {}
+
+  async getAllClasses() {
+    const exClasses = await this.prismaService.classes.findMany({
+      include: {
+        classTeachers: {
+          select: {
+            teachers: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                avatar: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return map(exClasses, (exClass) => {
+      const teachers = map(exClass.classTeachers, 'teachers');
+      return {
+        ...exClass,
+        teachers,
+        classTeachers: undefined,
+      };
+    });
+  }
+
   async create(createClassDto) {
     return this.prismaService.classes.create({
       data: createClassDto,

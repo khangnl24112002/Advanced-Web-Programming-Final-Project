@@ -12,7 +12,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { ClassesService } from './classes.service';
-import { CreateClassDto } from './dto/create-class.dto';
+import { CreateClassDto, UpdateClassDto } from './dto/create-class.dto';
 import { CurrentUser } from 'src/decorators/users.decorator';
 import {
   ApiBearerAuth,
@@ -101,7 +101,7 @@ export class ClassesController {
   @ApiOkResponse({ type: CreateClassResponse })
   async update(
     @Param('id') id: number,
-    @Body() createClassDto: CreateClassDto,
+    @Body() createClassDto: UpdateClassDto,
   ) {
     const exClass = await this.classesService.findClassById(+id);
     if (!exClass) {
@@ -156,6 +156,24 @@ export class ClassesController {
     try {
       const classes =
         await this.classesService.getAllClassesOfTeacher(teacherId);
+      return {
+        status: true,
+        data: classes,
+        message: 'Lấy danh sách lớp học thành công',
+      };
+    } catch (error) {
+      throw new InternalServerErrorException({
+        status: false,
+        message: 'Lỗi hệ thống',
+      });
+    }
+  }
+
+  @Get('admin')
+  @ApiOkResponse({ type: GetTeacherClassResponse })
+  async getAllClasses() {
+    try {
+      const classes = await this.classesService.getAllClasses();
       return {
         status: true,
         data: classes,
