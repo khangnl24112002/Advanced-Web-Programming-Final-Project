@@ -43,7 +43,15 @@ import { customAlphabet } from 'nanoid';
 import { CreateGradeDto, UpdateGradeDto } from '../assignments/dto/body.dto';
 import * as xlsx from 'xlsx';
 import { CloudinaryService } from '../files/cloudinary.service';
-import { includes, isEmpty, map, toNumber } from 'lodash';
+import {
+  filter,
+  flatMap,
+  includes,
+  isEmpty,
+  map,
+  toNumber,
+  uniqBy,
+} from 'lodash';
 import { NotificationService } from '../notification/notification.service';
 
 @Controller('classes')
@@ -569,6 +577,7 @@ export class ClassesController {
           fullName: students.firstName + ' ' + students.lastName,
           studentId: students?.uniqueId,
           Grade: !isStudent || isViewedByStudent ? student.score : null,
+          userId: students.id,
         };
       });
       return {
@@ -577,9 +586,39 @@ export class ClassesController {
         scores: refactoredStudentsData,
       };
     });
+    const refactorData = flatMap(
+      map(scores, (score) => {
+        const { scores } = score;
+        const refactoredScores = map(scores, (studentScore) => {
+          return {
+            fullName: studentScore.fullName,
+            studentId: studentScore.studentId,
+            grade: studentScore.Grade,
+            gradeId: score.id,
+            gradeName: score.name,
+            userId: studentScore.userId,
+          };
+        });
+        return refactoredScores;
+      }),
+    );
+    const students = uniqBy(refactorData, 'userId');
+    const refactorStudentsScore = map(students, (student) => {
+      const studentScores = filter(refactorData, { userId: student.userId });
+      return {
+        fullName: student.fullName,
+        studentId: student.studentId,
+        userId: student.userId,
+        scores: map(studentScores, (score) => ({
+          grade: score.grade,
+          gradeId: score.gradeId,
+          gradeName: score.gradeName,
+        })),
+      };
+    });
     return {
       status: true,
-      data: scores,
+      data: refactorStudentsScore,
       message: 'Lấy danh sách bảng điểm thành công',
     };
   }
