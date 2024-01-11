@@ -175,4 +175,14 @@ export const classServices = {
             return error.response.data;
         }
     },
+    toggleActiveClass: async (classId, status) => {
+        try {
+            const response = await axiosInstance.put(`/classes/${classId}`, {
+                isDisabled: status,
+            });
+            return response.data;
+        } catch (error) {
+            return error.response.data;
+        }
+    },
 };

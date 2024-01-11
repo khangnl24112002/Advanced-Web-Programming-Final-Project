@@ -111,6 +111,9 @@ const CustomerList = () => {
                             id: grade.id,
                             name: grade.name,
                             percentage: grade.percentage,
+                            assignments: grade.assignments
+                                ? grade.assignments
+                                : [],
                         });
                     });
                     setGradeComposition(gradeCompositionData);

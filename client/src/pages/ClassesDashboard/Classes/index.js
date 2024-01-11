@@ -70,12 +70,18 @@ const Classes = () => {
             if (user.role === "teacher") {
                 const response = await classServices.getTeacherClass(token);
                 if (response.status) {
-                    setClassList(response.data);
+                    const classRendered = response.data.filter(
+                        (item) => item.isDisabled !== true
+                    );
+                    setClassList(classRendered);
                 }
             } else if (user.role === "student") {
                 const response = await classServices.getStudentClass(token);
                 if (response.status) {
-                    setClassList(response.data);
+                    const classRendered = response.data.filter(
+                        (item) => item.isDisabled !== true
+                    );
+                    setClassList(classRendered);
                 }
             }
             setIsLoading(false);

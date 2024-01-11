@@ -28,6 +28,7 @@ const MarkAssignmentModal = ({
         },
         [onClose]
     );
+
     const { control, setValue, handleSubmit, reset } = useForm();
     const {
         control: controlAssignmentInfo,
@@ -35,12 +36,14 @@ const MarkAssignmentModal = ({
     } = useForm();
     const onSubmit = async (data) => {
         const score = parseFloat(data.score);
+
         if (score < 0 || score > 10) {
             return errorToast("Số điểm không hợp lệ!");
         } else {
             const requestObject = {
-                studentAssignmentId: data.id,
-                expectedScore: data.score,
+                studentAssignmentId: parseInt(assignmentDetail.id),
+                expectedScore: parseInt(data.score),
+                comment: "Phúc khảo điểm",
             };
             console.log(requestObject);
             const response = await assignmentServices.postAssignmentReview(
@@ -81,7 +84,6 @@ const MarkAssignmentModal = ({
         if (studentDescription !== "") {
             requestObject.description = studentDescription;
         }
-        console.log(assignmentDetail);
         // Call API to update assignment info
         const response = await assignmentServices.studentSubmitAssignment(
             assignmentId,

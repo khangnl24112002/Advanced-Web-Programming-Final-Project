@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import styles from "./Row.module.sass";
 import cn from "classnames";
+import { classServices } from "../../../../../services/ClassServices.js";
+import { successToast, errorToast } from "../../../../../utils/toast.js";
 // import Checkbox from "../../../../../components/Checkbox";
 import Balance from "../../../../../components/Balance/index.js";
 import ModalProduct from "../../../../../components/ModalProduct/index.js";
@@ -10,13 +12,17 @@ import { numberWithCommas } from "../../../../../utils.js";
 
 const Row = ({ item, value, onChange, up }) => {
     const [visibleModalProduct, setVisibleModalProduct] = useState(false);
-
+    const handleToggleActive = async (classId, status) => {
+        const response = await classServices.toggleActiveClass(classId, status);
+        if (response.status) {
+            successToast("Đổi trạng thái thành công", 2000);
+        } else {
+            return errorToast("Đổi trạng thái thất bại");
+        }
+    };
     return (
         <>
-            <div
-                className={styles.row}
-                onClick={() => setVisibleModalProduct(true)}
-            >
+            <div className={styles.row}>
                 <div className={styles.col}></div>
                 <div className={styles.col}>{item.name}</div>
                 <div className={styles.col}>{item.uniqueCode}</div>
@@ -31,6 +37,14 @@ const Row = ({ item, value, onChange, up }) => {
                             Không hoạt động
                         </div>
                     )}
+                </div>
+                <div
+                    className={styles.col}
+                    onClick={() => {
+                        handleToggleActive(item.id, !item.isDisabled);
+                    }}
+                >
+                    Toggle
                 </div>
             </div>
             <ModalProduct

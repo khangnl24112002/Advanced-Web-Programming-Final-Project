@@ -94,7 +94,12 @@ export const assignmentServices = {
         try {
             const response = await axiosInstance.post(
                 `/assignments/${assignmentId}/mark-score-excel`,
-                body
+                body,
+                {
+                    headers: {
+                        "content-type": "multipart/form-data",
+                    },
+                }
             );
             return response.data;
         } catch (error) {
@@ -152,6 +157,17 @@ export const assignmentServices = {
             const response = await axiosInstance.post(
                 `/assignments/${assignmentId}/student-assignment`,
                 data
+            );
+            return response.data;
+        } catch (error) {
+            return error.response.data;
+        }
+    },
+    confirmAssignmentGrade: async (classId, gradeId) => {
+        try {
+            const response = await axiosInstance.put(
+                `/classes/${classId}/grades/${gradeId}`,
+                { status: "COMPLETE" }
             );
             return response.data;
         } catch (error) {

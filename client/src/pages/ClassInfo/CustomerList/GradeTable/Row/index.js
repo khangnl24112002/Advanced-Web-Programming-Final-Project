@@ -62,11 +62,6 @@ const Row = ({
                         </div>
                     </div>
                 </div>
-                <div className={styles.col}>
-                    <div className={styles.email}>
-                        {item.studentId ? item.studentId : ""}
-                    </div>
-                </div>
 
                 {studentGradeArray &&
                     studentGradeArray.map((grade, index) => (
