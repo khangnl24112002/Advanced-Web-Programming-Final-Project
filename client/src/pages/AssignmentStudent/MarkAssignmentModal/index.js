@@ -11,15 +11,20 @@ import TextInput from "../../../components/TextInput";
 import { useForm, Controller } from "react-hook-form";
 import { errorToast, successToast } from "../../../utils/toast";
 import { assignmentServices } from "../../../services/AssignmentServices";
+import { useAuth } from "../../../hooks/useAuth";
 
 const MarkAssignmentModal = ({
     visible,
     onClose,
     assignmentDetail,
-    reviews,
+    review,
     alreadySubmit,
 }) => {
+    useEffect(() => {
+        console.log(review);
+    }, []);
     const { assignmentId } = useParams();
+    const { user } = useAuth();
     const escFunction = useCallback(
         (e) => {
             if (e.keyCode === 27) {
@@ -28,12 +33,57 @@ const MarkAssignmentModal = ({
         },
         [onClose]
     );
-
+    const [messageData, setMessageData] = useState([]);
+    const onSubmitMessage = async (data) => {
+        try {
+            console.log("review : ", review);
+            const response = await assignmentServices.sendMessage(
+                assignmentId,
+                review.studentRequestedReviewId,
+                data.reviewContent
+            );
+            if (response.status) {
+                window.location.reload();
+                return successToast("Đã gửi tin nhắn", 2000);
+            } else {
+                return errorToast("Không gửi được. Vui lòng thử lại sau.");
+            }
+        } catch (error) {
+            return errorToast("Không gửi được. Vui lòng thử lại sau");
+        }
+    };
     const { control, setValue, handleSubmit, reset } = useForm();
     const {
         control: controlAssignmentInfo,
         handleSubmit: handleSubmitAssignmentInfo,
     } = useForm();
+
+    // Lấy nội dung tin nhắn
+    useEffect(() => {
+        const getMessageList = async () => {
+            if (!review) {
+                return;
+            }
+            const studentRequestedReviewId = review.studentRequestedReviewId;
+            try {
+                const response = await assignmentServices.getMessageList(
+                    studentRequestedReviewId
+                );
+                if (response.status) {
+                    setMessageData(response.data);
+                } else {
+                    return errorToast(
+                        "Không lấy được tin nhắn. Vui lòng thử lại sau."
+                    );
+                }
+            } catch (error) {
+                return errorToast(
+                    "Không lấy được tin nhắn. Vui lòng thử lại sau."
+                );
+            }
+        };
+        getMessageList();
+    }, []);
     const onSubmit = async (data) => {
         const score = parseFloat(data.score);
 
@@ -115,9 +165,6 @@ const MarkAssignmentModal = ({
     const { control: reviewControl, handleSubmit: handleSubmitReview } =
         useForm();
 
-    const onSubmitReview = (data) => {
-        console.log(data);
-    };
     return createPortal(
         visible && (
             <div id="modal-product" className={styles.modal}>
@@ -237,6 +284,150 @@ const MarkAssignmentModal = ({
                             )}
                             {alreadySubmit && (
                                 <>
+                                    {review && (
+                                        <>
+                                            <div
+                                                style={{ flex: 2 }}
+                                                className={cn(styles.head)}
+                                            >
+                                                <div
+                                                    style={{
+                                                        display: "flex",
+                                                        flexDirection: "column",
+                                                        gap: "20px",
+                                                    }}
+                                                >
+                                                    <div
+                                                        className={cn(
+                                                            "title-green",
+                                                            styles.title
+                                                        )}
+                                                    >
+                                                        Phúc khảo
+                                                    </div>
+                                                    <div
+                                                        className={
+                                                            styles.messagebox
+                                                        }
+                                                    >
+                                                        {messageData.length &&
+                                                            messageData.map(
+                                                                (
+                                                                    message,
+                                                                    index
+                                                                ) => {
+                                                                    if (
+                                                                        message.userId !==
+                                                                        user?.id
+                                                                    ) {
+                                                                        return (
+                                                                            <div
+                                                                                className={
+                                                                                    styles.another_message
+                                                                                }
+                                                                            >
+                                                                                <div
+                                                                                    className={
+                                                                                        styles.name
+                                                                                    }
+                                                                                >
+                                                                                    {
+                                                                                        message.user
+                                                                                    }
+                                                                                </div>
+                                                                                <div
+                                                                                    className={
+                                                                                        styles.content
+                                                                                    }
+                                                                                >
+                                                                                    {
+                                                                                        message.message
+                                                                                    }
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    } else {
+                                                                        return (
+                                                                            <div
+                                                                                className={
+                                                                                    styles.your_message
+                                                                                }
+                                                                            >
+                                                                                <div
+                                                                                    className={
+                                                                                        styles.name
+                                                                                    }
+                                                                                >
+                                                                                    {
+                                                                                        message.user
+                                                                                    }
+                                                                                </div>
+                                                                                <div
+                                                                                    className={
+                                                                                        styles.content
+                                                                                    }
+                                                                                >
+                                                                                    {
+                                                                                        message.message
+                                                                                    }
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    }
+                                                                }
+                                                            )}
+                                                    </div>
+                                                    <form
+                                                        onSubmit={handleSubmitReview(
+                                                            onSubmitMessage
+                                                        )}
+                                                    >
+                                                        <Controller
+                                                            render={({
+                                                                field: {
+                                                                    onChange,
+                                                                    onBlur,
+                                                                    value,
+                                                                },
+                                                            }) => (
+                                                                <TextInput
+                                                                    className={
+                                                                        styles.field
+                                                                    }
+                                                                    label="Nội dung phản hồi"
+                                                                    type="text"
+                                                                    required
+                                                                    onChange={
+                                                                        onChange
+                                                                    }
+                                                                    onBlur={
+                                                                        onBlur
+                                                                    }
+                                                                    value={
+                                                                        value
+                                                                    }
+                                                                />
+                                                            )}
+                                                            name="reviewContent"
+                                                            control={
+                                                                reviewControl
+                                                            }
+                                                        />
+                                                        <button
+                                                            className={cn(
+                                                                "button",
+                                                                styles.button
+                                                            )}
+                                                            style={{}}
+                                                            type="submit"
+                                                        >
+                                                            Gửi
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
                                     <div
                                         style={{ flex: 1 }}
                                         className={cn(styles.head)}
@@ -261,137 +452,55 @@ const MarkAssignmentModal = ({
                                                     onSubmit
                                                 )}
                                             >
-                                                <Controller
-                                                    render={({
-                                                        field: {
-                                                            onChange,
-                                                            onBlur,
-                                                            value,
-                                                        },
-                                                    }) => (
-                                                        <TextInput
-                                                            className={
-                                                                styles.field
-                                                            }
-                                                            label="Số điểm mong đợi"
-                                                            type="number"
-                                                            required
-                                                            onChange={onChange}
-                                                            onBlur={onBlur}
-                                                            value={value}
+                                                {!review && (
+                                                    <>
+                                                        <Controller
+                                                            render={({
+                                                                field: {
+                                                                    onChange,
+                                                                    onBlur,
+                                                                    value,
+                                                                },
+                                                            }) => (
+                                                                <TextInput
+                                                                    className={
+                                                                        styles.field
+                                                                    }
+                                                                    label="Số điểm mong đợi"
+                                                                    type="number"
+                                                                    required
+                                                                    onChange={
+                                                                        onChange
+                                                                    }
+                                                                    onBlur={
+                                                                        onBlur
+                                                                    }
+                                                                    value={
+                                                                        value
+                                                                    }
+                                                                />
+                                                            )}
+                                                            name="score"
+                                                            control={control}
                                                         />
-                                                    )}
-                                                    name="score"
-                                                    control={control}
-                                                />
-                                                <button
-                                                    className={cn(
-                                                        "button",
-                                                        styles.button
-                                                    )}
-                                                    style={{}}
-                                                    type="submit"
-                                                >
-                                                    Gửi điểm
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                    <div
-                                        style={{ flex: 1 }}
-                                        className={cn(styles.head)}
-                                    >
-                                        <div
-                                            style={{
-                                                display: "flex",
-                                                flexDirection: "column",
-                                                gap: "20px",
-                                            }}
-                                        >
-                                            <div
-                                                className={cn(
-                                                    "title-green",
-                                                    styles.title
+                                                        <button
+                                                            className={cn(
+                                                                "button",
+                                                                styles.button
+                                                            )}
+                                                            style={{}}
+                                                            type="submit"
+                                                        >
+                                                            Gửi điểm
+                                                        </button>
+                                                    </>
                                                 )}
-                                            >
-                                                Phúc khảo
-                                            </div>
-                                            <div className={styles.messagebox}>
-                                                <div
-                                                    className={
-                                                        styles.your_message
-                                                    }
-                                                >
-                                                    <div
-                                                        className={styles.name}
-                                                    >
-                                                        khagnnl2412@gmail.com
+                                                {review && (
+                                                    <div>
+                                                        Bạn đã gửi phúc khảo
+                                                        điểm
                                                     </div>
-                                                    <div
-                                                        className={
-                                                            styles.content
-                                                        }
-                                                    >
-                                                        Phúc khảo giúp em
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    className={
-                                                        styles.another_message
-                                                    }
-                                                >
-                                                    <div
-                                                        className={styles.name}
-                                                    >
-                                                        Bạn
-                                                    </div>
-                                                    <div
-                                                        className={
-                                                            styles.content
-                                                        }
-                                                    >
-                                                        Phúc cc
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <form
-                                                onSubmit={handleSubmitReview(
-                                                    onSubmitReview
                                                 )}
-                                            >
-                                                <Controller
-                                                    render={({
-                                                        field: {
-                                                            onChange,
-                                                            onBlur,
-                                                            value,
-                                                        },
-                                                    }) => (
-                                                        <TextInput
-                                                            className={
-                                                                styles.field
-                                                            }
-                                                            label="Nội dung phản hồi"
-                                                            type="text"
-                                                            required
-                                                            onChange={onChange}
-                                                            onBlur={onBlur}
-                                                            value={value}
-                                                        />
-                                                    )}
-                                                    name="reviewContent"
-                                                    control={reviewControl}
-                                                />
-                                                <button
-                                                    className={cn(
-                                                        "button",
-                                                        styles.button
-                                                    )}
-                                                    style={{}}
-                                                    type="submit"
-                                                >
-                                                    Gửi
-                                                </button>
                                             </form>
                                         </div>
                                     </div>

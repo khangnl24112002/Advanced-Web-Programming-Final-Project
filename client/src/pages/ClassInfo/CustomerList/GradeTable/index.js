@@ -309,24 +309,31 @@ const GradeTable = ({
 
                     {students.map((x, index) => {
                         const studentGradeArray = [];
-                        gradeBoard?.forEach((grade) => {
-                            if (grade.assignments) {
-                                const specificGrade =
-                                    grade.assignments.studentAssignments.filter(
-                                        (student) => student.studentId === x.id
+                        const studentGradeInfo = gradeBoard.find(
+                            (grade) => grade.userId === x.id
+                        );
+                        console.log(studentGradeInfo);
+                        if (!studentGradeInfo) {
+                            for (let i = 0; i <= gradeComposition.length; i++) {
+                                studentGradeArray.push("");
+                            }
+                        } else {
+                            for (let i = 0; i < gradeComposition.length; i++) {
+                                const pushedGrade =
+                                    studentGradeInfo.scores.find(
+                                        (grade) =>
+                                            grade.gradeName ===
+                                            gradeComposition[i].name
                                     );
-
-                                if (specificGrade) {
-                                    studentGradeArray.push(
-                                        specificGrade[0].score
-                                    );
+                                console.log(pushedGrade);
+                                if (pushedGrade) {
+                                    studentGradeArray.push(pushedGrade.grade);
                                 } else {
                                     studentGradeArray.push("");
                                 }
-                            } else {
-                                studentGradeArray.push("");
                             }
-                        });
+                        }
+                        console.log(studentGradeArray);
                         return (
                             <Row
                                 gradeComposition={gradeComposition}
