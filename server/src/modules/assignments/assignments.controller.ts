@@ -535,10 +535,16 @@ export class AssignmentsController {
     );
     return {
       status: true,
-      data: map(requestedGradeView, ({ users, ...conversation }) => ({
-        ...conversation,
-        user: users?.firstName + ' ' + users?.lastName,
-      })),
+      data: {
+        ...requestedGradeView,
+        conversations: map(
+          requestedGradeView,
+          ({ users, ...conversation }) => ({
+            ...conversation,
+            user: users?.firstName + ' ' + users?.lastName,
+          }),
+        ),
+      },
       message: 'Tải file Grade thành công',
     };
   }
