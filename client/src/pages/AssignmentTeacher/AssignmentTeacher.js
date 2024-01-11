@@ -23,6 +23,7 @@ const AssignmentTeacher = () => {
   const [content, setContent] = useState("");
   const navigate = useNavigate();
 
+  // Lấy toàn bộ danh sách học sinh phúc khảo
   useEffect(() => {
     setIsLoading(true);
     const getAssignmentData = async () => {
@@ -35,12 +36,6 @@ const AssignmentTeacher = () => {
       }
     };
     getAssignmentData();
-    setIsLoading(false);
-  }, [assignmentId]);
-
-  // Lấy toàn bộ danh sách học sinh phúc khảo
-  useEffect(() => {
-    setIsLoading(true);
     const getAssignmentReviews = async () => {
       const assignmentReviewsResponse =
         await assignmentServices.getAssignmentReviews(assignmentId);
@@ -52,7 +47,7 @@ const AssignmentTeacher = () => {
     };
     getAssignmentReviews();
     setIsLoading(false);
-  }, []);
+  }, [assignmentId]);
 
   const handleDeleteAssignment = async () => {
     const response = await assignmentServices.deleteAssignment(assignmentId);
