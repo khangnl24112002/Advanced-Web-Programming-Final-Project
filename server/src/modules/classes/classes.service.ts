@@ -154,6 +154,7 @@ export class ClassesService {
         },
       },
     });
+    if (!exClass) return null;
     const students = map(exClass.classStudents, 'students');
     const teachers = map(exClass.classTeachers, 'teachers');
     return {

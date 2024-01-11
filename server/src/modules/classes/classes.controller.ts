@@ -123,6 +123,7 @@ export class ClassesController {
     );
     const classResponse = await this.classesService.findClassById(
       classUpdated.id,
+      false,
     );
     return {
       status: true,
