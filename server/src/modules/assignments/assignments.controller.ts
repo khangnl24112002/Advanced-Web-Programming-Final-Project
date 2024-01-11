@@ -32,7 +32,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { AuthService } from '../auth/auth.service';
-import { map } from 'lodash';
+import { map, toString } from 'lodash';
 import { Prisma } from '@prisma/client';
 import { CurrentUser } from 'src/decorators/users.decorator';
 import { JwtAuthGuard } from 'src/guards/jwt.auth.guard';
@@ -256,7 +256,9 @@ export class AssignmentsController {
     const students = await Promise.all(
       excelData.map(async (data: any) => {
         const { StudentId } = data;
-        const student = await this.authService.getUserByUniqueId(StudentId);
+        const student = await this.authService.getUserByUniqueId(
+          toString(StudentId),
+        );
         return {
           studentId: student.id,
           score: data.Grade,
