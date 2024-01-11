@@ -113,11 +113,11 @@ export class ClassesService {
       },
     });
   }
-  async findClassById(id: number) {
+  async findClassById(id: number, notTakeAll: boolean = true) {
     const exClass = await this.prismaService.classes.findUnique({
       where: {
         id: id,
-        isDisabled: false,
+        ...(notTakeAll ? { isDisabled: false } : {}),
       },
       include: {
         classStudents: {

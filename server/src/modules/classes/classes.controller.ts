@@ -103,7 +103,7 @@ export class ClassesController {
     @Param('id') id: number,
     @Body() createClassDto: UpdateClassDto,
   ) {
-    const exClass = await this.classesService.findClassById(+id);
+    const exClass = await this.classesService.findClassById(+id, false);
     if (!exClass) {
       throw new BadRequestException({
         status: false,
