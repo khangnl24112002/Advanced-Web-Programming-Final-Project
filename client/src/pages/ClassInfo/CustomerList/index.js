@@ -27,6 +27,7 @@ const CustomerList = () => {
     const [teachers, setTeachers] = useState([]);
     const [students, setStudents] = useState([]);
     const [gradeComposition, setGradeComposition] = useState([]);
+    const [gradeBoard, setGradeBoard] = useState([]);
     const [urlClass, setUrlClass] = useState("http://example.com");
     const [activeUser, setActiveUser] = useState({});
     const inputRef = useRef(null);
@@ -104,6 +105,23 @@ const CustomerList = () => {
                 }
             };
             getClassGradeComposition();
+
+            // Fetch grade composition
+            const getClassGradeBoard = async () => {
+                const response = await classServices.getGradeBoard(classId);
+                if (response.status) {
+                    let gradeCompositionData = [];
+                    response.data.map((grade, index) => {
+                        gradeCompositionData.push({
+                            name: grade.name,
+                            percentage: grade.percentage,
+                        });
+                    });
+                    setGradeComposition(gradeCompositionData);
+                } else {
+                }
+            };
+            getClassGradeBoard();
             setIsLoading(false);
         };
 

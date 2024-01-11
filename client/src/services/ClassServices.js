@@ -155,6 +155,16 @@ export const classServices = {
             return error.response.data;
         }
     },
+    getGradeBoard: async (classId) => {
+        try {
+            const response = await axiosInstance.get(
+                `/classes/${classId}/grade-board`
+            );
+            return response.data;
+        } catch (error) {
+            return error.response.data;
+        }
+    },
     downloadScoreFromAssignment: async (assignmentId) => {
         try {
             const response = await axiosInstance.get(
