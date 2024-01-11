@@ -10,7 +10,7 @@ import { useForm, useFieldArray, Controller } from "react-hook-form";
 import Dropdown from "../../../../components/Dropdown";
 import { errorToast, successToast } from "../../../../utils/toast";
 import { classServices } from "../../../../services/ClassServices";
-
+import { userServices } from "../../../../services/UserServices";
 const SettingModal = ({
   visible,
   onClose,
@@ -18,7 +18,7 @@ const SettingModal = ({
   item,
   classId,
   urlClass,
-  keyInvite,
+  classCode,
   gradeComposition,
   classInfo,
 }) => {
@@ -81,7 +81,20 @@ const SettingModal = ({
 
   // Handle upload student list
   const onUploadStudent = async (data) => {
-    console.log(data);
+    if (data) {
+      const formData = new FormData();
+      formData.append("file", data.file);
+      try {
+        // You can write the URL of your server or any other endpoint used for file upload
+        const response = await userServices.updateStudentIdByFile(formData);
+        if (response.status) {
+          window.location.reload();
+          return successToast("Upload thành công!");
+        } else return errorToast("Không thể upload. Vui lòng thử lại sau");
+      } catch (error) {
+        return errorToast("Không thể upload. Vui lòng thử lại sau");
+      }
+    }
   };
   // Handle submit score compositions
   const onSubmitScore = async (data) => {
@@ -124,7 +137,6 @@ const SettingModal = ({
       ...classInfo,
       maximumStudents: parseInt(classInfo.maximumStudents),
     };
-    console.log(requestData);
     // Call API to update
     const response = {
       status: true,
@@ -381,14 +393,14 @@ const SettingModal = ({
 
             <div className={styles.description}>
               <div className={styles.info}>
-                Đây là mã mời đến lớp học của bạn: <br /> {keyInvite}
+                Đây là mã mời đến lớp học của bạn: <br /> {classCode}
               </div>
               {/**Key Invite */}
               <div>
                 <button
                   onClick={() => {
                     navigator.clipboard
-                      .writeText(keyInvite)
+                      .writeText(classCode)
                       .then(() => {
                         return successToast("Đã sao chép!", 1000);
                       })

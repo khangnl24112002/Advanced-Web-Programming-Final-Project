@@ -22,6 +22,7 @@ const List = ({ className }) => {
     const starCountRef = ref(database, "notifications/" + user.id);
     onValue(starCountRef, (snapshot) => {
       const data = snapshot.val();
+      data.sort((a, b) => new Date(b?.createdAt) - new Date(a?.createdAt));
       setNotifications(data);
     });
   }, []);
@@ -58,7 +59,7 @@ const List = ({ className }) => {
       <div className={styles.notifications}>
         <div className={styles.list}>
           {notifications &&
-            notifications.map((x, index) => (
+            notifications?.map((x, index) => (
               <Item
                 className={cn(styles.item, className)}
                 item={x}

@@ -38,7 +38,6 @@ const ClassInfoDashboard = ({ classId }) => {
     const getAssignmentList = async () => {
       const response = await assignmentServices.getAssignmentList(classId);
       if (response.status) {
-        console.log(response.data);
         setAssignments(response.data);
       } else {
         return errorToast(

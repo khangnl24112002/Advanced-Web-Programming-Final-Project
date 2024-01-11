@@ -11,12 +11,7 @@ import { useForm, Controller } from "react-hook-form";
 import { errorToast, successToast } from "../../../utils/toast";
 import { assignmentServices } from "../../../services/AssignmentServices";
 
-const MarkAssignmentModal = ({
-  visible,
-  onClose,
-  assignmentDetail,
-  reviews,
-}) => {
+const MarkAssignmentModal = ({ visible, onClose, assignmentDetail }) => {
   const escFunction = useCallback(
     (e) => {
       if (e.keyCode === 27) {
@@ -43,8 +38,7 @@ const MarkAssignmentModal = ({
   }, [visible]);
 
   const { control, setValue, handleSubmit, reset } = useForm();
-  const { control: reviewControl, handleSubmit: handleSubmitReview } =
-    useForm();
+
   const onSubmit = async (data) => {
     const score = parseFloat(data.score);
     if (score < 0 || score > 10) {
@@ -69,9 +63,6 @@ const MarkAssignmentModal = ({
         return errorToast("Chấm điểm thất bại!");
       }
     }
-  };
-  const onSubmitReview = (data) => {
-    console.log(data);
   };
   return createPortal(
     visible && (
@@ -123,33 +114,37 @@ const MarkAssignmentModal = ({
                   <div className={cn("title-green", styles.title)}>
                     Chấm điểm
                   </div>
-                  <form onSubmit={handleSubmit(onSubmit)}>
-                    <Controller
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                          className={styles.field}
-                          label="Số điểm muốn chấm"
-                          type="number"
-                          required
-                          onChange={onChange}
-                          onBlur={onBlur}
-                          value={value}
-                        />
-                      )}
-                      name="score"
-                      control={control}
-                    />
-                    <button
-                      className={cn("button", styles.button)}
-                      style={{}}
-                      type="submit"
-                    >
-                      Chấm điểm
-                    </button>
-                  </form>
+                  {assignmentDetail.score ? (
+                    <div>Đã chấm điểm</div>
+                  ) : (
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                      <Controller
+                        render={({ field: { onChange, onBlur, value } }) => (
+                          <TextInput
+                            className={styles.field}
+                            label="Số điểm muốn chấm"
+                            type="number"
+                            required
+                            onChange={onChange}
+                            onBlur={onBlur}
+                            value={value}
+                          />
+                        )}
+                        name="score"
+                        control={control}
+                      />
+                      <button
+                        className={cn("button", styles.button)}
+                        style={{}}
+                        type="submit"
+                      >
+                        Chấm điểm
+                      </button>
+                    </form>
+                  )}
                 </div>
               </div>
-              <div style={{ flex: 1 }} className={cn(styles.head)}>
+              {/* <div style={{ flex: 1 }} className={cn(styles.head)}>
                 <div
                   style={{
                     display: "flex",
@@ -195,7 +190,7 @@ const MarkAssignmentModal = ({
                     </button>
                   </form>
                 </div>
-              </div>
+              </div> */}
             </div>
           </Card>
         </div>

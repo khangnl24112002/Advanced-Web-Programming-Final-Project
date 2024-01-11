@@ -3,7 +3,7 @@ import styles from "./StudentSubmissionList.module.sass";
 // import cn from "classnames";
 // import Checkbox from "../../../../components/Checkbox";
 import Row from "./Row";
-const StudentSubmissionList = ({ items, reviews }) => {
+const StudentSubmissionList = ({ items }) => {
   // const [chooseAll, setСhooseAll] = useState(false);
 
   const [selectedFilters, setSelectedFilters] = useState([]);
@@ -15,12 +15,6 @@ const StudentSubmissionList = ({ items, reviews }) => {
       setSelectedFilters((selectedFilters) => [...selectedFilters, id]);
     }
   };
-  const getReviewByStudentId = (studentId) => {
-    const reviewList = reviews.filter((review, index) => {
-      return review.studentId === studentId;
-    });
-    return reviewList;
-  };
   return (
     <div className={styles.market}>
       <div className={styles.table}>
@@ -30,6 +24,7 @@ const StudentSubmissionList = ({ items, reviews }) => {
           <div className={styles.col}>MSSV</div>
           <div className={styles.col}>Email</div>
           <div className={styles.col}>Thời gian nộp</div>
+          <div className={styles.col}>Điểm</div>
         </div>
         {items.map((x, index) => (
           <Row
@@ -38,7 +33,6 @@ const StudentSubmissionList = ({ items, reviews }) => {
             up={items.length - index <= 2}
             value={selectedFilters.includes(x.id)}
             onChange={() => handleChange(x.id)}
-            reviews={getReviewByStudentId(x.studentId)}
           />
         ))}
       </div>

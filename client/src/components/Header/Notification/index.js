@@ -20,9 +20,10 @@ const Notification = ({ className }) => {
     const starCountRef = ref(database, "notifications/" + user.id);
     onValue(starCountRef, (snapshot) => {
       const data = snapshot.val();
+      data.sort((a, b) => new Date(b?.createdAt) - new Date(a?.createdAt));
       setNotifications(data);
       for (let i = 0; i < notifications?.length; i++) {
-        if (notifications[i].isRead === false) {
+        if (notifications[i]?.isRead === false) {
           setExistNotRead(true);
           return;
         }
@@ -61,7 +62,7 @@ const Notification = ({ className }) => {
           <div className={styles.list}>
             {notifications ? (
               notifications.map((x, index) => {
-                if (index < 5) {
+                if (index < 4) {
                   return (
                     <Item
                       className={cn(styles.item, className)}
