@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateClassDto {
   @IsNotEmpty({})
@@ -34,7 +40,7 @@ export class UpdateClassDto {
   description: string;
 
   @IsOptional()
-  @IsString()
+  @IsBoolean()
   @ApiProperty({ example: true })
   isDisabled: string;
 }
