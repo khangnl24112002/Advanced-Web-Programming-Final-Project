@@ -10,7 +10,8 @@ import Dropdown from "./Dropdown";
 import { useAuth } from "../../../../hooks/useAuth";
 import Modal from "../Modal";
 import { classServices } from "../../../../services/ClassServices";
-
+import { useForm, Controller } from "react-hook-form";
+import { assignmentServices } from "../../../../services/AssignmentServices";
 // data
 import { customers } from "../../../../mocks/customers";
 
@@ -24,6 +25,7 @@ const GradeTable = ({
     students,
     onActive,
     gradeComposition,
+    gradeBoard,
 }) => {
     const { user } = useAuth();
     const inputRef = useRef(null);
@@ -35,6 +37,11 @@ const GradeTable = ({
 
     const [openModal, setOpenModal] = useState(false);
     const [content, setContent] = useState(null);
+    const [activeAssignmentId, setActiveAssignmentId] = useState();
+    const {
+        control: controlAssignmentInfo,
+        handleSubmit: handleSubmitAssignmentInfo,
+    } = useForm();
 
     const validateGrade = (grade) => {
         let result = 1;
@@ -128,6 +135,7 @@ const GradeTable = ({
 
     const handleClickAssignmentOptions = async (option, assignmentId) => {
         if (option === "Xuất") {
+            console.log(assignmentId);
             const response = await classServices.downloadScoreFromAssignment(
                 assignmentId
             );
@@ -138,6 +146,105 @@ const GradeTable = ({
                 return errorToast("Xuất thất bại, vui lòng thử lại sau");
             }
         }
+        if (option === "Nhập") {
+            setActiveAssignmentId(assignmentId);
+            handleUploadGradeByExcel(assignmentId);
+        }
+    };
+    const onUpdateAssignmentInfo = async (data) => {
+        let fileUrl;
+
+        // Call API to upload file (if file exists)
+        if (data?.file) {
+            const uploadFileResponse = await assignmentServices.uploadFile(
+                data.file
+            );
+            if (uploadFileResponse.status) {
+                fileUrl = uploadFileResponse.data.url;
+            } else {
+                fileUrl = undefined;
+            }
+        }
+        // Create request object
+        const requestObject = {
+            metadata: undefined,
+        };
+
+        if (fileUrl !== undefined) {
+            requestObject.metadata = fileUrl;
+        }
+        // Call API to submit assignment score
+
+        const response = await assignmentServices.markScoreExcel(
+            activeAssignmentId,
+            requestObject
+        );
+        if (response.status) {
+            successToast("Cập nhật điểm thành công!", 2000);
+
+            window.location.reload();
+        } else {
+            return errorToast("Cập nhật điểm thất bại");
+        }
+    };
+    // Modal để show xác nhận rời khỏi lớp
+    const handleUploadGradeByExcel = (assignmentId) => {
+        setOpenModal(true);
+        setContent(
+            <>
+                <div className={cn("title-green", styles.modaltitle)}>
+                    Nhập điểm bằng excel
+                </div>
+                <div className={styles.info}>
+                    Hãy upload file excel bảng điểm
+                </div>
+                <form
+                    onSubmit={handleSubmitAssignmentInfo(
+                        onUpdateAssignmentInfo
+                    )}
+                    className={styles.description}
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "20px",
+                    }}
+                >
+                    <Controller
+                        render={({ field: { onChange, onBlur, value } }) => (
+                            <TextInput
+                                className={styles.field}
+                                label="Đính kèm tệp"
+                                type="file"
+                                onChange={(event) => {
+                                    onChange(event.target.files[0]);
+                                }}
+                                onBlur={onBlur}
+                                value={value?.fileName}
+                            />
+                        )}
+                        name="file"
+                        control={controlAssignmentInfo}
+                    />
+
+                    <div className={styles.foot}>
+                        <button
+                            onClick={() => {
+                                setOpenModal(false);
+                            }}
+                            className={cn("button-stroke", styles.button)}
+                        >
+                            <span>Quay lại</span>
+                        </button>
+                        <button
+                            type="submit"
+                            className={cn("button", styles.button)}
+                        >
+                            <span>Upload</span>
+                        </button>
+                    </div>
+                </form>
+            </>
+        );
     };
     return (
         <>
@@ -170,41 +277,67 @@ const GradeTable = ({
                                     <div className={styles.flex}>
                                         <div>{grade.name} </div>
                                         <div className={styles.dropdownBox}>
-                                            <Dropdown
-                                                className={styles.dropdown}
-                                                setValue={setGradeOptionValue}
-                                                options={gradeOptions}
-                                                chooseOption={(option) => {
-                                                    handleClickAssignmentOptions(
-                                                        option,
-                                                        grade.id
-                                                    );
-                                                }}
-                                                small
-                                            />
+                                            {user.role === "teacher" && (
+                                                <Dropdown
+                                                    className={styles.dropdown}
+                                                    setValue={
+                                                        setGradeOptionValue
+                                                    }
+                                                    options={gradeOptions}
+                                                    chooseOption={(option) => {
+                                                        handleClickAssignmentOptions(
+                                                            option,
+                                                            grade.id
+                                                        );
+                                                    }}
+                                                    small
+                                                />
+                                            )}
                                         </div>
                                     </div>
                                 </div>
                             ))}
                     </div>
 
-                    {students.map((x, index) => (
-                        <Row
-                            gradeComposition={gradeComposition}
-                            item={x}
-                            key={index}
-                            onChoose={onActive}
-                            editGrade={(grade, userId) => {
-                                handleEditGrade(grade, userId);
-                            }}
-                            activeTable={activeTable}
-                            setActiveTable={setActiveTable}
-                            activeId={activeId}
-                            setActiveId={setActiveId}
-                            value={selectedFilters.includes(x.id)}
-                            onChange={() => handleChange(x.id)}
-                        />
-                    ))}
+                    {students.map((x, index) => {
+                        const studentGradeArray = [];
+                        gradeBoard.forEach((grade) => {
+                            if (grade.assignments) {
+                                const specificGrade =
+                                    grade.assignments.studentAssignments.filter(
+                                        (student) => student.studentId === x.id
+                                    );
+
+                                if (specificGrade) {
+                                    studentGradeArray.push(
+                                        specificGrade[0].score
+                                    );
+                                } else {
+                                    studentGradeArray.push("");
+                                }
+                            } else {
+                                studentGradeArray.push("");
+                            }
+                        });
+                        return (
+                            <Row
+                                gradeComposition={gradeComposition}
+                                item={x}
+                                key={index}
+                                onChoose={onActive}
+                                studentGradeArray={studentGradeArray}
+                                editGrade={(grade, userId) => {
+                                    handleEditGrade(grade, userId);
+                                }}
+                                activeTable={activeTable}
+                                setActiveTable={setActiveTable}
+                                activeId={activeId}
+                                setActiveId={setActiveId}
+                                value={selectedFilters.includes(x.id)}
+                                onChange={() => handleChange(x.id)}
+                            />
+                        );
+                    })}
                 </div>
                 {/* <div className={styles.foot}>
                     <button

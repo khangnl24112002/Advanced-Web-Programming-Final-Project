@@ -34,6 +34,7 @@ const Row = ({ item, value, onChange, up }) => {
                 </div>
             </div>
             <ModalProduct
+                hidden={true}
                 item={item}
                 classDetail={item}
                 visible={visibleModalProduct}

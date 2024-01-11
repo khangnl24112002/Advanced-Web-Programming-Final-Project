@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import cn from "classnames";
 import { createPortal } from "react-dom";
 import { disableBodyScroll, clearAllBodyScrollLocks } from "body-scroll-lock";
@@ -18,6 +19,7 @@ const MarkAssignmentModal = ({
     reviews,
     alreadySubmit,
 }) => {
+    const { assignmentId } = useParams();
     const escFunction = useCallback(
         (e) => {
             if (e.keyCode === 27) {
@@ -42,7 +44,7 @@ const MarkAssignmentModal = ({
             };
             console.log(requestObject);
             const response = await assignmentServices.postAssignmentReview(
-                assignmentDetail.id,
+                assignmentId,
                 requestObject
             );
             if (response.status) {
@@ -79,9 +81,10 @@ const MarkAssignmentModal = ({
         if (studentDescription !== "") {
             requestObject.description = studentDescription;
         }
+        console.log(assignmentDetail);
         // Call API to update assignment info
         const response = await assignmentServices.studentSubmitAssignment(
-            assignmentDetail.assignmentId,
+            assignmentId,
             requestObject
         );
         if (response.status) {
