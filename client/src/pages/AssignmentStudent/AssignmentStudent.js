@@ -20,7 +20,7 @@ const AssignmentStudent = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [openModal, setOpenModal] = useState(false);
     const [assignmentData, setAssignmentData] = useState("");
-    const [assignmentReviews, setAssignmentReviews] = useState([]);
+    const [assignmentReview, setAssignmentReview] = useState();
     const [visibleModalProduct, setVisibleModalProduct] = useState(false);
     const [alreadySubmit, setAlreadySubmit] = useState();
     const [studentAssignment, setStudentAssignment] = useState({});
@@ -48,18 +48,25 @@ const AssignmentStudent = () => {
     // Lấy toàn bộ danh sách học sinh phúc khảo
     useEffect(() => {
         setIsLoading(true);
-        const getAssignmentReviews = async () => {
+        const getAssignmentReview = async () => {
             const assignmentReviewsResponse =
                 await assignmentServices.getAssignmentReviews(assignmentId);
             if (assignmentReviewsResponse.status) {
-                setAssignmentReviews(assignmentReviewsResponse.data);
+                let messageInfo = assignmentReviewsResponse.data.find(
+                    (message) =>
+                        message.studentId === user.id &&
+                        message.status !== "DENIED" &&
+                        message.status !== "ACCEPT"
+                );
+                console.log(messageInfo);
+                setAssignmentReview(messageInfo);
             } else {
                 return errorToast(
                     "Không thể lấy được dữ liệu. Vui lòng thử lại sau."
                 );
             }
         };
-        getAssignmentReviews();
+        getAssignmentReview();
         setIsLoading(false);
     }, []);
 
@@ -165,7 +172,7 @@ const AssignmentStudent = () => {
                             onClose={() => setVisibleModalProduct(false)}
                             visible={visibleModalProduct}
                             assignmentDetail={studentAssignment}
-                            // reviews={}
+                            review={assignmentReview}
                             alreadySubmit={alreadySubmit}
                         />
                         <Modal
