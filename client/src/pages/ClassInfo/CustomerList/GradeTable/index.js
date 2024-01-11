@@ -11,11 +11,14 @@ import { useAuth } from "../../../../hooks/useAuth";
 import Modal from "../Modal";
 import { classServices } from "../../../../services/ClassServices";
 import { useForm, Controller } from "react-hook-form";
+import { useParams } from "react-router-dom";
 import { assignmentServices } from "../../../../services/AssignmentServices";
 // data
 import { customers } from "../../../../mocks/customers";
 
-const gradeOptions = ["Xuất", "Nhập"];
+const gradeOptions = ["Xuất", "Nhập", "Chốt"];
+
+let activeAssignment;
 
 const GradeTable = ({
     className,
@@ -29,6 +32,8 @@ const GradeTable = ({
 }) => {
     const { user } = useAuth();
     const inputRef = useRef(null);
+    const { classId } = useParams();
+    const [activeAssignmentId, setActiveAssignmentId] = useState("");
 
     const [chooseAll, setСhooseAll] = useState(false);
     const [activeId, setActiveId] = useState(customers[0].id);
@@ -37,7 +42,9 @@ const GradeTable = ({
 
     const [openModal, setOpenModal] = useState(false);
     const [content, setContent] = useState(null);
-    const [activeAssignmentId, setActiveAssignmentId] = useState();
+
+    const [selectedExcelFile, setSelectedExcelFile] = useState(null);
+
     const {
         control: controlAssignmentInfo,
         handleSubmit: handleSubmitAssignmentInfo,
@@ -133,7 +140,11 @@ const GradeTable = ({
         }
     };
 
-    const handleClickAssignmentOptions = async (option, assignmentId) => {
+    const handleClickAssignmentOptions = async (
+        option,
+        assignmentId,
+        gradeId
+    ) => {
         if (option === "Xuất") {
             console.log(assignmentId);
             const response = await classServices.downloadScoreFromAssignment(
@@ -149,42 +160,37 @@ const GradeTable = ({
         if (option === "Nhập") {
             setActiveAssignmentId(assignmentId);
             handleUploadGradeByExcel(assignmentId);
+            activeAssignment = assignmentId;
+        }
+        if (option === "Chốt") {
+            const response = await assignmentServices.confirmAssignmentGrade(
+                classId,
+                gradeId
+            );
+            if (response.status) {
+                successToast("Chốt thành công", 2000);
+            } else {
+                return errorToast("Chốt thất bại, vui lòng thử lại sau");
+            }
         }
     };
     const onUpdateAssignmentInfo = async (data) => {
-        let fileUrl;
-
-        // Call API to upload file (if file exists)
-        if (data?.file) {
-            const uploadFileResponse = await assignmentServices.uploadFile(
-                data.file
+        if (!data) {
+            return errorToast("Bạn chưa tải file lên!");
+        }
+        const formData = new FormData();
+        formData.append("file", data.file);
+        try {
+            const response = await assignmentServices.markScoreExcel(
+                activeAssignment,
+                formData
             );
-            if (uploadFileResponse.status) {
-                fileUrl = uploadFileResponse.data.url;
-            } else {
-                fileUrl = undefined;
-            }
-        }
-        // Create request object
-        const requestObject = {
-            metadata: undefined,
-        };
-
-        if (fileUrl !== undefined) {
-            requestObject.metadata = fileUrl;
-        }
-        // Call API to submit assignment score
-
-        const response = await assignmentServices.markScoreExcel(
-            activeAssignmentId,
-            requestObject
-        );
-        if (response.status) {
-            successToast("Cập nhật điểm thành công!", 2000);
-
-            window.location.reload();
-        } else {
-            return errorToast("Cập nhật điểm thất bại");
+            if (response.status) {
+                // window.location.reload();
+                return successToast("Upload thành công!");
+            } else return errorToast("Không thể upload. Vui lòng thử lại sau");
+        } catch (error) {
+            return errorToast("Không thể upload. Vui lòng thử lại sau");
         }
     };
     // Modal để show xác nhận rời khỏi lớp
@@ -270,7 +276,6 @@ const GradeTable = ({
                             />
                         </div> */}
                         <div className={styles.col}>Họ và tên</div>
-                        <div className={styles.col}>MSSV</div>
                         {gradeComposition &&
                             gradeComposition.map((grade, index) => (
                                 <div className={styles.col} key={index}>
@@ -285,8 +290,11 @@ const GradeTable = ({
                                                     }
                                                     options={gradeOptions}
                                                     chooseOption={(option) => {
+                                                        console.log(grade);
                                                         handleClickAssignmentOptions(
                                                             option,
+                                                            grade.assignments
+                                                                ?.id,
                                                             grade.id
                                                         );
                                                     }}
@@ -301,7 +309,7 @@ const GradeTable = ({
 
                     {students.map((x, index) => {
                         const studentGradeArray = [];
-                        gradeBoard.forEach((grade) => {
+                        gradeBoard?.forEach((grade) => {
                             if (grade.assignments) {
                                 const specificGrade =
                                     grade.assignments.studentAssignments.filter(
