@@ -554,6 +554,7 @@ export class ClassesController {
       const { assignments, status } = studentAssignment;
       if (isEmpty(assignments)) {
         return {
+          id: studentAssignment.id,
           name: studentAssignment.name,
           scores: [],
         };
@@ -570,6 +571,7 @@ export class ClassesController {
         };
       });
       return {
+        id: studentAssignment.id,
         name: studentAssignment.name,
         scores: refactoredStudentsData,
       };
