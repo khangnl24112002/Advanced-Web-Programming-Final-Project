@@ -158,6 +158,18 @@ export class AssignmentsService {
     });
   }
 
+  async getStudentAssignment(id: number) {
+    return this.primsaService.studentAssignments.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        students: true,
+        assignments: true,
+      },
+    });
+  }
+
   async createConversation(
     id: number,
     data: Prisma.studentRequestedReviewConversationUncheckedCreateInput,

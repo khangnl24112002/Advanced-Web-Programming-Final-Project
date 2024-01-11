@@ -12,7 +12,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { ClassesService } from './classes.service';
-import { CreateClassDto } from './dto/create-class.dto';
+import { CreateClassDto, UpdateClassDto } from './dto/create-class.dto';
 import { CurrentUser } from 'src/decorators/users.decorator';
 import {
   ApiBearerAuth,
@@ -101,7 +101,7 @@ export class ClassesController {
   @ApiOkResponse({ type: CreateClassResponse })
   async update(
     @Param('id') id: number,
-    @Body() createClassDto: CreateClassDto,
+    @Body() createClassDto: UpdateClassDto,
   ) {
     const exClass = await this.classesService.findClassById(+id);
     if (!exClass) {
@@ -156,6 +156,24 @@ export class ClassesController {
     try {
       const classes =
         await this.classesService.getAllClassesOfTeacher(teacherId);
+      return {
+        status: true,
+        data: classes,
+        message: 'Lấy danh sách lớp học thành công',
+      };
+    } catch (error) {
+      throw new InternalServerErrorException({
+        status: false,
+        message: 'Lỗi hệ thống',
+      });
+    }
+  }
+
+  @Get('admin')
+  @ApiOkResponse({ type: GetTeacherClassResponse })
+  async getAllClasses() {
+    try {
+      const classes = await this.classesService.getAllClasses();
       return {
         status: true,
         data: classes,
@@ -557,6 +575,38 @@ export class ClassesController {
       status: true,
       data: grades,
       message: 'Lấy danh sách bảng điểm thành công',
+    };
+  }
+
+  @Get(':id/invite-by-class-code/:classCode')
+  async inviteStudentByClassCode(
+    @Param('classCode') classCode: string,
+    @Param('id') id: number,
+    @CurrentUser('id') userId: string,
+  ) {
+    const exClass = await this.classesService.findClassByCodeId(classCode);
+    if (!exClass) {
+      throw new BadRequestException({
+        status: false,
+        message: 'Mã lớp không tồn tại',
+      });
+    }
+    const exUser = await this.classesService.findStudentOrTeacherInClass(
+      +id,
+      userId,
+      ROLES.STUDENT,
+    );
+    if (exUser) {
+      throw new BadRequestException({
+        status: false,
+        message: 'Bạn đã tham gia lớp học này',
+      });
+    }
+    await this.classesService.inviteStudentToClass(+id, userId);
+    return {
+      status: true,
+      message: 'Tham gia lớp thành công',
+      data: null,
     };
   }
 }

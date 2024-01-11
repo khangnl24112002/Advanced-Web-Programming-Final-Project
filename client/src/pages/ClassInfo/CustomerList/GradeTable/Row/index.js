@@ -29,6 +29,10 @@ const Row = ({
   const handleEditGrade = (grade) => {
     editGrade(grade, userId);
   };
+  useEffect(() => {
+    setUserId(item.id);
+    console.log("gradecompo", gradeComposition);
+  }, [item.id]);
   const { user } = useAuth();
 
   return (
@@ -88,6 +92,14 @@ const Row = ({
                     </svg>
                   </div>
                 )}
+              </div>
+              {/* <Balance
+                {gradeComposition &&
+                    gradeComposition.map((grade, index) => (
+                        <div className={styles.col} key={index}>
+                            {/* <div className={styles.lifetime}> */}
+              <div className={styles.flex}>
+                <div>10</div>
               </div>
               {/* <Balance
                                 className={styles.balance}

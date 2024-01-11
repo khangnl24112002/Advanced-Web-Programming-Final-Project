@@ -37,6 +37,20 @@ export const classServices = {
             return error.response.data;
         }
     },
+    // API lấy danh sách các lớp học cho admin
+    getAllClasses: async (token) => {
+        try {
+            const response = await axiosInstance.get("/classes", {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + token,
+                },
+            });
+            return response.data;
+        } catch (error) {
+            return error.response.data;
+        }
+    },
     // API lấy mã mời của lớp
     getInviteLinkClass: async (classId) => {
         try {
@@ -135,6 +149,16 @@ export const classServices = {
         try {
             const response = await axiosInstance.get(
                 `/classes/${classId}/export-grade-board`
+            );
+            return response.data;
+        } catch (error) {
+            return error.response.data;
+        }
+    },
+    getGradeBoard: async (classId) => {
+        try {
+            const response = await axiosInstance.get(
+                `/classes/${classId}/grade-board`
             );
             return response.data;
         } catch (error) {

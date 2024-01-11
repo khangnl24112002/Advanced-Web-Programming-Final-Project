@@ -14,6 +14,7 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AssignmentsService } from './assignments.service';
 import {
   CreateAssignmentDTO,
+  CreateConversationDto,
   MarkScoreStudentDto,
   RequestedGradeViewDto,
   StudentAssigmentDto,
@@ -128,8 +129,8 @@ export class AssignmentsController {
     };
   }
 
-  @Get(':id/download-score')
-  async downloadScoreForAssignment(@Param('id') id: number) {
+  @Get(':assignmentId/download-score')
+  async downloadScoreForAssignment(@Param('assignmentId') id: number) {
     const grade = await this.assignmentsService.getAssignment(+id);
     if (!grade) {
       throw new HttpException(
@@ -161,10 +162,10 @@ export class AssignmentsController {
     };
   }
 
-  @Post(':id/student-assignment')
+  @Post(':assignmentId/student-assignment')
   async createStudentAssignment(
     @Body() body: StudentAssigmentDto,
-    @Param('id') id: string,
+    @Param('assignmentId') id: string,
     @CurrentUser('id') studentId: string,
   ) {
     const assignment = await this.assignmentsService.getAssignment(+id);
@@ -197,9 +198,9 @@ export class AssignmentsController {
     };
   }
 
-  @Post(':id/mark-score')
+  @Post(':assignmentId/mark-score')
   async markScoreForAssignment(
-    @Param('id') id: number,
+    @Param('assignmentId') id: number,
     @Body() body: MarkScoreStudentDto,
   ) {
     const { scores } = body;
@@ -273,8 +274,8 @@ export class AssignmentsController {
     };
   }
 
-  @Get(':id/requested-grade-view')
-  async getRequestedGradeView(@Param('id') id: number) {
+  @Get(':assignmentId/requested-grade-view')
+  async getRequestedGradeView(@Param('assignmentId') id: number) {
     const requestedReviews =
       await this.assignmentsService.getRequestedGradeView(+id);
     const refactoredData = map(requestedReviews, (studentAssignment) => {
@@ -288,6 +289,7 @@ export class AssignmentsController {
         comment: studentAssignment.comment,
         status: studentAssignment.status,
         studentRequestedReviewId: studentAssignment.id,
+        studentAssignmentId: studentAssignment?.studentAssignmentId,
       };
     });
 
@@ -298,18 +300,31 @@ export class AssignmentsController {
     };
   }
 
-  @Post(':id/requested-grade-view')
+  @Post(':assignmentId/requested-grade-view')
   async requestedGradeView(
-    @Param('id') id: number,
+    @Param('assignmentId') id: number,
     @Body() body: RequestedGradeViewDto,
+    @CurrentUser() student: any,
   ) {
-    const { studentId, expectedScore, studentAssignmentId, comment } = body;
+    const assignment = await this.assignmentsService.getAssignment(+id);
+    if (!assignment) {
+      throw new HttpException(
+        {
+          status: false,
+          message: 'Không tìm thấy bài tập',
+        },
+        404,
+      );
+    }
+    const { teacherId } = assignment;
+    const { expectedScore, studentAssignmentId, comment } = body;
     const inputData: Prisma.studentRequestedReviewsUncheckedCreateInput = {
       assignmentId: +id,
-      studentId,
+      studentId: student.id,
       expectedScore,
       comment,
       status: REQUESTED_REVIEW_STATUS.OPENED,
+      studentAssignmentId,
     };
     const requestedGradeView =
       await this.assignmentsService.createRequestedGradeView(inputData);
@@ -320,6 +335,26 @@ export class AssignmentsController {
         status: ASSIGNMENT_STATUS.REQUESTED_REVIEW,
       },
     );
+    // CREATE NOTIFICATION FOR TEACHER
+    const notiLength =
+      await this.notificationService.readNotiLengthFromDB(teacherId);
+    const payload = {
+      content: `Sinh viên ${
+        student?.lastName + ' ' + student?.firstName
+      } vừa tạo một phúc khảo cho bài tập ${assignment.name}`,
+      createdAt: new Date().toISOString(),
+      isRead: false,
+      title: 'Bạn vừa nhận được thông báo trong đoạn hội thoại',
+      type: 'review',
+    };
+    await this.notificationService.saveNewNotiToUser({
+      userId: teacherId,
+      currentNotiLength: notiLength || 0,
+      newData: {
+        ...payload,
+        id: notiLength ? notiLength + 1 : 0,
+      },
+    });
     return {
       status: true,
       data: requestedGradeView,
@@ -331,12 +366,24 @@ export class AssignmentsController {
   async updateRequestedGradeView(
     @Param('studentRequestedReviewId') studentRequestedReviewId: number,
     @Body() body: UpdateRequestedGradeViewDto,
+    @CurrentUser() teacher: any,
   ) {
     const { actualScore, status, studentAssignmentId } = body;
     const prepareData: Prisma.studentRequestedReviewsUncheckedUpdateInput = {
       actualScore,
       status,
     };
+    const studentAssignment =
+      await this.assignmentsService.getStudentAssignment(studentAssignmentId);
+    if (!studentAssignment) {
+      throw new HttpException(
+        {
+          status: false,
+          message: 'Không tìm thấy bài tập của học sinh',
+        },
+        404,
+      );
+    }
     const requestedGradeView =
       await this.assignmentsService.updateRequestedGradeView(
         +studentRequestedReviewId,
@@ -346,10 +393,36 @@ export class AssignmentsController {
     await this.assignmentsService.updateStudentAssignment(
       +studentAssignmentId,
       {
-        status: ASSIGNMENT_STATUS.DONE_REQUESTED_REVIEW,
+        status:
+          status === 'ACCEPT'
+            ? ASSIGNMENT_STATUS.ACCEPT_REQUESTED_REVIEW
+            : ASSIGNMENT_STATUS.DENIED_REQUESTED_REVIEW,
         score: actualScore,
       },
     );
+    // CREATE NOTIFICATION FOR STUDENT
+    const { students, assignments } = studentAssignment;
+    const userId = students.id;
+    const notiLength =
+      await this.notificationService.readNotiLengthFromDB(userId);
+    const id = notiLength ? notiLength + 1 : 0;
+    const payload = {
+      content: `Giáo viên ${
+        teacher?.firstName + ' ' + teacher?.lastName
+      } vừa phản hồi phúc khảo bài tập ${assignments?.name}`,
+      createdAt: new Date().toISOString(),
+      isRead: false,
+      title: 'Bạn vừa nhận được thông báo trong đoạn hội thoại',
+      type: 'review',
+    };
+    await this.notificationService.saveNewNotiToUser({
+      userId,
+      currentNotiLength: notiLength || 0,
+      newData: {
+        ...payload,
+        id,
+      },
+    });
     return {
       status: true,
       data: requestedGradeView,
@@ -357,12 +430,14 @@ export class AssignmentsController {
     };
   }
 
-  @Post(':id/requested-grade-view/:studentRequestedReviewId/conversation')
+  @Post(
+    ':assignmentId/requested-grade-view/:studentRequestedReviewId/conversation',
+  )
   async createConversation(
     @Param('studentRequestedReviewId') studentRequestedReviewId: number,
-    @Body() body: any,
+    @Body() body: CreateConversationDto,
     @CurrentUser('id') userId: string,
-    @Param('id') id: number,
+    @Param('assignmentId') id: number,
   ) {
     const { message } = body;
     const assignment = await this.assignmentsService.getAssignment(+id);
@@ -397,7 +472,7 @@ export class AssignmentsController {
       const id = notiLength ? notiLength + 1 : 0;
       const payload = {
         content: `Sinh viên ${
-          students?.firstName + '' + students?.lastName
+          students?.lastName + ' ' + students?.firstName
         } vừa phản hồi trong cuộc hội thoại phúc khảo bài tập ${
           assignment.name
         }`,
@@ -421,7 +496,7 @@ export class AssignmentsController {
       const id = notiLength ? notiLength + 1 : 0;
       const payload = {
         content: `Giáo viên ${
-          teacher?.firstName + '' + teacher?.lastName
+          teacher?.lastName + ' ' + teacher?.firstName
         } vừa phản hồi trong cuộc hội thoại phúc khảo bài tập ${
           assignment.name
         }`,

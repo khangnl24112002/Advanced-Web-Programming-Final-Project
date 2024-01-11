@@ -28,7 +28,6 @@ const CustomerList = () => {
   const [students, setStudents] = useState([]);
   const [gradeComposition, setGradeComposition] = useState([]);
   const [urlClass, setUrlClass] = useState("http://example.com");
-  const [classCode, setClassCode] = useState(null);
   const [activeUser, setActiveUser] = useState({});
   const inputRef = useRef(null);
   const [optionValue, setOptionValue] = useState(optionListTeacher[0]);
@@ -44,7 +43,7 @@ const CustomerList = () => {
       setIsLoading(true);
       const response = await classServices.getClassDetail(classId);
       const responseData = await response.data;
-      setClassCode(responseData.uniqueCode);
+
       setClassInfo({
         name: responseData.name,
         description: responseData.description,
@@ -258,18 +257,13 @@ const CustomerList = () => {
               />
             </div>
             {/**Button xem thông tin cài đặt của lớp học */}
-            {user?.role === "teacher" && (
-              <button
-                style={{ marginLeft: "20px" }}
-                className={cn(
-                  "button-square-stroke button-small",
-                  styles.button
-                )}
-                onClick={() => setVisibleSettingModal(true)}
-              >
-                <Icon name="setting" size="24" />
-              </button>
-            )}
+            <button
+              style={{ marginLeft: "20px" }}
+              className={cn("button-square-stroke button-small", styles.button)}
+              onClick={() => setVisibleSettingModal(true)}
+            >
+              <Icon name="setting" size="24" />
+            </button>
           </>
         }
       >
@@ -330,17 +324,15 @@ const CustomerList = () => {
           >
             {content}
           </Modal>
-          {user?.role === "teacher" && (
-            <SettingModal
-              urlClass={urlClass}
-              classCode={classCode}
-              classId={classId}
-              classInfo={classInfo}
-              gradeComposition={gradeComposition}
-              visible={visibleSettingModal}
-              onClose={() => setVisibleSettingModal(false)}
-            />
-          )}
+          <SettingModal
+            urlClass={urlClass}
+            keyInvite={"ZA412F"}
+            classId={classId}
+            classInfo={classInfo}
+            gradeComposition={gradeComposition}
+            visible={visibleSettingModal}
+            onClose={() => setVisibleSettingModal(false)}
+          />
         </>
       )}
     </>

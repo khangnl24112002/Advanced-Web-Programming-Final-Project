@@ -117,4 +117,27 @@ export const assignmentServices = {
       return error.response.data;
     }
   },
+  postAssignmentReview: async (assignmentId, body) => {
+    try {
+      const response = await axiosInstance.post(
+        `/assignments/${assignmentId}/requested-grade-view`,
+        body
+      );
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  },
+
+  studentSubmitAssignment: async (assignmentId, data) => {
+    try {
+      const response = await axiosInstance.post(
+        `/assignments/${assignmentId}/student-assignment`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  },
 };
