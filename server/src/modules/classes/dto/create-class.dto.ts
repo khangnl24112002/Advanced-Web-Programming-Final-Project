@@ -42,5 +42,5 @@ export class UpdateClassDto {
   @IsOptional()
   @IsBoolean()
   @ApiProperty({ example: true })
-  isDisabled: string;
+  isDisabled: boolean;
 }
