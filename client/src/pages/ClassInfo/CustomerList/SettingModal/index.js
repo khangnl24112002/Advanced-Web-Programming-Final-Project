@@ -124,7 +124,6 @@ const SettingModal = ({
       ...classInfo,
       maximumStudents: parseInt(classInfo.maximumStudents),
     };
-    console.log(requestData);
     // Call API to update
     const response = {
       status: true,

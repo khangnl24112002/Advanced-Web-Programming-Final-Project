@@ -31,10 +31,6 @@ const List = ({ className }) => {
     // Write the new post's data simultaneously in the posts list and the user's post list.
     const updates = {};
     updates[`/notifications/${user.id}/${id}`] = {
-      // Sua lai o day
-      // Loi: giáo viên update được, còn học sinh update là mất dữ liệu
-      // Sửa: Học sinh không render ra phần cài đặt thông tin môn học
-      // Sửa: admin không được render thông báo
       ...notifications[id],
       isRead: true,
     };

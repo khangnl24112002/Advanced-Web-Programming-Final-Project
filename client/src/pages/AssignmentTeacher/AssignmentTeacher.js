@@ -6,6 +6,7 @@ import Card from "../../components/Card";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import UpdateAssignmentModal from "./UpdateAssignmentModal";
 import StudentSubmissionList from "./StudentSubmissionList";
+import StudentReviewList from "./StudentReviewList";
 import * as dayjs from "dayjs";
 import { assignmentServices } from "../../services/AssignmentServices";
 import { errorToast, successToast } from "../../utils/toast";
@@ -93,6 +94,7 @@ const AssignmentTeacher = () => {
       </>
     );
   };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       {isLoading && <LoadingSpinner />}
@@ -172,14 +174,32 @@ const AssignmentTeacher = () => {
                 <div className={styles.wrapper}>
                   <StudentSubmissionList
                     items={assignmentData.studentAssignments}
-                    reviews={assignmentReviews}
                   />
                 </div>
               </div>
             )}
             {!isLoading && assignmentData.studentAssignments?.length <= 0 && (
-              <div style={{ textAlign: "center" }}>
+              <div className={styles.content} style={{ textAlign: "center" }}>
                 Không có sinh viên nào nộp bài.
+              </div>
+            )}
+          </Card>
+          <Card
+            className={styles.card}
+            title="Danh sách phúc khảo"
+            classTitle={cn("title-green", styles.title)}
+            classCardHead={cn(styles.head)}
+          >
+            {!isLoading && assignmentReviews?.length > 0 && (
+              <div className={styles.classes}>
+                <div className={styles.wrapper}>
+                  <StudentReviewList items={assignmentReviews} />
+                </div>
+              </div>
+            )}
+            {!isLoading && assignmentReviews?.length <= 0 && (
+              <div className={styles.content} style={{ textAlign: "center" }}>
+                Không có sinh viên nào phúc khảo.
               </div>
             )}
           </Card>

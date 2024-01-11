@@ -5,25 +5,33 @@ import cn from "classnames";
 import ModalProduct from "../../../../components/ModalProduct/index.js";
 import MarkAssignmentModal from "../../MarkAssignmentModal/index.js";
 import * as dayjs from "dayjs";
+import ReviewModal from "../../ReviewModal/ReviewModal.js";
 
-const Row = ({ item, value, onChange, up }) => {
+const Row = ({ item, up }) => {
   const [visibleModalProduct, setVisibleModalProduct] = useState(false);
   return (
     <>
       <div className={styles.row} onClick={() => setVisibleModalProduct(true)}>
         <div className={styles.col}></div>
         <div className={styles.col}>
-          {item.students.lastName + " " + item.students.firstName}
+          {item?.lastName + " " + item?.firstName}
         </div>
-        <div className={styles.col}>{item.students?.uniqueId}</div>
-        <div className={styles.col}>{item.students.email}</div>
+        <div className={styles.col}>{item?.uniqueId}</div>
+        <div className={styles.col}>{item?.expectedScore}</div>
         <div className={styles.col}>
-          {dayjs(item.createdAt).format("DD/MM/YYYY")}
-        </div>
-        <div className={styles.col}>
-          <div className={cn("status-green-dark", styles.purchase)}>
-            {item?.score ? item.score : "Chưa chấm điểm"}
-          </div>
+          {item?.status === "ACCEPT" ? (
+            <div className={cn("status-green-dark", styles.purchase)}>
+              Đã chấp nhận
+            </div>
+          ) : item?.status === "DENIED" ? (
+            <div className={cn("status-green-dark", styles.purchase)}>
+              Không chấp nhận
+            </div>
+          ) : (
+            <div className={cn("status-green-dark", styles.purchase)}>
+              Đang mở
+            </div>
+          )}
         </div>
       </div>
       {/* <ModalProduct
@@ -32,10 +40,10 @@ const Row = ({ item, value, onChange, up }) => {
         visible={visibleModalProduct}
         onClose={() => setVisibleModalProduct(false)}
       /> */}
-      <MarkAssignmentModal
+      <ReviewModal
         onClose={() => setVisibleModalProduct(false)}
         visible={visibleModalProduct}
-        assignmentDetail={item}
+        item={item}
       />
     </>
   );
