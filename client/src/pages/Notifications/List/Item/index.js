@@ -7,7 +7,9 @@ const Item = ({ className, item, handleReadNotification }) => {
   const [visible, setVisible] = useState(false);
 
   return (
-    <div className={cn(styles.item, { [styles.new]: !item.isRead }, className)}>
+    <div
+      className={cn(styles.item, { [styles.new]: !item?.isRead }, className)}
+    >
       <div className={styles.details}>
         <div className={styles.line}>
           <div className={styles.subtitle}>{item.title}</div>
@@ -26,7 +28,7 @@ const Item = ({ className, item, handleReadNotification }) => {
           value={visible}
           setValue={setVisible}
           handleReadNotification={handleReadNotification}
-          isRead={item.isRead}
+          isRead={item?.isRead}
         />
       </div>
     </div>

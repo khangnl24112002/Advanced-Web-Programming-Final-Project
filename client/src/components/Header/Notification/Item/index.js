@@ -5,8 +5,8 @@ import styles from "./Item.module.sass";
 import dayjs from "dayjs";
 const Item = ({ className, item, onClose }) => {
   return (
-    <Link
-      className={cn(styles.item, { [styles.new]: !item.isRead }, className)}
+    <div
+      className={cn(styles.item, { [styles.new]: !item?.isRead }, className)}
       to={item.url}
       onClick={onClose}
     >
@@ -29,7 +29,7 @@ const Item = ({ className, item, onClose }) => {
           dangerouslySetInnerHTML={{ __html: item.content }}
         ></div>
       </div>
-    </Link>
+    </div>
   );
 };
 

@@ -22,6 +22,7 @@ const List = ({ className }) => {
     const starCountRef = ref(database, "notifications/" + user.id);
     onValue(starCountRef, (snapshot) => {
       const data = snapshot.val();
+      data.sort((a, b) => new Date(b?.createdAt) - new Date(a?.createdAt));
       setNotifications(data);
     });
   }, []);
@@ -30,6 +31,10 @@ const List = ({ className }) => {
     // Write the new post's data simultaneously in the posts list and the user's post list.
     const updates = {};
     updates[`/notifications/${user.id}/${id}`] = {
+      // Sua lai o day
+      // Loi: giáo viên update được, còn học sinh update là mất dữ liệu
+      // Sửa: Học sinh không render ra phần cài đặt thông tin môn học
+      // Sửa: admin không được render thông báo
       ...notifications[id],
       isRead: true,
     };
@@ -58,7 +63,7 @@ const List = ({ className }) => {
       <div className={styles.notifications}>
         <div className={styles.list}>
           {notifications &&
-            notifications.map((x, index) => (
+            notifications?.map((x, index) => (
               <Item
                 className={cn(styles.item, className)}
                 item={x}

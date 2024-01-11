@@ -17,6 +17,8 @@ const MarkAssignmentModal = ({
   assignmentDetail,
   reviews,
 }) => {
+  console.log("Assignment Detail: ", assignmentDetail);
+  console.log("Review: ", reviews);
   const escFunction = useCallback(
     (e) => {
       if (e.keyCode === 27) {

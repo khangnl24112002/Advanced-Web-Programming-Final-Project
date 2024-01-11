@@ -15,7 +15,7 @@ const Row = ({ item, value, onChange, up, reviews }) => {
         <div className={styles.col}>
           {item.students.lastName + " " + item.students.firstName}
         </div>
-        <div className={styles.col}>{item.studentId}</div>
+        <div className={styles.col}>{item.students?.uniqueId}</div>
         <div className={styles.col}>{item.students.email}</div>
         <div className={styles.col}>
           {dayjs(item.createdAt).format("DD/MM/YYYY")}

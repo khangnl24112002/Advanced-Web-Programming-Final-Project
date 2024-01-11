@@ -56,17 +56,16 @@ const Home = () => {
 
   const handleUpload = async () => {
     if (file) {
-      console.log("Uploading file student:", file);
-      // const formData = new FormData();
-      // formData.append("file", file);
+      const formData = new FormData();
+      formData.append("file", file);
 
-      // try {
-      //   // You can write the URL of your server or any other endpoint used for file upload
-      //   const response = await userServices.updateStudentIdByFile(formData);
-      //   console.log(response);
-      // } catch (error) {
-      //   console.error(error);
-      // }
+      try {
+        // You can write the URL of your server or any other endpoint used for file upload
+        const response = await userServices.updateStudentIdByFile(formData);
+        console.log(response);
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
   return (
