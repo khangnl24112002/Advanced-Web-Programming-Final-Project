@@ -289,6 +289,7 @@ export class AssignmentsController {
         comment: studentAssignment.comment,
         status: studentAssignment.status,
         studentRequestedReviewId: studentAssignment.id,
+        studentAssignmentId: studentAssignment?.studentAssignmentId,
       };
     });
 
@@ -535,16 +536,10 @@ export class AssignmentsController {
     );
     return {
       status: true,
-      data: {
-        ...requestedGradeView,
-        conversations: map(
-          requestedGradeView,
-          ({ users, ...conversation }) => ({
-            ...conversation,
-            user: users?.firstName + ' ' + users?.lastName,
-          }),
-        ),
-      },
+      data: map(requestedGradeView, ({ users, ...conversation }) => ({
+        ...conversation,
+        user: users?.firstName + ' ' + users?.lastName,
+      })),
       message: 'Tải file Grade thành công',
     };
   }
