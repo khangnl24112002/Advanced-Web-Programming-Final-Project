@@ -354,7 +354,7 @@ export class AssignmentsController {
       currentNotiLength: notiLength || 0,
       newData: {
         ...payload,
-        id: notiLength ? notiLength + 1 : 0,
+        id: notiLength ? notiLength : 0,
       },
     });
     return {
@@ -407,7 +407,7 @@ export class AssignmentsController {
     const userId = students.id;
     const notiLength =
       await this.notificationService.readNotiLengthFromDB(userId);
-    const id = notiLength ? notiLength + 1 : 0;
+    const id = notiLength ? notiLength : 0;
     const payload = {
       content: `Giáo viên ${
         teacher?.firstName + ' ' + teacher?.lastName
@@ -471,7 +471,7 @@ export class AssignmentsController {
       const userId = teacher.id;
       const notiLength =
         await this.notificationService.readNotiLengthFromDB(userId);
-      const id = notiLength ? notiLength + 1 : 0;
+      const id = notiLength ? notiLength : 0;
       const payload = {
         content: `Sinh viên ${
           students?.lastName + ' ' + students?.firstName

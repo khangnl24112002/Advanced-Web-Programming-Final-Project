@@ -449,7 +449,7 @@ export class ClassesController {
         const userId = student?.id;
         const notiLength =
           await this.notificationService.readNotiLengthFromDB(userId);
-        const id = notiLength ? notiLength + 1 : 0;
+        const id = notiLength ? notiLength : 0;
         const payload = {
           content: `Giáo viên lóp ${exClass.name} vừa cập nhật điểm số bài tập`,
           createdAt: new Date().toISOString(),
@@ -550,10 +550,13 @@ export class ClassesController {
     const teachers = await this.classesService.getTeachersOfClass(+id);
     const refactorTeachers = map(teachers, ({ teachers }) => teachers);
     const isStudent = !includes(map(refactorTeachers, 'id'), userId);
-    map(grades, (studentAssignment) => {
+    const scores = map(grades, (studentAssignment) => {
       const { assignments, status } = studentAssignment;
       if (isEmpty(assignments)) {
-        return null;
+        return {
+          name: studentAssignment.name,
+          scores: [],
+        };
       }
       const { studentAssignments } = assignments;
       const refactoredStudentsData = map(studentAssignments, (student) => {
@@ -573,7 +576,7 @@ export class ClassesController {
     });
     return {
       status: true,
-      data: grades,
+      data: scores,
       message: 'Lấy danh sách bảng điểm thành công',
     };
   }

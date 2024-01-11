@@ -51,7 +51,7 @@ export class NotificationService {
     }
     const newKeyRef = ref
       .child(userId)
-      .child((currentNotiLength + 1).toString())
+      .child(currentNotiLength.toString())
       .set(newData);
     return newKeyRef;
   }

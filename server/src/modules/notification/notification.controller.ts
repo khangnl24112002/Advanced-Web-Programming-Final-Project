@@ -1,12 +1,13 @@
 import { Controller, Post, UseGuards } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { CurrentUser } from 'src/decorators/users.decorator';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/guards/jwt.auth.guard';
 
 @Controller('notification')
 @ApiTags('Notification')
 @UseGuards(JwtAuthGuard)
+@ApiBearerAuth('Bearer')
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
@@ -21,7 +22,7 @@ export class NotificationController {
     };
     const notiLength =
       await this.notificationService.readNotiLengthFromDB(userId);
-    const id = notiLength ? notiLength + 1 : 0;
+    const id = notiLength ? notiLength : 0;
     const saveNewNotiToUser = await this.notificationService.saveNewNotiToUser({
       userId,
       currentNotiLength: notiLength || 0,
