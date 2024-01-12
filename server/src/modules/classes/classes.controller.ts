@@ -626,7 +626,6 @@ export class ClassesController {
   @Get(':id/invite-by-class-code/:classCode')
   async inviteStudentByClassCode(
     @Param('classCode') classCode: string,
-    @Param('id') id: number,
     @CurrentUser('id') userId: string,
   ) {
     const exClass = await this.classesService.findClassByCodeId(classCode);
@@ -637,7 +636,7 @@ export class ClassesController {
       });
     }
     const exUser = await this.classesService.findStudentOrTeacherInClass(
-      +id,
+      exClass.id,
       userId,
       ROLES.STUDENT,
     );
@@ -647,7 +646,7 @@ export class ClassesController {
         message: 'Bạn đã tham gia lớp học này',
       });
     }
-    await this.classesService.inviteStudentToClass(+id, userId);
+    await this.classesService.inviteStudentToClass(exClass.id, userId);
     return {
       status: true,
       message: 'Tham gia lớp thành công',
