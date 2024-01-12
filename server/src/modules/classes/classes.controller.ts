@@ -623,7 +623,7 @@ export class ClassesController {
     };
   }
 
-  @Get(':id/invite-by-class-code/:classCode')
+  @Get('invite-by-class-code/:classCode')
   async inviteStudentByClassCode(
     @Param('classCode') classCode: string,
     @CurrentUser('id') userId: string,
