@@ -4,7 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import RedirectModal from "./RedirectModal/index";
 import Dropdown from "../../components/Dropdown";
-import { getRoleIdFromRole } from "../../utils/Role";
+import { getRoleIdFromRole, getRoleFromId } from "../../utils/Role";
 import styles from "./RedirectModal/RedirectModal.module.sass";
 import { userServices } from "../../services/UserServices";
 import cn from "classnames";
@@ -47,8 +47,8 @@ const OAUthRedirect = () => {
     // role=4: teacher
     if (role === "Học sinh") {
       userRole = getRoleIdFromRole("student");
-    } else if (role === "teacher") {
-      userRole = getRoleIdFromRole("Giáo viên");
+    } else if (role === "Giáo viên") {
+      userRole = getRoleIdFromRole("teacher");
     }
     const userInfo = {
       id: searchParams.get("id"),
@@ -75,7 +75,7 @@ const OAUthRedirect = () => {
           email: userInfo.email,
           firstName: userInfo.firstName,
           lastName: userInfo.lastName,
-          role: userRole,
+          role: getRoleFromId(userRole),
           picture: userInfo.picture,
         },
         token: token,
