@@ -135,12 +135,12 @@ const AssignmentTeacher = () => {
               >
                 Cập nhật bài tập
               </button>
-              <button
+              {/* <button
                 className={cn("button", styles.button)}
                 onClick={handleOpenDeleteModal}
               >
                 Xóa bài tập
-              </button>
+              </button> */}
             </div>
             <UpdateAssignmentModal
               visible={openModal}
