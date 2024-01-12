@@ -131,16 +131,17 @@ const SettingModal = ({
   };
 
   // Handle submit class info
-  const onSubmitClassInfo = (classInfo) => {
+  const onSubmitClassInfo = async (classInfo) => {
     // Change maximumStudent to int
     const requestData = {
       ...classInfo,
       maximumStudents: parseInt(classInfo.maximumStudents),
     };
     // Call API to update
-    const response = {
-      status: true,
-    };
+    const response = await classServices.updateClassDetail(
+      classId,
+      requestData
+    );
     if (response.status) {
       return successToast("Cập nhật thành công!", 3000);
     } else {
