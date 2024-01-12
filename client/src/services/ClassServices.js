@@ -23,6 +23,16 @@ export const classServices = {
       return error.response.data;
     }
   },
+  studentJoinClass: async (classId, classCode) => {
+    try {
+      const response = await axiosInstance.get(
+        `/classes/${classId}/invite-by-class-code/${classCode}`
+      );
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  },
   // API lấy danh sách lớp học học sinh tham gia
   getStudentClass: async (token) => {
     try {

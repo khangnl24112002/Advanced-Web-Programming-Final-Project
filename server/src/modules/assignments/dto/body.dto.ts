@@ -157,15 +157,15 @@ export class RequestedGradeViewDto {
 
 export class UpdateRequestedGradeViewDto {
   @ApiProperty({ required: false, example: 10 })
-  @IsNotEmpty()
+  @IsOptional()
   actualScore: number;
 
   @ApiProperty({ required: false, example: 'ACCEPT | DENIED' })
-  @IsNotEmpty()
+  @IsOptional()
   status: string;
 
   @ApiProperty({ required: false, example: 10 })
-  @IsNotEmpty()
+  @IsOptional()
   studentAssignmentId: number;
 }
 

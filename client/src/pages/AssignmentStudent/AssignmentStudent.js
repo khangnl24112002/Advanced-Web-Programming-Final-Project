@@ -149,6 +149,7 @@ const AssignmentStudent = () => {
                                             );
                                     }
                                     setStudentAssignment(studentData);
+                                    console.log(assignmentData);
                                     if (!studentData) {
                                         setAlreadySubmit(false);
                                     } else {

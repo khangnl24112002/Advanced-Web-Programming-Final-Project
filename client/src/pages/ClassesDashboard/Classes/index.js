@@ -6,6 +6,8 @@ import Form from "../../../components/Form";
 import Dropdown from "../../../components/Dropdown";
 import ClassList from "./ClassList";
 import Table from "./Table";
+import TextInput from "../../../components/TextInput";
+import { useForm, Controller } from "react-hook-form";
 import { Link } from "react-router-dom";
 // data
 import { traffic } from "../../../mocks/traffic";
@@ -15,6 +17,7 @@ import Icon from "../../../components/Icon";
 import { useAuth } from "../../../hooks/useAuth";
 import { classServices } from "../../../services/ClassServices";
 import LoadingSpinner from "../../../components/LoadingSpinner/LoadingSpinner";
+import { successToast, errorToast } from "../../../utils/toast";
 
 const indicatorsTraffic = [
     {
@@ -88,7 +91,87 @@ const Classes = () => {
         };
         getClassList();
     }, [user.role]);
+    const [openModal, setOpenModal] = useState(false);
+    const [content, setContent] = useState(null);
+    const {
+        control: controlAssignmentInfo,
+        handleSubmit: handleSubmitAssignmentInfo,
+    } = useForm();
+    const onUpdateAssignmentInfo = async (data) => {
+        if (!data) {
+            return errorToast("Bạn chưa tải file lên!");
+        }
+        const formData = new FormData();
+        formData.append("file", data.file);
+        try {
+            const response = await classServices.studentJoinClass();
+            if (response.status) {
+                // window.location.reload();
+                return successToast("Upload thành công!");
+            } else return errorToast("Không thể upload. Vui lòng thử lại sau");
+        } catch (error) {
+            return errorToast("Không thể upload. Vui lòng thử lại sau");
+        }
+    };
+    // Modal để vào lớp qua ID
+    const handleUploadGradeByExcel = (assignmentId) => {
+        setOpenModal(true);
+        setContent(
+            <>
+                <div className={cn("title-green", styles.modaltitle)}>
+                    Nhập điểm bằng excel
+                </div>
+                <div className={styles.info}>
+                    Hãy upload file excel bảng điểm
+                </div>
+                <form
+                    onSubmit={handleSubmitAssignmentInfo(
+                        onUpdateAssignmentInfo
+                    )}
+                    className={styles.description}
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "20px",
+                    }}
+                >
+                    <Controller
+                        render={({ field: { onChange, onBlur, value } }) => (
+                            <TextInput
+                                className={styles.field}
+                                label="Đính kèm tệp"
+                                type="file"
+                                onChange={(event) => {
+                                    onChange(event.target.files[0]);
+                                }}
+                                onBlur={onBlur}
+                                value={value?.fileName}
+                            />
+                        )}
+                        name="file"
+                        control={controlAssignmentInfo}
+                    />
 
+                    <div className={styles.foot}>
+                        <button
+                            onClick={() => {
+                                setOpenModal(false);
+                            }}
+                            className={cn("button-stroke", styles.button)}
+                        >
+                            <span>Quay lại</span>
+                        </button>
+                        <button
+                            type="submit"
+                            className={cn("button", styles.button)}
+                        >
+                            <span>Upload</span>
+                        </button>
+                    </div>
+                </form>
+            </>
+        );
+    };
     return (
         <Card
             className={styles.card}
@@ -118,6 +201,15 @@ const Classes = () => {
                             <Icon name="add" size="20" />
                             <span>Tạo lớp</span>
                         </Link>
+                    ) : null}
+                    {user.role === "student" ? (
+                        <div
+                            className={cn("button-small", styles.button)}
+                            to="addClass"
+                        >
+                            <Icon name="add" size="20" />
+                            <span>Tham gia lớp</span>
+                        </div>
                     ) : null}
                 </>
             }

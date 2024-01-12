@@ -170,7 +170,7 @@ const MarkAssignmentModal = ({
             <div id="modal-product" className={styles.modal}>
                 <div className={styles.control}>
                     <div className={cn("button-white", styles.button)}>
-                        Bài nộp
+                        {alreadySubmit ? "Bạn đã nộp bài" : "Bạn chưa nộp bài"}
                     </div>
                     <button className={styles.close} onClick={onClose}>
                         <Icon name="close" size="20" />
