@@ -158,9 +158,9 @@ const GradeTable = ({
             }
         }
         if (option === "Nhập") {
-            setActiveAssignmentId(assignmentId);
-            handleUploadGradeByExcel(assignmentId);
-            activeAssignment = assignmentId;
+            setActiveAssignmentId(gradeId);
+            handleUploadGradeByExcel(gradeId);
+            activeAssignment = gradeId;
         }
         if (option === "Chốt") {
             const response = await assignmentServices.confirmAssignmentGrade(
@@ -276,6 +276,7 @@ const GradeTable = ({
                             />
                         </div> */}
                         <div className={styles.col}>Họ và tên</div>
+                        <div className={styles.col}>MSSV</div>
                         {gradeComposition &&
                             gradeComposition.map((grade, index) => (
                                 <div className={styles.col} key={index}>
@@ -309,7 +310,7 @@ const GradeTable = ({
 
                     {students.map((x, index) => {
                         const studentGradeArray = [];
-                        const studentGradeInfo = gradeBoard.find(
+                        const studentGradeInfo = gradeBoard?.find(
                             (grade) => grade.userId === x.id
                         );
                         console.log(studentGradeInfo);
@@ -325,7 +326,6 @@ const GradeTable = ({
                                             grade.gradeName ===
                                             gradeComposition[i].name
                                     );
-                                console.log(pushedGrade);
                                 if (pushedGrade) {
                                     studentGradeArray.push(pushedGrade.grade);
                                 } else {
@@ -338,6 +338,7 @@ const GradeTable = ({
                             <Row
                                 gradeComposition={gradeComposition}
                                 item={x}
+                                studentGradeInfo={studentGradeInfo}
                                 key={index}
                                 onChoose={onActive}
                                 studentGradeArray={studentGradeArray}

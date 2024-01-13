@@ -17,6 +17,7 @@ const Row = ({
     gradeComposition,
     editGrade,
     studentGradeArray,
+    studentGradeInfo,
 }) => {
     const handleClick = (id) => {
         setActiveTable(true);
@@ -62,6 +63,7 @@ const Row = ({
                         </div>
                     </div>
                 </div>
+                <div className={styles.col}>{studentGradeInfo?.studentId}</div>
 
                 {studentGradeArray &&
                     studentGradeArray.map((grade, index) => (

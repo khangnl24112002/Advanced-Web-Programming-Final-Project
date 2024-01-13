@@ -17,7 +17,7 @@ const EditProfileForm = ({
     toggleEdit,
     token,
     isShow = true,
-    isShowInputStudentId = false
+    isShowInputStudentId = false,
 }) => {
     const initalState = {
         email: user.email,
@@ -64,7 +64,7 @@ const EditProfileForm = ({
                 successToast(response.message);
                 setTimeout(() => {
                     toggleEdit(false);
-                    window.location.reload();
+                    // window.location.reload();
                 }, 1000);
             } else {
                 setSubmitResult(response.message);
@@ -101,97 +101,102 @@ const EditProfileForm = ({
     };
 
     return (
-        
-        (isShow && (
+        isShow && (
             <main className={styles.editScreen}>
-            <div className={styles.editContainer}>
-                <div
-                    style={
-                        isEditing
-                            ? { display: "flex", flexDirection: "row" }
-                            : { display: "flex", flexDirection: "row-reverse" }
-                    }
-                >
-                    {isEditing && (
-                        <div
-                            className={styles.backButton}
-                            onClick={() => {
-                                toggleEdit(false);
-                            }}
-                        >
-                            Back
-                        </div>
-                    )}
-                    {!isEditing && (
-                        <div
-                            className={styles.forwardButton}
-                            onClick={() => {
-                                toggleEdit(true);
-                            }}
-                        >
-                            Edit
-                        </div>
-                    )}
-                </div>
-                <Form onSubmit={handleSubmit}>
-                    <div className={styles.editIntro}>
-                        <h3 className={styles["text-center"]}>
-                            {isEditing ? "Chỉnh sửa hồ sơ" : "Hồ sơ của bạn"}
-                        </h3>
-                        <div className={styles.avatarContainer}>
-                            <img
-                                src="/assets/sample-avatar.jpg"
-                                alt="avatar"
-                                className={styles.avatarImage}
-                            />
-                        </div>
-                    </div>
-                    <div className={styles.editContext}>
-                        <FormInput
-                            type="email"
-                            name="email"
-                            title="Email"
-                            placeholder="Change Email"
-                            value={userAccount.email}
-                            onChange={handleChange}
-                            error={errors.email}
-                            disabled={true}
-                        />
-                        <div className={styles.formInputLine}>
-                            <FormInput
-                                type="lastName"
-                                name="lastName"
-                                title="Họ"
-                                placeholder="Enter Last Name"
-                                value={user.lastName}
-                                onChange={handleChange}
-                                error={errors.lastName}
-                                disabled={!isEditing}
-                            />
-                            <FormInput
-                                type="firstName"
-                                name="firstName"
-                                title="Tên"
-                                placeholder="Enter First Name"
-                                value={user.firstName}
-                                onChange={handleChange}
-                                error={errors.firstName}
-                                disabled={!isEditing}
-                            />
-                        </div>
-                        {(user.role === "student" || isShowInputStudentId) && (
-                            <FormInput
-                                type="uniqueId"
-                                name="uniqueId"
-                                title="Mã số"
-                                placeholder="Nhập mã số"
-                                value={user.uniqueId ? user.uniqueId : ""}
-                                onChange={handleChange}
-                                error={errors.uniqueId}
-                                disabled={!isEditing}
-                            />
+                <div className={styles.editContainer}>
+                    <div
+                        style={
+                            isEditing
+                                ? { display: "flex", flexDirection: "row" }
+                                : {
+                                      display: "flex",
+                                      flexDirection: "row-reverse",
+                                  }
+                        }
+                    >
+                        {isEditing && (
+                            <div
+                                className={styles.backButton}
+                                onClick={() => {
+                                    toggleEdit(false);
+                                }}
+                            >
+                                Back
+                            </div>
                         )}
-                        {/* <div className="hiddenElement">
+                        {!isEditing && (
+                            <div
+                                className={styles.forwardButton}
+                                onClick={() => {
+                                    toggleEdit(true);
+                                }}
+                            >
+                                Edit
+                            </div>
+                        )}
+                    </div>
+                    <Form onSubmit={handleSubmit}>
+                        <div className={styles.editIntro}>
+                            <h3 className={styles["text-center"]}>
+                                {isEditing
+                                    ? "Chỉnh sửa hồ sơ"
+                                    : "Hồ sơ của bạn"}
+                            </h3>
+                            <div className={styles.avatarContainer}>
+                                <img
+                                    src="/assets/sample-avatar.jpg"
+                                    alt="avatar"
+                                    className={styles.avatarImage}
+                                />
+                            </div>
+                        </div>
+                        <div className={styles.editContext}>
+                            <FormInput
+                                type="email"
+                                name="email"
+                                title="Email"
+                                placeholder="Change Email"
+                                value={userAccount.email}
+                                onChange={handleChange}
+                                error={errors.email}
+                                disabled={true}
+                            />
+                            <div className={styles.formInputLine}>
+                                <FormInput
+                                    type="lastName"
+                                    name="lastName"
+                                    title="Họ"
+                                    placeholder="Enter Last Name"
+                                    value={user.lastName}
+                                    onChange={handleChange}
+                                    error={errors.lastName}
+                                    disabled={!isEditing}
+                                />
+                                <FormInput
+                                    type="firstName"
+                                    name="firstName"
+                                    title="Tên"
+                                    placeholder="Enter First Name"
+                                    value={user.firstName}
+                                    onChange={handleChange}
+                                    error={errors.firstName}
+                                    disabled={!isEditing}
+                                />
+                            </div>
+                            {(user.role === "student" ||
+                                isShowInputStudentId) && (
+                                <FormInput
+                                    type="uniqueId"
+                                    name="uniqueId"
+                                    title="Mã số"
+                                    placeholder="Nhập mã số"
+                                    value={user.uniqueId ? user.uniqueId : ""}
+                                    onChange={handleChange}
+                                    error={errors.uniqueId}
+                                    disabled={!isEditing}
+                                />
+                            )}
+                            {/* <div className="hiddenElement">
                             <FormInput
                                 type="id"
                                 name="id"
@@ -199,7 +204,7 @@ const EditProfileForm = ({
                                 onChange={handleChange}
                             />
                         </div> */}
-                        {/* {submitResult !== "" && isEditing ? (
+                            {/* {submitResult !== "" && isEditing ? (
                             <Alert
                                 className="my-3"
                                 variant={
@@ -209,16 +214,16 @@ const EditProfileForm = ({
                                 {submitResult}
                             </Alert>
                         ) : null} */}
-                        {isEditing && (
-                            <div className="d-grid">
-                                <Button type="submit" name="Xác nhận" />
-                            </div>
-                        )}
-                    </div>
-                </Form>
-            </div>
-        </main>
-        ))
+                            {isEditing && (
+                                <div className="d-grid">
+                                    <Button type="submit" name="Xác nhận" />
+                                </div>
+                            )}
+                        </div>
+                    </Form>
+                </div>
+            </main>
+        )
     );
 };
 
