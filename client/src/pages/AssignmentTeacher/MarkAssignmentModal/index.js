@@ -103,7 +103,7 @@ const MarkAssignmentModal = ({ visible, onClose, assignmentDetail }) => {
                                     <div>Nội dung đã làm</div>
                                     <LargeInput
                                         className={styles.field}
-                                        value={assignmentDetail.metadata}
+                                        value={assignmentDetail.description}
                                         disabled
                                     />
                                     <div>File đính kèm</div>
@@ -112,7 +112,7 @@ const MarkAssignmentModal = ({ visible, onClose, assignmentDetail }) => {
                                         target="_blank"
                                         rel="noreferrer"
                                     >
-                                        {assignmentDetail.description}
+                                        {assignmentDetail.metadata}
                                     </a>
                                 </div>
                             </div>

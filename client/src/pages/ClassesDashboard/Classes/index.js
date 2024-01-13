@@ -13,6 +13,7 @@ import { Link } from "react-router-dom";
 import { traffic } from "../../../mocks/traffic";
 import { viewers } from "../../../mocks/viewers";
 import { market } from "../../../mocks/market";
+import Modal from "./Modal";
 import Icon from "../../../components/Icon";
 import { useAuth } from "../../../hooks/useAuth";
 import { classServices } from "../../../services/ClassServices";
@@ -97,37 +98,32 @@ const Classes = () => {
         control: controlAssignmentInfo,
         handleSubmit: handleSubmitAssignmentInfo,
     } = useForm();
-    const onUpdateAssignmentInfo = async (data) => {
-        if (!data) {
-            return errorToast("Bạn chưa tải file lên!");
+    const onStudentJoinClass = async (data) => {
+        if (data.code === "" || !data.code) {
+            return errorToast("Bạn chưa nhập Code!");
         }
-        const formData = new FormData();
-        formData.append("file", data.file);
+        console.log(data);
         try {
-            const response = await classServices.studentJoinClass();
+            const response = await classServices.studentJoinClass(data.code);
             if (response.status) {
-                // window.location.reload();
-                return successToast("Upload thành công!");
-            } else return errorToast("Không thể upload. Vui lòng thử lại sau");
+                window.location.reload();
+                return successToast("Vào lớp thành công!");
+            } else return errorToast("Không thể vào lớp. Vui lòng thử lại sau");
         } catch (error) {
-            return errorToast("Không thể upload. Vui lòng thử lại sau");
+            return errorToast("Không thể vào lớp. Vui lòng thử lại sau");
         }
     };
     // Modal để vào lớp qua ID
-    const handleUploadGradeByExcel = (assignmentId) => {
+    const handleJoinClass = () => {
         setOpenModal(true);
         setContent(
             <>
                 <div className={cn("title-green", styles.modaltitle)}>
-                    Nhập điểm bằng excel
+                    Tham gia lớp học bằng code
                 </div>
-                <div className={styles.info}>
-                    Hãy upload file excel bảng điểm
-                </div>
+                <div className={styles.info}>Hãy nhập mã lớp học</div>
                 <form
-                    onSubmit={handleSubmitAssignmentInfo(
-                        onUpdateAssignmentInfo
-                    )}
+                    onSubmit={handleSubmitAssignmentInfo(onStudentJoinClass)}
                     className={styles.description}
                     style={{
                         display: "flex",
@@ -139,16 +135,16 @@ const Classes = () => {
                         render={({ field: { onChange, onBlur, value } }) => (
                             <TextInput
                                 className={styles.field}
-                                label="Đính kèm tệp"
-                                type="file"
+                                label="Mã lớp học"
+                                type="text"
                                 onChange={(event) => {
-                                    onChange(event.target.files[0]);
+                                    onChange(event.target.value);
                                 }}
                                 onBlur={onBlur}
-                                value={value?.fileName}
+                                value={value}
                             />
                         )}
-                        name="file"
+                        name="code"
                         control={controlAssignmentInfo}
                     />
 
@@ -165,7 +161,7 @@ const Classes = () => {
                             type="submit"
                             className={cn("button", styles.button)}
                         >
-                            <span>Upload</span>
+                            <span>Vào lớp</span>
                         </button>
                     </div>
                 </form>
@@ -205,7 +201,7 @@ const Classes = () => {
                     {user.role === "student" ? (
                         <div
                             className={cn("button-small", styles.button)}
-                            to="addClass"
+                            onClick={handleJoinClass}
                         >
                             <Icon name="add" size="20" />
                             <span>Tham gia lớp</span>
@@ -222,6 +218,13 @@ const Classes = () => {
                     </div>
                 </div>
             )}
+            <Modal
+                outerClassName={styles.outer}
+                visible={openModal}
+                onClose={() => setOpenModal(false)}
+            >
+                {content}
+            </Modal>
             {!isLoading && classList.length <= 0 && (
                 <div className={styles.text} style={{ textAlign: "center" }}>
                     Không tìm thấy lớp học bạn đã tham gia
