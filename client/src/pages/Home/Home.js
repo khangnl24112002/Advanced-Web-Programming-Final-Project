@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./style.css";
 import UserCard from "../../components/UserCard/UserCard";
-
+import { successToast } from "../../utils/toast";
 import { userServices } from "../../services/UserServices";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import styles from "./Home.module.sass";
@@ -62,7 +62,10 @@ const Home = () => {
       try {
         // You can write the URL of your server or any other endpoint used for file upload
         const response = await userServices.updateStudentIdByFile(formData);
-        console.log(response);
+        if (response.status) {
+          window.location.reload();
+          return successToast("Upload thành công!");
+        }
       } catch (error) {
         console.error(error);
       }
