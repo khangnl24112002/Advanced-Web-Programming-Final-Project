@@ -449,6 +449,7 @@ const SettingModal = ({
                   control={controlUploadStudent}
                 />
                 <button
+                  type="submit"
                   className={cn("button-white", styles.button)}
                   style={{ marginTop: "20px" }}
                 >
