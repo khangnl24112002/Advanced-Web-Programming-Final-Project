@@ -80,6 +80,10 @@ export class AssignmentsService {
               create: assignment,
               update: assignment,
             });
+          } else {
+            return this.primsaService.studentAssignments.create({
+              data: assignment,
+            });
           }
           return null;
         }),
