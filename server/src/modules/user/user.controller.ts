@@ -87,7 +87,7 @@ export class UserController {
   @ApiOkResponse()
   async updateStudentIdFile(@UploadedFile() file: Express.Multer.File) {
     const excelData = await readFileExcel(file.path);
-    await Promise.all(
+    const finalData = await Promise.all(
       map(excelData, async (data) => {
         try {
           const { Email, StudentId }: any = data;
@@ -104,6 +104,7 @@ export class UserController {
     return {
       status: true,
       message: 'update studentId success',
+      finalData,
     };
   }
 }
