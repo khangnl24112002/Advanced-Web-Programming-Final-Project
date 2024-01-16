@@ -56,7 +56,7 @@ const Row = ({
 
                 <div className={styles.col}>
                     <div className={styles.lifetime}>
-                        <div>6th December, 2023</div>
+                        <div>16th January, 2024</div>
                         {/* <Balance
                             className={styles.balance}
                             value={item.balance}
